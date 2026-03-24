@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Table | Roland's Steak House</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .table-seat.unavailable { 
+            cursor: not-allowed !important; 
+            opacity: 0.8; 
+            transform: scale(0.95) !important;
+            background-color: #fee2e2 !important;
+            border: 2px solid #ef4444 !important;
+            box-shadow: none !important;
+        }
+        .table-seat.unavailable .table-label {
+            color: #b91c1c !important;
+        }
+        .table-seat.unavailable:hover {
+            transform: scale(0.95) !important;
+            box-shadow: none !important;
+            border-color: #ef4444 !important;
+        }
+    </style>
+</head>
+<body>
+
+    <header id="main-header">
+        <div class="logo"><img src="images/rolandsLOGO.jpg" alt="Logo"></div>
+        <nav>
+            <ul>
+                <li><a href="index.html#home" class="nav-link">Home</a></li>
+                <li><a href="index.html#about" class="nav-link">About</a></li>
+                <li><a href="index.html#menu" class="nav-link">Menu</a></li>
+                <li><a href="index.html#reservations" class="nav-link active">Reservations</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="seat-selection-section">
+        <h2 style="font-family: 'Playfair Display'; font-size: 40px; margin-bottom: 10px;">Choose Your Reservation</h2>
+        
+        <div class="reservation-filter">
+            <label><input type="radio" name="res-type" value="standard" checked> <span>Standard</span></label>
+            <label><input type="radio" name="res-type" value="priority"> <span>Priority</span></label>
+            <label><input type="radio" name="res-type" value="full"> <span>Full Venue Booking</span></label>
+        </div>
+
+        <div id="event-options" style="display: none; margin-bottom: 20px;">
+            <p>Select Event Type:</p>
+            <select id="event-type-select" style="padding: 10px; border-radius: 5px; border: 2px solid #2e7d32; font-family: 'Roboto';">
+                <option value="Wedding">Wedding</option>
+                <option value="Private Meeting">Private Meeting</option>
+                <option value="Birthday">Birthday</option>
+            </select>
+        </div>
+
+        <div id="table-grid-container">
+            <p id="instruction-text">Please select a table:</p>
+            <div class="floor-plan">
+                <div class="table-seat available" data-id="Table 1"><img src="https://via.placeholder.com/150?text=Table+1" alt="T1"><div class="table-label">Table 1</div></div>
+                <div class="table-seat available" data-id="Table 2"><img src="https://via.placeholder.com/150?text=Table+2" alt="T2"><div class="table-label">Table 2</div></div>
+                <div class="table-seat available" data-id="Table 3"><img src="https://via.placeholder.com/150?text=Table+3" alt="T3"><div class="table-label">Table 3</div></div>
+                <div class="table-seat available" data-id="Table 4"><img src="https://via.placeholder.com/150?text=Table+4" alt="T4"><div class="table-label">Table 4</div></div>
+                <div class="table-seat available" data-id="Table 5"><img src="https://via.placeholder.com/150?text=Table+5" alt="T5"><div class="table-label">Table 5</div></div>
+                <div class="table-seat available" data-id="Table 6"><img src="https://via.placeholder.com/150?text=Table+6" alt="T6"><div class="table-label">Table 6</div></div>
+                <div class="table-seat available" data-id="Table 7"><img src="https://via.placeholder.com/150?text=Table+7" alt="T7"><div class="table-label">Table 7</div></div>
+                <div class="table-seat available" data-id="Table 8"><img src="https://via.placeholder.com/150?text=Table+8" alt="T8"><div class="table-label">Table 8</div></div>
+                <div class="table-seat available" data-id="Table 9"><img src="https://via.placeholder.com/150?text=Table+9" alt="T9"><div class="table-label">Table 9</div></div>
+                <div class="table-seat available vip" data-id="Table 10"><img src="https://via.placeholder.com/150?text=VIP+10" alt="T10"><div class="table-label">VIP 10</div></div>
+            </div>
+        </div>
+
+        <div class="checkout-panel">
+            <p style="font-size: 18px; margin-bottom: 20px;">
+                Selection: <strong id="selected-seat-display" style="color: #2e7d32;">None</strong>
+            </p>
+            <button id="confirm-final-btn" disabled>Confirm Booking</button>
+        </div>
+    </section>
+
+    <script>
+        const availableTables = document.querySelectorAll('.table-seat');
+        const displaySpan = document.getElementById('selected-seat-display');
+        const confirmBtn = document.getElementById('confirm-final-btn');
+        const eventOptions = document.getElementById('event-options');
+        const tableContainer = document.getElementById('table-grid-container');
+        const eventSelect = document.getElementById('event-type-select');
+        
+        let chosenTableId = null;
+        let reservationType = 'standard'; 
+
+        document.querySelectorAll('input[name="res-type"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                reservationType = e.target.value;
+                
+                if (reservationType === 'full') {
+                    eventOptions.style.display = 'block';
+                    tableContainer.style.display = 'none';
+                    chosenTableId = "Full Venue - " + eventSelect.value;
+                    displaySpan.textContent = chosenTableId;
+                    confirmBtn.disabled = false;
+                } else {
+                    eventOptions.style.display = 'none';
+                    tableContainer.style.display = 'block';
+                    chosenTableId = null;
+                    displaySpan.textContent = "None";
+                    confirmBtn.disabled = true;
+                    availableTables.forEach(t => t.classList.remove('selected'));
+                }
+            });
+        });
+
+        eventSelect.addEventListener('change', () => {
+            if (reservationType === 'full') {
+                chosenTableId = "Full Venue - " + eventSelect.value;
+                displaySpan.textContent = chosenTableId;
+            }
+        });
+
+        // Parse storage variables for lockout logic
+        const chosenDate = localStorage.getItem('arrivalDate'); 
+        const chosenTime = localStorage.getItem('arrivalTime'); 
+        const overrides = JSON.parse(localStorage.getItem('tableOverrides') || '{}');
+        const history = JSON.parse(localStorage.getItem('reservationHistory') || '[]');
+
+        // Check history for tables booked precisely on this arrival date AND time
+        const bookedTableIdsForDate = new Set();
+        history.forEach(r => {
+            if (r.arrivalDate === chosenDate && r.arrivalTime === chosenTime && r.bookedTable) {
+                bookedTableIdsForDate.add(r.bookedTable);
+            }
+        });
+
+        availableTables.forEach(table => {
+            const tId = table.getAttribute('data-id');
+            const isManuallyBlocked = overrides[tId] === 'unavailable';
+            const isBooked = bookedTableIdsForDate.has(tId);
+            
+            // If the table is taken, apply the unavailable lock-out visual class
+            if (isManuallyBlocked || isBooked) {
+                table.classList.remove('available');
+                table.classList.add('unavailable');
+                if(isBooked) table.title = 'Already booked for this date and time (' + chosenDate + ', ' + chosenTime + ')';
+                if(isManuallyBlocked) table.title = 'Table unavailable for management reasons';
+            }
+
+            table.addEventListener('click', () => {
+                // Ignore clicks entirely if table is locked
+                if (table.classList.contains('unavailable')) return;
+
+                availableTables.forEach(t => t.classList.remove('selected'));
+                table.classList.add('selected');
+                chosenTableId = table.getAttribute('data-id');
+                displaySpan.textContent = chosenTableId;
+                confirmBtn.disabled = false;
+            });
+        });
+
+        confirmBtn.addEventListener('click', () => {
+            localStorage.setItem('bookedTable', chosenTableId);
+            localStorage.setItem('reservationType', reservationType);
+            if(reservationType === 'priority') {
+                window.location.href = "pre-order.html"; 
+            } else {
+                window.location.href = "standard-payment.html"; 
+            }
+        });
+    </script>
+</body>
+</html>

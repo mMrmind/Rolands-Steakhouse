@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Priority Booking Payment | Roland's</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        #payment-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 70vh;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .payment-card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 400px;
+            width: 100%;
+            border-top: 6px solid #fbbf24;
+        }
+    </style>
+</head>
+<body>
+    <header id="main-header">
+        <div class="logo"><img src="images/rolandsLOGO.jpg" alt="Logo"></div>
+    </header>
+
+    <section id="payment-section">
+        <div class="payment-card">
+            <h2 style="font-family: 'Playfair Display'; color: #2e7d32; margin-bottom: 10px;">Payment</h2>
+            <p>Please send the payment via GCash.</p>
+            <div style="background: #e2e8f0; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <p style="margin: 0; font-size: 14px; color: #555;">GCash Number</p>
+                <h3 style="margin: 5px 0;">0912 345 6789</h3>
+                <p style="margin: 10px 0 0 0; font-size: 14px; color: #555;">Amount Due</p>
+                <h3 style="margin: 5px 0; color: #2e7d32;">₱<span id="display-amt"></span></h3>
+            </div>
+            
+            <input type="text" id="ref-num" placeholder="Enter GCash Reference No." style="width:100%; padding:14px; margin-bottom:20px; border:1px solid #ccc; border-radius:6px; box-sizing: border-box;" required>
+            
+            <button id="confirm-payment-btn" style="width:100%;">Confirm Payment</button>
+        </div>
+    </section>
+
+    <script>
+        const total = localStorage.getItem('totalBill') || '0';
+        document.getElementById('display-amt').textContent = Number(total).toLocaleString();
+
+        document.getElementById('confirm-payment-btn').addEventListener('click', () => {
+            const ref = document.getElementById('ref-num').value.trim();
+            if(!ref) return alert("Please enter the GCash reference number.");
+            
+            document.getElementById('confirm-payment-btn').textContent = "Processing...";
+            document.getElementById('confirm-payment-btn').disabled = true;
+
+            setTimeout(() => {
+                const resNo = 'RES-' + Math.floor(100000 + Math.random() * 900000);
+                localStorage.setItem('reservationNumber', resNo);
+                
+                const history = JSON.parse(localStorage.getItem('reservationHistory') || '[]');
+                
+                const orderText = localStorage.getItem('orderSummary') || '';
+                const foodArray = orderText ? orderText.split(', ') : [];
+                
+                const dateKey = localStorage.getItem('arrivalDate') || '';
+                const timeKey = localStorage.getItem('arrivalTime') || '';
+                const rawDateStr = dateKey + "T" + timeKey;
+                const d = new Date(rawDateStr);
+                const displayDt = isNaN(d) ? rawDateStr : d.toLocaleString(undefined, {
+                    weekday: 'short', month: 'short', day: 'numeric',
+                    hour: 'numeric', minute: '2-digit', hour12: true
+                });
+                
+                localStorage.setItem('arrivalDateTimeDisplay', displayDt);
+                
+                history.push({
+                    reservationNumber: resNo,
+                    reservationType: 'priority',
+                    arrivalDate: dateKey,
+                    arrivalTime: timeKey,
+                    arrivalDateTimeDisplay: displayDt,
+                    customerName: localStorage.getItem('customerName'),
+                    bookedTable: localStorage.getItem('bookedTable'),
+                    orderSummary: orderText,
+                    foods: foodArray,
+                    paymentAmount: total,
+                    completedAt: new Date().toISOString()
+                });
+                
+                localStorage.setItem('reservationHistory', JSON.stringify(history));
+                window.location.href = "receipt.html";
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

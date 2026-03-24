@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Admin Dashboard | Roland's</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="css/superadmin.css">
+</head>
+
+<body>
+    <header>
+        <div class="brand">Roland's Super Admin</div>
+        <div class="actions">
+            <div id="admin-status" class="muted"></div>
+            <button class="secondary hidden" id="logout-admin-btn" type="button">Secure Logout</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- AUTH SECTION -->
+        <div id="auth-section" class="auth-wrap">
+            <h1 class="auth-title">Super Admin Access</h1>
+            <div class="auth-card">
+                <div id="super-admin-login">
+                    <h2>System Authentication</h2>
+                    <div>
+                        <label for="admin-password">Super Admin Passkey</label>
+                        <input id="admin-password" type="password" placeholder="Enter master passkey">
+                    </div>
+                    <div class="btnrow">
+                        <button type="button" id="admin-login-btn">Authenticate</button>
+                    </div>
+                    <div class="msg" id="auth-message"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DASHBOARD SECTION -->
+        <div id="dashboard-section" class="hidden">
+            <h2 class="section-title">System Overview</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>Total Reservations</h3>
+                    <div class="value" id="stat-total">0</div>
+                </div>
+                <div class="card">
+                    <h3>Priority Booking %</h3>
+                    <div class="value" id="stat-priority-pct">0%</div>
+                </div>
+                <div class="card">
+                    <h3>Total Revenue</h3>
+                    <div class="value" id="stat-revenue">₱0</div>
+                </div>
+                <div class="card">
+                    <h3>Staff Admins Registered</h3>
+                    <div class="value" id="stat-admins">0</div>
+                </div>
+                <div class="card" style="border: 1px solid #4ade80; background: rgba(74, 222, 128, 0.05);">
+                    <h3 style="color: #4ade80;">Live Customers</h3>
+                    <div class="value" id="super-stat-online">0</div>
+                    <div class="muted" id="super-online-list" style="margin-top: 6px; font-weight: bold; color: #f8fafc;">None</div>
+                </div>
+            </div>
+
+            <!-- VISUAL ANALYTICS -->
+            <h2 class="section-title">Analytics</h2>
+            <div class="graph-container">
+                <div class="card">
+                    <h3>Booking Activity (Estimated over Next/Past 7 Days)</h3>
+                    <canvas id="trendChart"></canvas>
+                </div>
+                <div class="card"
+                    style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <h3 style="align-self: flex-start;">Reservation Types</h3>
+                    <canvas id="typeChart"></canvas>
+                </div>
+            </div>
+
+            <h2 class="section-title">Management & Records</h2>
+            <div class="row">
+                <input id="search-input" type="text" placeholder="Search across all records...">
+                <button type="button" id="export-csv-btn" class="secondary" title="Excel Compatible CSV">Export
+                    Analytics (Excel)</button>
+            </div>
+
+            <div class="muted" id="summary-line"></div>
+            <div style="height: 12px;"></div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Reserv. #</th>
+                        <th>Arrival</th>
+                        <th>Customer / Contact</th>
+                        <th>Table</th>
+                        <th>Type</th>
+                        <th>Foods / Notes</th>
+                        <th>Paid</th>
+                    </tr>
+                </thead>
+                <tbody id="history-tbody">
+                    <!-- Filled by JS -->
+                </tbody>
+            </table>
+
+            <h2 class="section-title">Danger Zone</h2>
+            <div class="settings-panel">
+                <h3>System Overrides (Irreversible Actions)</h3>
+                <p class="muted" style="margin-bottom: 15px;">Use extreme caution. These actions apply to all local
+                    browser storage for this application.</p>
+                <div class="danger-actions">
+                    <button type="button" id="clear-history-btn" class="danger">Purge All Reservations</button>
+                    <button type="button" id="clear-admins-btn" class="danger">Revoke All Staff Admin Accounts</button>
+                </div>
+            </div>
+
+            <div style="height: 40px;"></div>
+        </div>
+    </div>
+
+    <script>
+        // --- UTILITIES ---
+        function safeJsonParse(value, fallback) {
+            try { return JSON.parse(value || ''); } catch (e) { return fallback; }
+        }
+
+        function getReservationHistory() {
+            return safeJsonParse(localStorage.getItem('reservationHistory'), []) || [];
+        }
+
+        function getAdminUsers() {
+            return safeJsonParse(localStorage.getItem('adminUsers'), []) || [];
+        }
+
+        const SUPER_ADMIN_PASSKEY = "rolands1994";
+
+        function setSuperAdminSession() {
+            sessionStorage.setItem('superAdminActive', 'true');
+        }
+
+        function logoutSuperAdmin() {
+            sessionStorage.removeItem('superAdminActive');
+            window.location.reload();
+        }
+
+        // --- DASHBOARD RENDERING ---
+        function renderDashboard() {
+            const dashboard = document.getElementById('dashboard-section');
+            const auth = document.getElementById('auth-section');
+            const adminStatus = document.getElementById('admin-status');
+            const logoutBtn = document.getElementById('logout-admin-btn');
+
+            const history = getReservationHistory();
+            const adminUsers = getAdminUsers();
+            const priorityHistory = history.filter(r => r.reservationType === 'priority');
+
+            const total = history.length;
+            const priorityCount = priorityHistory.length;
+            const revenue = priorityHistory.reduce((sum, r) => sum + Number(r.paymentAmount || 0), 0);
+            const adminCount = adminUsers.length;
+
+            const priorityPct = total > 0 ? Math.round((priorityCount / total) * 100) : 0;
+
+            document.getElementById('stat-total').textContent = total;
+            document.getElementById('stat-priority-pct').textContent = `${priorityPct}%`;
+            document.getElementById('stat-revenue').textContent = `₱${Number(revenue).toLocaleString()}`;
+            document.getElementById('stat-admins').textContent = adminCount;
+
+            // --- CUSTOMER TRACKING POLL ---
+            function pollOnlineAdmins() {
+                const online = safeJsonParse(localStorage.getItem('onlineCustomers'), {});
+                const now = Date.now();
+                const activeNames = [];
+                let count = 0;
+                for(const [custId, data] of Object.entries(online)) {
+                    if (now - data.time < 15000) {
+                        count++;
+                        activeNames.push(data.name);
+                    } else {
+                        delete online[custId];
+                    }
+                }
+                localStorage.setItem('onlineCustomers', JSON.stringify(online));
+                
+                const onlineValue = document.getElementById('super-stat-online');
+                const onlineList = document.getElementById('super-online-list');
+                if (onlineValue) onlineValue.textContent = count;
+                if (onlineList) {
+                    onlineList.textContent = activeNames.length ? activeNames.join(', ') : 'No customers browsing right now.';
+                }
+            }
+            pollOnlineAdmins();
+            setInterval(pollOnlineAdmins, 5000); // Keep synced every 5 sec
+
+            const historyTbody = document.getElementById('history-tbody');
+            const searchInput = document.getElementById('search-input');
+            const summaryLine = document.getElementById('summary-line');
+
+            function foodText(r) {
+                const foods = Array.isArray(r.foods) ? r.foods : [];
+                if (!foods.length) return r.reservationType === 'standard' ? 'Standard deposit' : 'None';
+                return foods.join(', ');
+            }
+
+            function createTypePill(type) {
+                const span = document.createElement('span');
+                if (type === 'priority') {
+                    span.className = 'pill';
+                    span.textContent = 'PRO';
+                } else if (type === 'standard') {
+                    span.className = 'pill std';
+                    span.textContent = 'STD';
+                } else {
+                    span.className = 'pill std';
+                    span.textContent = type;
+                }
+                return span;
+            }
+
+            function renderRows(rows) {
+                historyTbody.innerHTML = '';
+                if (!rows.length) {
+                    historyTbody.innerHTML = `<tr><td colspan="7" class="muted" style="text-align: center;">No reservations found in database.</td></tr>`;
+                    return;
+                }
+
+                rows.forEach(r => {
+                    const tr = document.createElement('tr');
+
+                    tr.innerHTML = `
+                        <td><strong>${r.reservationNumber || 'N/A'}</strong></td>
+                        <td>${r.arrivalDateTimeDisplay || r.arrivalDate || ''}</td>
+                        <td>${r.customerName || 'Unknown'}</td>
+                        <td>${r.bookedTable || 'None'}</td>
+                        <td></td>
+                        <td>${foodText(r)}</td>
+                        <td style="color: #4ade80; font-weight: bold;">₱${Number(r.paymentAmount || 0).toLocaleString()}</td>
+                    `;
+
+                    tr.children[4].appendChild(createTypePill(r.reservationType));
+                    historyTbody.appendChild(tr);
+                });
+            }
+
+            function applySearch() {
+                const q = (searchInput.value || '').trim().toLowerCase();
+                const filtered = !q ? history : history.filter(r => {
+                    return (r.reservationNumber || '').toLowerCase().includes(q) ||
+                        (r.customerName || '').toLowerCase().includes(q);
+                });
+                renderRows(filtered);
+                summaryLine.textContent = `Showing ${filtered.length} of ${history.length} global records.`;
+            }
+
+            renderRows(history);
+            summaryLine.textContent = `Showing ${history.length} of ${history.length} global records.`;
+            searchInput.addEventListener('input', applySearch);
+
+            // ==========================================
+            // CHART.JS INTEGRATION
+            // ==========================================
+
+            Chart.defaults.color = '#94a3b8';
+            Chart.defaults.font.family = "'Roboto', sans-serif";
+
+            // 1. Booking Trends Chart
+            // Generate a simple array of last 7 dates for visualization
+            const dates = [];
+            const counts = [];
+            const trackingDates = {};
+
+            // Collect all dates from history. Sort them.
+            history.forEach(r => {
+                if (r.arrivalDate) {
+                    trackingDates[r.arrivalDate] = (trackingDates[r.arrivalDate] || 0) + 1;
+                }
+            });
+
+            let sortedDates = Object.keys(trackingDates).sort();
+            if (sortedDates.length === 0) {
+                sortedDates = [new Date().toISOString().split('T')[0]]; // fallback to today
+                trackingDates[sortedDates[0]] = 0;
+            }
+
+            // Only show up to 7 available dates
+            const tailDates = sortedDates.slice(-7);
+
+            tailDates.forEach(d => {
+                dates.push(d);
+                counts.push(trackingDates[d]);
+            });
+
+            const ctxTrend = document.getElementById('trendChart').getContext('2d');
+            new Chart(ctxTrend, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Total Reservations',
+                        data: counts,
+                        borderColor: '#fbbf24', // Gold
+                        backgroundColor: 'rgba(251, 191, 36, 0.15)', // Light Gold transparent
+                        borderWidth: 2,
+                        pointBackgroundColor: '#fbbf24',
+                        pointBorderColor: '#1e293b',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { color: 'rgba(51, 65, 85, 0.5)' } },
+                        y: {
+                            grid: { color: 'rgba(51, 65, 85, 0.5)' },
+                            beginAtZero: true,
+                            ticks: { stepSize: 1 }
+                        }
+                    }
+                }
+            });
+
+            // 2. Reservation Type Breakdown (Doughnut Chart)
+            const ctxType = document.getElementById('typeChart').getContext('2d');
+            new Chart(ctxType, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Priority (PRO)', 'Standard (STD)'],
+                    datasets: [{
+                        data: [priorityCount, total - priorityCount],
+                        backgroundColor: ['#fbbf24', '#3b82f6'],
+                        borderColor: '#1e293b',
+                        borderWidth: 3,
+                        hoverOffset: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { padding: 20, usePointStyle: true, pointStyle: 'circle' }
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+
+
+            // ==========================================
+            // EXCEL/CSV EXPORT INTEGRATION
+            // ==========================================
+            document.getElementById('export-csv-btn').onclick = () => {
+                const rows = history.slice();
+
+                // Fields to export
+                const header = [
+                    'Reservation #', 'Type', 'Arrival Date', 'Customer Name', 'Table Number', 'Food Ordered', 'Payment Amount'
+                ];
+
+                // Excel requires a UTF-8 BOM (\uFEFF) to properly parse UTF-8 characters natively.
+                let csvLines = '\uFEFF' + header.join(',') + '\n';
+
+                rows.forEach(r => {
+                    const foods = Array.isArray(r.foods) ? r.foods.join('; ') : '';
+
+                    // Values wrapped reliably with escaped double quotes
+                    const values = [
+                        r.reservationNumber || '',
+                        r.reservationType || '',
+                        r.arrivalDateTimeDisplay || r.arrivalDate || '',
+                        r.customerName || '',
+                        r.bookedTable || '',
+                        foods,
+                        r.paymentAmount || 0
+                    ].map(v => {
+                        let text = String(v);
+                        // Escape quotes and wrap in quotes for robust CSV
+                        text = text.replace(/"/g, '""');
+                        return `"${text}"`;
+                    });
+
+                    csvLines += values.join(',') + '\n';
+                });
+
+                const blob = new Blob([csvLines], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `rolands-superadmin-export-${new Date().toISOString().slice(0, 10)}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(url);
+            };
+
+            // Danger Actions
+            document.getElementById('clear-history-btn').onclick = () => {
+                const ok = confirm('CRITICAL WARNING: This will permanently delete ALL reservation history. Are you absolutely sure?');
+                if (ok) {
+                    localStorage.removeItem('reservationHistory');
+                    alert("History purged.");
+                    window.location.reload();
+                }
+            };
+
+            document.getElementById('clear-admins-btn').onclick = () => {
+                const ok = confirm('CRITICAL WARNING: This will delete all staff admin accounts. They will need to register again. Proceed?');
+                if (ok) {
+                    localStorage.removeItem('adminUsers');
+                    localStorage.removeItem('adminLoggedInUser');
+                    alert("Staff admin accounts revoked.");
+                    window.location.reload();
+                }
+            };
+
+            // UI Reveal
+            auth.classList.add('hidden');
+            dashboard.classList.remove('hidden');
+            adminStatus.textContent = 'Super Admin Mode';
+            logoutBtn.classList.remove('hidden');
+        }
+
+        // --- AUTHENTICATION ---
+        function initAuth() {
+            const authMsg = document.getElementById('auth-message');
+            document.getElementById('logout-admin-btn').onclick = logoutSuperAdmin;
+
+            if (sessionStorage.getItem('superAdminActive') === 'true') {
+                return renderDashboard();
+            }
+
+            document.getElementById('admin-login-btn').addEventListener('click', () => {
+                authMsg.textContent = '';
+                const password = document.getElementById('admin-password').value || '';
+
+                if (!password) return authMsg.textContent = 'Passkey is required.';
+
+                if (password === SUPER_ADMIN_PASSKEY) {
+                    setSuperAdminSession();
+                    renderDashboard();
+                } else {
+                    authMsg.textContent = 'Invalid Master Passkey.';
+                }
+            });
+
+            // Allow ENTER key to submit
+            document.getElementById('admin-password').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    document.getElementById('admin-login-btn').click();
+                }
+            });
+        }
+
+        initAuth();
+    </script>
+</body>
+
+</html>

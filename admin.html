@@ -58,12 +58,25 @@
                     <div class="msg" id="auth-message-2"></div>
                 </div>
             </div>
+            <div style="text-align: center; margin-top: 25px;">
+                <a href="superadmin.html" style="color: #2e7d32; font-size: 14px; text-decoration: none; transition: 0.2s; font-weight: 600;" onmouseover="this.style.color='#1b5e20'" onmouseout="this.style.color='#2e7d32'">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: middle;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    Super Admin Access
+                </a>
+            </div>
         </div>
 
         <div id="dashboard-section" class="hidden">
-            <div class="grid">
-                <div class="card">
-                    <h3>Total Reservations</h3>
+            <div class="admin-tabs">
+                <button class="tab-link active" onclick="switchAdminTab('overview', this)">Dashboard Overview</button>
+                <button class="tab-link" onclick="switchAdminTab('kitchen', this)">Kitchen Queue</button>
+                <button class="tab-link" onclick="switchAdminTab('floorplan', this)">Floor Plan</button>
+            </div>
+
+            <div id="tab-overview" class="admin-tab-content">
+                <div class="grid">
+                    <div class="card">
+                        <h3>Total Reservations</h3>
                     <div class="value" id="stat-total">0</div>
                 </div>
                 <div class="card">
@@ -160,6 +173,29 @@
                         <button type="button" onclick="saveEditModal()" style="flex:1;">Save Changes</button>
                     </div>
                 </div>
+            </div>
+            </div> <!-- End tab-overview -->
+
+            <div id="tab-kitchen" class="admin-tab-content hidden">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="margin:0; font-family: 'Playfair Display', serif; color: #2e7d32; font-size: 26px;">Kitchen Operations</h2>
+                    <span class="muted" style="font-weight: 700;">Automatic Sync active</span>
+                </div>
+                <div class="ticket-grid" id="kds-grid">Loading queue...</div>
+            </div>
+
+            <div id="tab-floorplan" class="admin-tab-content hidden">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="margin:0; font-family: 'Playfair Display', serif; color: #2e7d32; font-size: 26px;">Front-of-House Hostess</h2>
+                    <span class="muted" style="font-weight: 700;">Tap tables to manage live status</span>
+                </div>
+                <div class="legend">
+                    <div class="legend-item"><div class="dot dot-available"></div> Available</div>
+                    <div class="legend-item"><div class="dot dot-reserved"></div> Reserved</div>
+                    <div class="legend-item"><div class="dot dot-seated"></div> Seated / Dining</div>
+                    <div class="legend-item"><div class="dot dot-cleaning"></div> Cleaning</div>
+                </div>
+                <div class="floor-plan" id="hostess-grid">Loading floor plan...</div>
             </div>
         </div>
     </div>
@@ -365,6 +401,127 @@
                 window.closeEditModal();
             };
 
+            window.switchAdminTab = function(tabId, btnElement) {
+                document.querySelectorAll('.admin-tab-content').forEach(el => el.classList.add('hidden'));
+                document.getElementById('tab-' + tabId).classList.remove('hidden');
+                
+                document.querySelectorAll('.tab-link').forEach(el => el.classList.remove('active'));
+                if(btnElement) btnElement.classList.add('active');
+            };
+
+            // KItchen Logic
+            function renderKitchenQueue() {
+                const hist = getReservationHistory();
+                const grid = document.getElementById('kds-grid');
+                if(!grid) return;
+                
+                grid.innerHTML = '';
+                const foodOrders = hist.filter(r => r.foods && r.foods.length > 0 && r.kdsStatus !== 'served');
+                
+                foodOrders.sort((a, b) => {
+                    if (a.kdsStatus === 'ready' && b.kdsStatus !== 'ready') return 1;
+                    if (b.kdsStatus === 'ready' && a.kdsStatus !== 'ready') return -1;
+                    if (a.arrivalTime && b.arrivalTime) return a.arrivalTime.localeCompare(b.arrivalTime);
+                    return 0;
+                });
+                
+                if (foodOrders.length === 0) {
+                    grid.innerHTML = `<div class="kds-empty">No Active Pre-Orders in Queue</div>`;
+                    return;
+                }
+
+                foodOrders.forEach(r => {
+                    const realIdx = hist.findIndex(hr => hr.reservationNumber === r.reservationNumber);
+                    const status = r.kdsStatus || 'pending';
+                    const t = document.createElement('div');
+                    t.className = `ticket status-${status}`;
+                    
+                    const foodsHtml = (r.foods || []).map(f => `<li>1x ${f}</li>`).join('');
+                    
+                    let btns = '';
+                    if (status === 'pending') {
+                        btns = `<button class="btn-cook" onclick="updateKDSStatus(${realIdx}, 'cooking')">Start Cooking</button>`;
+                    } else if (status === 'cooking') {
+                        btns = `<button class="btn-ready" onclick="updateKDSStatus(${realIdx}, 'ready')">Mark Ready</button>`;
+                    } else if (status === 'ready') {
+                        btns = `<button class="btn-clear" onclick="updateKDSStatus(${realIdx}, 'served')">Dismiss</button>`;
+                    }
+
+                    t.innerHTML = `
+                        <div class="ticket-header">
+                            <div>
+                                <div class="ticket-table">${r.bookedTable || 'Waiting'}</div>
+                                <div class="ticket-name">${r.customerName}</div>
+                            </div>
+                            <div class="ticket-meta">
+                                <div class="ticket-time">${r.arrivalTime || 'ASAP'}</div>
+                                <div class="ticket-status status-text-${status}">${status}</div>
+                            </div>
+                        </div>
+                        <ul class="food-list">${foodsHtml}</ul>
+                        <div class="actions">${btns}</div>
+                    `;
+                    grid.appendChild(t);
+                });
+            }
+
+            window.updateKDSStatus = function(idx, newStatus) {
+                const hist = getReservationHistory();
+                if(hist[idx]) {
+                    hist[idx].kdsStatus = newStatus;
+                    localStorage.setItem('reservationHistory', JSON.stringify(hist));
+                    renderKitchenQueue();
+                }
+            };
+
+            // Hostess Logic
+            const ALL_TABLES = ["Table 1", "Table 2", "Table 3", "Table 4", "Table 5", "Table 6", "Table 7", "Table 8", "Table 9", "VIP 10"];
+            const cycleStatus = { 'available': 'reserved', 'reserved': 'seated', 'seated': 'cleaning', 'cleaning': 'available' };
+
+            function renderFloorPlan() {
+                const overrides = safeJsonParse(localStorage.getItem('tableOverrides'), {});
+                const hist = getReservationHistory();
+                const fp = document.getElementById('hostess-grid');
+                if(!fp) return;
+                fp.innerHTML = '';
+
+                ALL_TABLES.forEach(tId => {
+                    let status = overrides[tId] || 'available';
+                    if (status === 'unavailable') status = 'reserved';
+                    
+                    const res = hist.find(r => r.bookedTable === tId && !r.completedAt);
+                    const metaText = res ? `in queue @ ${res.arrivalTime || 'today'}` : '';
+
+                    const card = document.createElement('div');
+                    card.className = `table-card card-${status}`;
+                    card.onclick = () => {
+                        const next = cycleStatus[status] || 'available';
+                        overrides[tId] = next;
+                        localStorage.setItem('tableOverrides', JSON.stringify(overrides));
+                        renderFloorPlan();
+                        renderTableManagement(); // update the simple overrides above too
+                    };
+                    
+                    card.innerHTML = `
+                        <div class="table-name">${tId}</div>
+                        <div class="table-status">${status}</div>
+                        <div class="table-meta">${status === 'reserved' && metaText ? metaText : ''}</div>
+                    `;
+                    fp.appendChild(card);
+                });
+            }
+
+            // Bind pollers
+            if(!window.isPollingActive) {
+                setInterval(() => {
+                    renderKitchenQueue();
+                    renderFloorPlan();
+                }, 5000);
+                window.isPollingActive = true;
+            }
+            renderKitchenQueue();
+            renderFloorPlan();
+
             window.deleteItem = function(resObjNum) {
                 if(confirm("Are you sure you want to delete this reservation? This cannot be undone.")) {
                     const hist = getReservationHistory();
@@ -499,7 +656,7 @@
                     csvLines.push(values.join(','));
                 });
 
-                const blob = new Blob([csvLines.join('\\n')], { type: 'text/csv;charset=utf-8;' });
+                const blob = new Blob(['\uFEFF' + csvLines.join('\n')], { type: 'text/csv;charset=utf-8;' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;

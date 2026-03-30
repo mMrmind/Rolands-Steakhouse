@@ -154,3 +154,30 @@ button:hover {
     body { background: white; }
     .receipt-wrapper { filter: none; }
 }
+
+/* Mobile */
+@media (max-width: 480px) {
+    body {
+        align-items: flex-start;
+        padding: 20px 0;
+    }
+
+    .receipt-paper {
+        width: 90vw;
+        padding: 24px 20px;
+    }
+
+    .receipt-wrapper {
+        margin: 20px auto;
+        width: 90vw;
+    }
+
+    .btn-area {
+        width: 90vw;
+        margin: 20px auto 0;
+    }
+
+    .btn-area button {
+        width: 100%;
+    }
+}

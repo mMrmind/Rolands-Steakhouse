@@ -213,3 +213,51 @@
             color: #4caf50;
             font-size: 28px;
         }
+
+        /* =========================================
+           RESPONSIVE – Login Page
+           ========================================= */
+        @media (max-width: 480px) {
+            body {
+                height: auto;
+                min-height: 100vh;
+                overflow-y: auto;
+                align-items: flex-start;
+                padding: 70px 0 30px;
+            }
+
+            .auth-container {
+                padding: 16px;
+            }
+
+            .auth-card {
+                padding: 30px 20px;
+                border-radius: 18px;
+            }
+
+            .auth-header h2 {
+                font-size: 26px;
+            }
+
+            .back-home {
+                top: 16px;
+                left: 16px;
+                font-size: 13px;
+                padding: 6px 12px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .auth-card {
+                padding: 24px 14px;
+            }
+
+            .auth-header h2 {
+                font-size: 22px;
+            }
+
+            .btn-auth {
+                font-size: 14px;
+                padding: 13px;
+            }
+        }

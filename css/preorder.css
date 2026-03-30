@@ -300,12 +300,59 @@ body {
         display: flex;
         overflow-x: auto;
         padding: 15px;
+        gap: 8px;
     }
     .category-btn {
-        flex: 1;
+        flex-shrink: 0;
         white-space: nowrap;
-        margin-right: 10px;
         margin-bottom: 0;
         text-align: center;
+        padding: 12px 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    #preorder-container {
+        padding: 0 10px;
+        margin: 16px auto;
+        gap: 14px;
+    }
+
+    .menu-category-title {
+        font-size: 22px;
+    }
+
+    .menu-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .menu-card {
+        padding: 14px;
+    }
+
+    .menu-img {
+        height: 120px;
+    }
+
+    .cart-sidebar {
+        padding: 16px;
+    }
+
+    .cart-items-container {
+        max-height: 240px;
+    }
+
+    .cart-header {
+        font-size: 20px;
+    }
+
+    .checkout-btn {
+        font-size: 15px;
+        padding: 13px;
+    }
+
+    .category-btn {
+        font-size: 13px;
+        padding: 10px 12px;
     }
 }

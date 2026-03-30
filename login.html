@@ -57,7 +57,7 @@
 
                 <div class="input-group">
                     <label for="signup-name">Full Name</label>
-                    <input type="text" id="signup-name" placeholder="John Doe" required>
+                    <input type="text" id="signup-name" placeholder="John Doe" required oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')">
                 </div>
                 
                 <div class="input-group">
@@ -106,9 +106,9 @@
         </div>
 
         <div style="text-align: center; margin-top: 25px;">
-            <a href="superadmin.html" style="color: rgba(255,255,255,0.6); font-size: 13px; text-decoration: none; transition: 0.2s; font-weight: 500;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.6)'">
+            <a href="admin.html" style="color: rgba(255,255,255,0.6); font-size: 13px; text-decoration: none; transition: 0.2s; font-weight: 500;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.6)'">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: middle;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                Super Admin Access
+                Staff Admin Access
             </a>
         </div>
     </div>

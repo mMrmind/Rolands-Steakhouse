@@ -93,7 +93,8 @@
         </div>
 
         <div class="btn-area">
-            <button class="print-btn" onclick="downloadReceiptAsPhoto()">DOWNLOAD RECEIPT</button>
+            <button class="print-btn" onclick="window.print()">🖨️ PRINT RECEIPT</button>
+            <button class="print-btn" style="background:#334155;" onclick="downloadReceiptAsPhoto()">📥 DOWNLOAD RECEIPT</button>
             <button class="home-btn" onclick="window.location.href='index.html'">RETURN HOME</button>
         </div>
     </div>
@@ -131,20 +132,36 @@
              });
         }
 
-        // Load data from localStorage
-        const name = localStorage.getItem('customerName') || 'Valued Guest';
-        const table = localStorage.getItem('bookedTable') || 'TBD';
-        const total = localStorage.getItem('totalBill') || '0';
-        const orders = localStorage.getItem('orderSummary') || 'No items selected';
+        // Load from URL param if available, otherwise fallback to temporary localStorage keys
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlRes = urlParams.get('res');
+        
+        let name = localStorage.getItem('customerName') || 'Valued Guest';
+        let table = localStorage.getItem('bookedTable') || 'TBD';
+        let total = localStorage.getItem('totalBill') || '0';
+        let orders = localStorage.getItem('orderSummary') || 'No items selected';
+        let reservationNumber = localStorage.getItem('reservationNumber') || 'TBD';
+        let arrivalDisplay = localStorage.getItem('arrivalDateTimeDisplay') || new Date().toLocaleString();
+
+        if (urlRes) {
+            const hist = JSON.parse(localStorage.getItem('reservationHistory') || '[]');
+            const myRes = hist.find(r => r.reservationNumber === urlRes);
+            if (myRes) {
+                name = myRes.customerName || 'Valued Guest';
+                table = myRes.bookedTable || 'TBD';
+                total = myRes.paymentAmount || '0';
+                orders = myRes.orderSummary || 'No items selected';
+                reservationNumber = myRes.reservationNumber;
+                arrivalDisplay = myRes.arrivalDateTimeDisplay || new Date().toLocaleString();
+            }
+        }
 
         // Fill receipt
-        const reservationNumber = localStorage.getItem('reservationNumber') || 'TBD';
         document.getElementById('order-num').textContent = reservationNumber;
         document.getElementById('customer-name').textContent = name;
         document.getElementById('table-id').textContent = table;
         document.getElementById('total-amount').textContent = Number(total).toLocaleString();
-        document.getElementById('date-now').textContent =
-            localStorage.getItem('arrivalDateTimeDisplay') || new Date().toLocaleString();
+        document.getElementById('date-now').textContent = arrivalDisplay;
 
         // Fill order items
         const list = document.getElementById('order-items-list');

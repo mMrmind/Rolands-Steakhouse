@@ -74,6 +74,7 @@
         .dot-seated { background: #ef4444; }
         .dot-cleaning { background: #3b82f6; }
         .dot-reserved { background: #f59e0b; }
+        .dot-unavailable { background: #94a3b8; }
         .floor-plan { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
         .table-card { background: white; border: 3px solid #e2e8f0; border-radius: 16px; padding: 20px; text-align: center; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.05); user-select: none; }
         .table-card:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.1); }
@@ -88,3 +89,38 @@
         .card-cleaning .table-status { color: #1e40af; }
         .card-reserved { border-color: #f59e0b; background: #fffbeb; }
         .card-reserved .table-status { color: #b45309; }
+        .card-unavailable { border-color: #94a3b8; background: #f8fafc; }
+        .card-unavailable .table-status { color: #475569; }
+        /* Toast Floor Panel */
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .toast-close { float: right; background: none; border: none; font-size: 22px; cursor: pointer; color: #888; padding: 0; margin-top: -4px; }
+        .toast-res-card { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; }
+        .toast-res-card strong { color: #1b5e20; }
+        .toast-edit-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; align-items: flex-end; }
+        .toast-edit-row label { font-size: 12px; font-weight: 700; color: #555; text-transform: uppercase; display: block; margin-bottom: 4px; }
+        .toast-edit-row input { padding: 8px 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
+        .toast-save-btn { background: #2e7d32; color: white; border: none; padding: 9px 18px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 14px; }
+        .toast-save-btn:hover { background: #1b5e20; }
+
+        /* Live Chat UI */
+        .chat-layout { display: flex; height: 600px; background: white; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; overflow: hidden; margin-top: 15px; }
+        .chat-sidebar { width: 300px; background: #f8fafc; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; overflow-y: auto; }
+        .chat-session-card { padding: 15px; border-bottom: 1px solid #e2e8f0; cursor: pointer; transition: background 0.2s; }
+        .chat-session-card:hover { background: #f1f5f9; }
+        .chat-session-card.active { background: #e0f2fe; border-left: 4px solid #0284c7; }
+        .chat-session-title { font-weight: 700; color: #1e293b; font-size: 15px; margin-bottom: 4px; }
+        .chat-session-meta { font-size: 12px; color: #64748b; }
+        .chat-main { flex: 1; display: flex; flex-direction: column; background: #ffffff; }
+        .chat-main-header { padding: 15px; border-bottom: 1px solid #e2e8f0; font-weight: 700; font-size: 18px; color: #0f172a; background: #f8fafc; display: flex; justify-content: space-between; align-items: center; }
+        .chat-main-body { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background: #fdfdfd; }
+        .chat-msg-admin { max-width: 70%; padding: 12px 16px; border-radius: 18px; font-size: 14px; line-height: 1.4; word-wrap: break-word; }
+        .chat-msg-admin.customer { background: #f1f5f9; color: #334155; align-self: flex-start; border-bottom-left-radius: 4px; }
+        .chat-msg-admin.staff { background: #2e7d32; color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+        .chat-time-admin { font-size: 10px; opacity: 0.7; margin-top: 4px; text-align: right; }
+        .chat-msg-admin.customer .chat-time-admin { text-align: left; }
+        .chat-reply-area { padding: 15px; border-top: 1px solid #e2e8f0; background: #f8fafc; display: flex; gap: 10px; }
+        .chat-reply-input { flex: 1; padding: 12px 16px; border: 1px solid #cbd5e1; border-radius: 24px; font-size: 14px; outline: none; }
+        .chat-reply-btn { background: #2e7d32; color: white; border: none; padding: 0 24px; border-radius: 24px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .chat-reply-btn:disabled { background: #cbd5e1; cursor: not-allowed; }
+        .chat-reply-btn:hover:not(:disabled) { background: #1b5e20; }
+        .chat-empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #94a3b8; font-size: 18px; font-weight: 600; text-align: center; padding: 20px; }

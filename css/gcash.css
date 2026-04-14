@@ -205,3 +205,162 @@ body {
     from { transform: translateX(20px); opacity: 0; }
     to { transform: translateX(0); opacity: 1; }
 }
+
+/* ─── Payment Page Styles (payment.html / standard-payment.html) ─── */
+#payment-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80vh;
+    padding: 40px 16px;
+    text-align: center;
+    background: #f8fafc;
+}
+
+.payment-card {
+    background: white;
+    padding: 36px 32px;
+    border-radius: 20px;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.10);
+    max-width: 480px;
+    width: 100%;
+    border-top: 6px solid #fbbf24;
+}
+
+/* Toggle Switch */
+.pay-toggle {
+    display: flex;
+    background: #f1f5f9;
+    border-radius: 50px;
+    padding: 4px;
+    margin: 20px 0 28px;
+    position: relative;
+}
+
+.pay-toggle-btn {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 10px 0;
+    border-radius: 50px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    color: #888;
+    transition: color 0.3s;
+    z-index: 2;
+    position: relative;
+}
+
+.pay-toggle-btn.active { color: white; }
+
+.pay-toggle-slider {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: 4px;
+    width: calc(50% - 4px);
+    background: #0071bc;
+    border-radius: 50px;
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), background 0.35s;
+    z-index: 1;
+}
+
+.pay-toggle-slider.right {
+    transform: translateX(calc(100% + 0px));
+    background: #c0392b;
+}
+
+/* QR Panels */
+.qr-panels { overflow: hidden; position: relative; }
+.qr-panel { display: none; animation: panelFadeIn 0.4s ease; }
+.qr-panel.active { display: block; }
+
+@keyframes panelFadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.qr-img-wrap {
+    background: #f8fafc;
+    border-radius: 16px;
+    padding: 16px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 14px;
+}
+
+.qr-img-wrap img {
+    width: 100%;
+    max-width: 280px;
+    border-radius: 10px;
+    display: block;
+    margin: 0 auto;
+}
+
+.save-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 24px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    color: white;
+    transition: opacity 0.2s, transform 0.2s;
+    margin-top: 4px;
+}
+
+.save-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+.save-btn.gcash  { background: #0071bc; }
+.save-btn.qrph   { background: #c0392b; }
+
+/* Upload zone */
+.upload-zone {
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+    padding: 22px 16px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    margin-bottom: 6px;
+    position: relative;
+}
+
+.upload-zone:hover, .upload-zone.drag-over {
+    border-color: #2e7d32;
+    background: #f0fdf4;
+}
+
+.upload-zone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+}
+
+.upload-icon { font-size: 32px; margin-bottom: 8px; }
+
+.upload-preview {
+    max-width: 100%;
+    max-height: 140px;
+    border-radius: 8px;
+    margin-top: 10px;
+    display: none;
+    object-fit: cover;
+}
+
+.amount-badge {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 12px;
+    padding: 14px 20px;
+    margin-bottom: 24px;
+}
+
+@media (max-width: 480px) {
+    .payment-card { padding: 24px 16px; }
+}
+

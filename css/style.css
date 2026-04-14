@@ -1089,4 +1089,463 @@ button:hover {
     .table-seat img {
         height: 55px;
     }
+}
+
+/* ─────────────────────────────────────────────────
+   SEAT SELECTION — VIP, Lightbox & Background Styles
+   Extracted from seat-selection.html inline <style>
+   ───────────────────────────────────────────────── */
+
+/* Page background — soft greenish white */
+#seat-selection-section ~ html, body {
+    min-height: 100%;
+}
+
+/* Decorative green glow blob behind the table grid */
+#seat-selection-section::before {
+    content: '';
+    position: absolute;
+    top: 120px; left: 50%;
+    transform: translateX(-50%);
+    width: min(820px, 95vw);
+    height: 520px;
+    background: radial-gradient(ellipse,
+        rgba(56,142,60,.09) 0%,
+        rgba(129,199,132,.05) 40%,
+        transparent 72%
+    );
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Ensure section children render above the pseudo blob */
+#seat-selection-section > * { position: relative; z-index: 1; }
+
+/* In VIP mode, hide the blob */
+body.vip-mode #seat-selection-section::before { display: none; }
+
+/* Unavailable table */
+.table-seat.unavailable {
+    cursor: not-allowed !important;
+    opacity: 0.8;
+    transform: scale(0.95) !important;
+    background-color: #fee2e2 !important;
+    border: 2px solid #ef4444 !important;
+    box-shadow: none !important;
+}
+.table-seat.unavailable .table-label { color: #b91c1c !important; }
+.table-seat.unavailable:hover {
+    transform: scale(0.95) !important;
+    box-shadow: none !important;
+    border-color: #ef4444 !important;
+}
+
+/* Table image zoom hint */
+.table-seat img { cursor: zoom-in; transition: transform 0.2s; }
+.table-seat img:hover { transform: scale(1.06); }
+
+/* Lightbox */
+#table-lightbox {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.88);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    cursor: zoom-out;
+}
+#table-lightbox.open { display: flex; animation: lbFade .25s ease; }
+@keyframes lbFade { from{opacity:0} to{opacity:1} }
+#table-lightbox img {
+    max-width: 92vw; max-height: 85vh;
+    border-radius: 14px;
+    box-shadow: 0 8px 48px rgba(0,0,0,.6);
+    object-fit: contain; pointer-events: none;
+}
+#lb-caption { color:#fff; font-family:'Playfair Display',serif; font-size:20px; margin-top:14px; }
+#lb-close {
+    position:absolute; top:18px; right:24px;
+    color:#fff; font-size:36px; cursor:pointer;
+    user-select:none; opacity:.8; transition:opacity .2s;
+}
+#lb-close:hover { opacity:1; }
+
+/* VIP Fullscreen Background Photos */
+.vip-bg-slide {
+    position: fixed; inset: 0;
+    z-index: 10;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 1.4s ease-in-out;
+    filter: blur(7px) brightness(0.35);
+    transform: scale(1.09);
+    pointer-events: none;
+}
+.vip-bg-slide.active { opacity: 1; }
+
+#vip-bg-tint {
+    display: none;
+    position: fixed; inset: 0;
+    z-index: 11;
+    background: linear-gradient(160deg, rgba(5,2,0,.55) 0%, rgba(20,10,0,.28) 50%, rgba(5,2,0,.55) 100%);
+    pointer-events: none;
+}
+
+#vip-dots-bar {
+    display: none;
+    position: fixed;
+    bottom: 22px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 1002;
+    gap: 8px;
+}
+#vip-dots-bar.show { display: flex; }
+.vip-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: rgba(255,255,255,.3);
+    transition: background .4s, transform .3s;
+    cursor: pointer;
+}
+.vip-dot.active { background: #ffd700; transform: scale(1.45); }
+
+/* Header — stays relative/in-flow only on seat-selection page.
+   index.html uses position:fixed via the global header rule above — do NOT override it here. */
+.seat-selection-page #main-header { position: relative; z-index: 1000; }
+
+/* Seat-selection section — position relative so ::before pseudo-element works */
+/* (Already defined at line ~605; this adds z-index layering for VIP mode) */
+
+body.vip-mode #seat-selection-section {
+    background: transparent !important;
+    z-index: 100;
+    position: relative;
+}
+
+body.vip-mode #page-heading {
+    color: #fff !important;
+    text-shadow: 0 2px 20px rgba(0,0,0,.85);
+}
+body.vip-mode .reservation-filter label span {
+    color: #fff !important;
+    text-shadow: 0 1px 8px rgba(0,0,0,.7);
+}
+
+/* VIP Content Card */
+#vip-room-section { display: none; }
+#vip-room-section.show {
+    display: flex;
+    justify-content: center;
+    padding: 16px 16px 40px;
+    animation: vipUp .55s ease both;
+}
+@keyframes vipUp {
+    from { opacity:0; transform:translateY(28px); }
+    to   { opacity:1; transform:translateY(0); }
+}
+
+.vip-card {
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,215,0,.35);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    border-radius: 28px;
+    padding: 46px 44px 42px;
+    max-width: 560px; width: 100%;
+    text-align: center;
+    box-shadow: 0 24px 80px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.12);
+}
+
+.vip-crown { font-size: 54px; margin-bottom: 6px; filter: drop-shadow(0 3px 10px rgba(0,0,0,.7)); }
+
+.vip-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 2px 18px rgba(0,0,0,.85);
+    margin: 0 0 6px;
+}
+.vip-subtitle {
+    font-size: 14px;
+    color: rgba(255,215,100,.85);
+    margin: 0 0 26px;
+    letter-spacing: .4px;
+}
+
+.vip-pills { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 26px; }
+.vip-pill {
+    background: rgba(255,255,255,.13);
+    border: 1px solid rgba(255,255,255,.3);
+    backdrop-filter: blur(6px);
+    border-radius: 50px;
+    padding: 8px 18px;
+    font-size: 13px; font-weight: 600;
+    color: #fff;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: background .2s;
+}
+.vip-pill:hover { background: rgba(255,255,255,.22); }
+
+.vip-price-box {
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,215,0,.5);
+    border-radius: 18px;
+    padding: 18px 28px; margin-bottom: 30px;
+}
+.vip-price-box p { margin: 0; }
+.vip-price-main { font-size: 38px; font-weight: 800; color: #ffd700; text-shadow: 0 2px 10px rgba(0,0,0,.6); }
+.vip-price-main span { font-size: 16px; font-weight: 600; color: rgba(255,215,0,.75); }
+.vip-price-sub { font-size: 13px; color: rgba(255,255,255,.65); margin-top: 4px !important; }
+.vip-downpayment { font-size: 14px; color: #7effa8; margin-top: 8px !important; font-weight: 700; }
+
+.vip-reserve-btn {
+    background: linear-gradient(135deg, #ffd700, #ff9000);
+    color: #1a0800;
+    border: none; border-radius: 50px;
+    padding: 16px 52px;
+    font-size: 17px; font-weight: 800;
+    cursor: pointer; letter-spacing: .5px;
+    box-shadow: 0 8px 28px rgba(255,155,0,.5);
+    transition: transform .2s, box-shadow .2s;
+}
+.vip-reserve-btn:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 14px 40px rgba(255,155,0,.65);
+}
+
+@media (max-width: 540px) {
+    .vip-card { padding: 32px 20px; }
+}
+
+/* --- FOOTER --- */
+.site-footer {
+    background: #0f172a;
+    color: rgba(255,255,255,0.7);
+    padding: 64px 0 32px;
+    margin-top: auto;
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 48px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.footer-brand h3 {
+    font-family: 'Playfair Display', Georgia, serif;
+    color: #fff;
+    font-size: 24px;
+    margin-bottom: 16px;
+}
+
+.footer-brand p {
+    font-size: 14px;
+    line-height: 1.7;
+    max-width: 360px;
+}
+
+.footer-links h4 {
+    color: #f0c75e;
+    font-family: 'Roboto', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 16px;
+}
+
+.footer-links a {
+    display: block;
+    padding: 4px 0;
+    font-size: 14px;
+    transition: color 0.15s ease;
+    color: rgba(255,255,255,0.7);
+    text-decoration: none;
+}
+
+.footer-links a:hover { color: #4caf50; }
+
+.footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.1);
+    margin-top: 48px;
+    padding-top: 24px;
+    text-align: center;
+    font-size: 13px;
+    color: rgba(255,255,255,0.4);
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+@media (max-width: 768px) {
+    .footer-grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    .footer-brand p { max-width: 100%; margin: 0 auto 16px; }
+}
+
+/* --- CHAT WIDGET --- */
+.chat-widget-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.chat-bubble-btn {
+    width: 60px;
+    height: 60px;
+    background: #ff9000;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #1a0800;
+    font-size: 28px;
+    box-shadow: 0 4px 15px rgba(255, 144, 0, 0.4);
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+}
+.chat-bubble-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(255, 144, 0, 0.6);
+}
+
+.chat-panel {
+    width: 350px;
+    height: 480px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    margin-bottom: 15px;
+    transform: translateY(20px) scale(0.95) !important;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform-origin: bottom right;
+}
+
+.chat-panel.active {
+    transform: translateY(0) scale(1) !important;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.chat-header {
+    background: #1b5e20;
+    color: white;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.chat-header h4 {
+    margin: 0;
+    font-size: 16px;
+    font-family: 'Playfair Display', serif;
+}
+.chat-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 22px;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.chat-res-info {
+    font-size: 12px;
+    padding: 8px 15px;
+    background: #e8f5e9;
+    color: #2e7d32;
+    border-bottom: 1px solid #c8e6c9;
+    font-weight: 500;
+    text-align: center;
+}
+
+.chat-body {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    background: #f8fafc;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.chat-msg {
+    max-width: 80%;
+    padding: 10px 14px;
+    border-radius: 18px;
+    font-size: 14px;
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+.chat-msg.customer {
+    background: #2e7d32;
+    color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+}
+.chat-msg.staff {
+    background: #e2e8f0;
+    color: #334155;
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+}
+.chat-msg-time {
+    font-size: 10px;
+    margin-top: 4px;
+    opacity: 0.7;
+    text-align: right;
+}
+.chat-msg.staff .chat-msg-time {
+    text-align: left;
+}
+
+.chat-footer {
+    padding: 10px;
+    background: white;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+.chat-input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 20px;
+    outline: none;
+    font-family: inherit;
+    font-size: 14px;
+}
+.chat-submit-btn {
+    background: #1b5e20;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 18px;
 }

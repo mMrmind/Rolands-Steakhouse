@@ -150,9 +150,30 @@ button:hover {
 }
 
 @media print {
-    .btn-area { display: none; }
-    body { background: white; }
-    .receipt-wrapper { filter: none; }
+    .btn-area { display: none !important; }
+    body {
+        background: white;
+        margin: 0;
+        padding: 0;
+        display: block;
+    }
+    .receipt-wrapper {
+        filter: none;
+        margin: 0 auto;
+        width: 100%;
+    }
+    .receipt-paper {
+        width: 100%;
+        max-width: 320px;
+        margin: 0 auto;
+        box-shadow: none;
+        padding: 20px;
+        page-break-after: avoid;
+    }
+    * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
 }
 
 /* Mobile */

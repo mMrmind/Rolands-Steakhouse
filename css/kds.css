@@ -50,3 +50,6 @@ button { flex: 1; padding: 14px; border: none; border-radius: 6px; font-weight: 
 .btn-clear:hover { background: #dc2626; }
 
 .no-tickets { grid-column: 1 / -1; text-align: center; padding: 80px; color: #6b7280; font-size: 24px; font-weight: 500; border: 2px dashed #333; border-radius: 12px; }
+
+.kds-sync-hint { color: #9ca3af; font-size: 14px; align-self: center; }
+

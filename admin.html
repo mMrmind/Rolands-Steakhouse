@@ -20,19 +20,10 @@
         <div id="auth-section" class="auth-wrap">
             <h1 class="auth-title">Admin Access</h1>
             <div class="auth-card">
-                <div id="no-admin-users" class="hidden">
-                    <h2>Create Admin Account</h2>
-                    <label for="create-admin-username">Admin Username</label>
-                    <input id="create-admin-username" type="text" placeholder="e.g., admin">
-                    <label for="create-admin-password">Admin Password</label>
-                    <input id="create-admin-password" type="password" placeholder="Create password">
-                    <div class="btnrow">
-                        <button type="button" id="create-admin-btn">Create Admin</button>
-                    </div>
-                    <div class="msg" id="auth-message"></div>
-                    <div class="muted" style="margin-top:10px;">
-                        This admin login is local-only (stored in your browser).
-                    </div>
+                <div id="no-admin-users" class="hidden" style="text-align: center; padding: 20px;">
+                    <div style="font-size: 40px; margin-bottom: 15px;">🔒</div>
+                    <h2 style="color: #1b5e20; margin-bottom: 10px;">Access Restricted</h2>
+                    <p style="color: #555; line-height: 1.5; font-size: 14px;">No staff admin accounts have been registered yet. Please contact the <strong>Super Admin</strong> to create your staff account.</p>
                 </div>
 
                 <div id="admin-login" class="">
@@ -50,11 +41,6 @@
                     <div class="btnrow">
                         <button type="button" id="admin-login-btn">Sign In</button>
                     </div>
-                    <div style="margin-top: 10px; text-align: center;">
-                        <button type="button" id="reset-admin-btn" class="secondary" style="max-width: 240px; width: 100%;">
-                            Forgot password? Reset admin
-                        </button>
-                    </div>
                     <div class="msg" id="auth-message-2"></div>
                 </div>
             </div>
@@ -71,6 +57,79 @@
                 <button class="tab-link active" onclick="switchAdminTab('overview', this)">Dashboard Overview</button>
                 <button class="tab-link" onclick="switchAdminTab('kitchen', this)">Kitchen Queue</button>
                 <button class="tab-link" onclick="switchAdminTab('floorplan', this)">Floor Plan</button>
+                <button class="tab-link" onclick="switchAdminTab('menu', this)">Menu Availability</button>
+                <button class="tab-link" onclick="switchAdminTab('chat', this)">Live Chat</button>
+                <button class="tab-link" onclick="switchAdminTab('promotions', this)">🎉 Promotions</button>
+                <button class="tab-link" onclick="switchAdminTab('payments', this)">💳 Payments</button>
+            </div>
+
+            <!-- LIVE CHAT TAB -->
+            <div id="tab-chat" class="admin-tab-content hidden">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h2 style="margin:0; font-family: 'Playfair Display', serif; color: #2e7d32; font-size: 26px;">Live Customer Support</h2>
+                </div>
+                <div class="chat-layout">
+                    <div class="chat-sidebar" id="adminChatList"></div>
+                    <div class="chat-main" id="adminChatMain">
+                        <div class="chat-empty-state">Select a chat on the left to start replying.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PROMOTIONS TAB -->
+            <div id="tab-promotions" class="admin-tab-content hidden">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+                    <h2 style="margin:0; font-family:'Playfair Display',serif; color:#2e7d32; font-size:26px;">🎉 Promotions & Ads</h2>
+                    <span class="muted" style="font-weight:700;">Promos are shown live on the homepage</span>
+                </div>
+
+                <div class="card" style="margin-bottom:24px;">
+                    <h3 style="margin:0 0 16px; color:#1b5e20; font-size:16px; text-transform:uppercase; letter-spacing:.5px;">Upload New Promotion</h3>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
+                        <div>
+                            <label style="display:block; margin-bottom:5px; font-weight:700; font-size:13px; color:#555;">Promo Title</label>
+                            <input type="text" id="promo-title" placeholder="e.g. Weekend Steak Special" style="width:100%; padding:10px 12px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-size:14px;">
+                        </div>
+                        <div>
+                            <label style="display:block; margin-bottom:5px; font-weight:700; font-size:13px; color:#555;">Short Description</label>
+                            <input type="text" id="promo-desc" placeholder="e.g. 20% off all steaks this weekend!" style="width:100%; padding:10px 12px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-size:14px;">
+                        </div>
+                    </div>
+                    <label style="display:block; margin-bottom:8px; font-weight:700; font-size:13px; color:#555;">Promo Image</label>
+                    <div style="border:2px dashed #c8e6c9; border-radius:10px; padding:24px; text-align:center; cursor:pointer; background:#f0fdf4; position:relative; margin-bottom:14px;" onclick="document.getElementById('promo-upload-input').click()">
+                        <div style="font-size:36px;">📷</div>
+                        <div style="font-size:14px; color:#555; margin-top:8px;">Click to upload a promo image</div>
+                        <div style="font-size:12px; color:#aaa; margin-top:4px;">PNG, JPG supported</div>
+                        <input type="file" id="promo-upload-input" accept="image/*" style="display:none;" onchange="previewPromoImage(this)">
+                    </div>
+                    <img id="promo-preview-img" src="" style="display:none; max-height:180px; border-radius:8px; margin-bottom:14px; border:1px solid #e2e8f0;">
+                    <button type="button" onclick="addPromo()" style="width:100%; padding:13px; font-size:15px;">✅ Publish Promotion</button>
+                </div>
+
+                <h3 style="margin:0 0 14px; color:#1b5e20; font-size:16px; text-transform:uppercase; letter-spacing:.5px;">Active Promotions</h3>
+                <div id="promo-list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap:16px;"></div>
+                <div id="promo-empty" style="color:#aaa; font-style:italic; text-align:center; padding:30px;">No promotions published yet.</div>
+            </div>
+
+            <!-- PAYMENTS TAB -->
+            <div id="tab-payments" class="admin-tab-content hidden">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+                    <h2 style="margin:0; font-family:'Playfair Display',serif; color:#2e7d32; font-size:26px;">💳 Payment History</h2>
+                    <span class="muted" style="font-weight:700;">All submitted payments from customers</span>
+                </div>
+                <div id="payment-history-list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap:16px;"></div>
+                <div id="payment-history-empty" style="color:#aaa; font-style:italic; text-align:center; padding:40px;">No payments recorded yet.</div>
+            </div>
+
+            <!-- MENU ITEM OVERRIDES TAB -->
+            <div id="tab-menu" class="admin-tab-content hidden">
+                <div class="card" style="margin-bottom: 24px;">
+                    <h2 style="font-family: 'Playfair Display', serif; color: #2e7d32; margin: 0 0 12px 0; font-size: 20px;">Toggle Menu Availability</h2>
+                    <p style="color: #666; margin: 0 0 20px 0; font-size: 14px;">Click an item below to mark it as Sold Out. It will be immediately greyed out and unavailable for order on the Pre-Order page.</p>
+                    <div id="admin-menu-grid">
+                        <!-- Menu items rendered via JS -->
+                    </div>
+                </div>
             </div>
 
             <div id="tab-overview" class="admin-tab-content">
@@ -122,11 +181,6 @@
             </table>
 
             <div style="height: 16px;"></div>
-            
-            <h2 style="font-family: 'Playfair Display', serif; color: #2e7d32; margin-top: 15px; margin-bottom: 12px; font-size: 20px;">Table Management Overrides</h2>
-            <div class="grid" id="admin-tables-grid" style="grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; margin-bottom: 24px;">
-                <!-- Tables rendered via JS -->
-            </div>
 
             <div class="grid" style="grid-template-columns: repeat(2, 1fr);">
                 <div class="card">
@@ -165,8 +219,14 @@
                         <option value="Table 7">Table 7</option>
                         <option value="Table 8">Table 8</option>
                         <option value="Table 9">Table 9</option>
-                        <option value="Table 10">VIP 10</option>
+                        <option value="Table 10">Table 10</option>
                     </select>
+
+                    <div id="edit-foods-container" style="display:none;">
+                        <label style="display:block; margin: 10px 0 5px; font-weight:600; font-size:14px; text-transform:uppercase;">Food Order <span style="font-size:11px;color:#888;">(Comma separated)</span></label>
+                        <input type="text" id="edit-foods" placeholder="e.g. Bangus Steak, French Fries" style="width: 100%; padding:10px; border:1px solid #ccc; border-radius:5px; box-sizing:border-box; margin-bottom:5px;">
+                        <input type="text" id="edit-beef" placeholder="Beef note (e.g. Medium Rare) (Optional)" style="width: 100%; padding:10px; border:1px solid #ccc; border-radius:5px; box-sizing:border-box; background:#f0fdf4;">
+                    </div>
 
                     <div style="display:flex; gap: 10px; margin-top:20px;">
                         <button type="button" class="secondary" onclick="closeEditModal()" style="flex:1;">Cancel</button>
@@ -174,6 +234,7 @@
                     </div>
                 </div>
             </div>
+
             </div> <!-- End tab-overview -->
 
             <div id="tab-kitchen" class="admin-tab-content hidden">
@@ -194,9 +255,39 @@
                     <div class="legend-item"><div class="dot dot-reserved"></div> Reserved</div>
                     <div class="legend-item"><div class="dot dot-seated"></div> Seated / Dining</div>
                     <div class="legend-item"><div class="dot dot-cleaning"></div> Cleaning</div>
+                    <div class="legend-item"><div class="dot dot-unavailable"></div> Unavailable</div>
                 </div>
                 <div class="floor-plan" id="hostess-grid">Loading floor plan...</div>
+
+                <!-- Toast Info Panel -->
+                <div id="floor-toast" style="
+                    display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+                    background: white; border-top: 4px solid #2e7d32;
+                    box-shadow: 0 -8px 30px rgba(0,0,0,0.15);
+                    padding: 20px 28px 28px; max-height: 60vh; overflow-y: auto;
+                    animation: slideUp 0.3s ease;
+                ">
+
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 14px;">
+                        <span id="toast-table-title" style="font-family:'Playfair Display',serif; font-size:20px; font-weight:700; color:#1b5e20;"></span>
+                        <button class="toast-close" onclick="document.getElementById('floor-toast').style.display='none'">✕</button>
+                    </div>
+                    <div id="toast-reservations-list"></div>
+                    <div id="toast-no-res" style="color:#888; font-style:italic; display:none;">No reservations for this table.</div>
+                </div>
             </div>
+
+        </div>
+    </div>
+
+    <!-- Payment Proof Modal (Global, outside all tabs) -->
+    <div id="proof-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; z-index:9999;">
+        <div style="background:white; border-radius:16px; width:100%; max-width:520px; padding:28px; max-height:90vh; overflow-y:auto; position:relative; margin:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+            <button onclick="document.getElementById('proof-modal').style.display='none'" style="position:absolute; top:14px; right:16px; background:none; border:none; font-size:24px; cursor:pointer; color:#888; line-height:1;">✕</button>
+            <h2 style="margin:0 0 14px; color:#1b5e20; font-family:'Playfair Display',serif;">🧾 Payment Proof</h2>
+            <div id="proof-modal-info" style="margin-bottom:16px; font-size:14px; color:#555; border:1px solid #e2e8f0; border-radius:8px; padding:12px;"></div>
+            <img id="proof-modal-img" src="" style="width:100%; border-radius:10px; border:1px solid #e2e8f0; display:none;">
+            <div id="proof-modal-noimg" style="color:#aaa; font-style:italic; text-align:center; padding:20px;">No screenshot uploaded.</div>
         </div>
     </div>
 
@@ -208,6 +299,49 @@
         function safeJsonParse(value, fallback) {
             try { return JSON.parse(value || ''); } catch (e) { return fallback; }
         }
+
+        const menuData = [
+            { id:'m5', title:'Fillet Mignon', category:'Beef' },
+            { id:'m6', title:'Tenderloin Steak (200g)', category:'Beef' },
+            { id:'m7', title:'Tenderloin Tips (200g)', category:'Beef' },
+            { id:'m8', title:'Rib Eye Steak (200-350g)', category:'Beef' },
+            { id:'m9', title:'Hamburger Steak (204g)', category:'Beef' },
+            { id:'t1', title:'T-Bone Medium (250-400g)', category:'T-Bone & Sirloin' },
+            { id:'t2', title:'T-Bone Large (450-500g)', category:'T-Bone & Sirloin' },
+            { id:'t3', title:'T-Bone Extra Large (551-500g)', category:'T-Bone & Sirloin' },
+            { id:'t4', title:'T-Bone XX Large (551-500g)', category:'T-Bone & Sirloin' },
+            { id:'t5', title:'Porter House (551-600g)', category:'T-Bone & Sirloin' },
+            { id:'s1', title:'Sirloin Mini (250-300g)', category:'T-Bone & Sirloin' },
+            { id:'s2', title:'Sirloin Small (251-350g)', category:'T-Bone & Sirloin' },
+            { id:'s3', title:'Sirloin Mid Size (351-450g)', category:'T-Bone & Sirloin' },
+            { id:'s4', title:'Sirloin Big Size (401-450g)', category:'T-Bone & Sirloin' },
+            { id:'m1', title:'Whole Chicken', category:'Chicken & Fish' },
+            { id:'m2', title:'Half Chicken', category:'Chicken & Fish' },
+            { id:'m3', title:'Fish Steak (Tanigue)', category:'Chicken & Fish' },
+            { id:'m4', title:'Bangus Steak', category:'Chicken & Fish' },
+            { id:'sw1', title:'Big Sunny Burger with Fries', category:'Sandwich & Sides' },
+            { id:'sw2', title:'Big Sunny Steak Sandwich', category:'Sandwich & Sides' },
+            { id:'sw3', title:'Steak Sandwich', category:'Sandwich & Sides' },
+            { id:'sw4', title:'Cheeseburger', category:'Sandwich & Sides' },
+            { id:'sd1', title:'Cream of Mushroom Soup', category:'Sandwich & Sides' },
+            { id:'sd2', title:'Cream of Chicken Soup', category:'Sandwich & Sides' },
+            { id:'sd3', title:'Potato Salad', category:'Sandwich & Sides' },
+            { id:'sd4', title:'French Fries', category:'Sandwich & Sides' },
+            { id:'sd5', title:'Mashed Potato', category:'Sandwich & Sides' },
+            { id:'sd6', title:'Garlic Rice', category:'Sandwich & Sides' },
+            { id:'sd7', title:'Plain Rice', category:'Sandwich & Sides' },
+            { id:'d1', title:'Mango Juice', category:'Drinks' },
+            { id:'d2', title:'Pineapple Juice', category:'Drinks' },
+            { id:'d3', title:'Four Seasons', category:'Drinks' },
+            { id:'d4', title:'Iced Tea', category:'Drinks' },
+            { id:'d5', title:'Blue Lemonade', category:'Drinks' },
+            { id:'d6', title:'Coke in Can', category:'Drinks' },
+            { id:'d7', title:'San Mig Light', category:'Drinks' },
+            { id:'d8', title:'Drip Coffee', category:'Drinks' },
+            { id:'d9', title:'Bottled Water (500ml)', category:'Drinks' },
+            { id:'w1', title:'Carlo Rossi (Red)', category:'Drinks' },
+            { id:'w2', title:'Adega De Pegões', category:'Drinks' }
+        ];
 
         function getUsers() {
             return safeJsonParse(localStorage.getItem('adminUsers'), []) || [];
@@ -269,12 +403,15 @@
 
             function foodText(r) {
                 const foods = Array.isArray(r.foods) ? r.foods : [];
+                let text = '';
                 if (!foods.length) {
-                    // For standard bookings, show a small note.
-                    if (r.reservationType === 'standard') return 'Standard deposit (no foods recorded).';
-                    return 'No foods recorded.';
+                    if (r.reservationType === 'standard') text = 'Standard deposit (no foods recorded).';
+                    else text = 'No foods recorded.';
+                } else {
+                    text = foods.join(', ');
                 }
-                return foods.join(', ');
+                if (r.beefNote) text += ` | 🥩 ${r.beefNote}`;
+                return text;
             }
 
             function createTypePill(type) {
@@ -332,8 +469,15 @@
                     tdFoods.textContent = foods;
 
                     const tdPaid = document.createElement('td');
-                    tdPaid.textContent = `₱${Number(r.paymentAmount || 0).toLocaleString()}`;
-                    
+                    tdPaid.innerHTML = `<div>₱${Number(r.paymentAmount || 0).toLocaleString()}</div>`;
+                    if (r.paymentProof || r.paymentRef) {
+                        const proofBtn = document.createElement('button');
+                        proofBtn.textContent = '🧾 View Proof';
+                        proofBtn.style.cssText = 'font-size:11px; padding:3px 8px; margin-top:4px; background:#e0f2fe; border:1px solid #7ec8e3; color:#0369a1; border-radius:4px; cursor:pointer; display:block; width:100%;';
+                        proofBtn.onclick = () => window.openProofModal(r);
+                        tdPaid.appendChild(proofBtn);
+                    }
+
                     const tdActions = document.createElement('td');
                     tdActions.innerHTML = `
                         <button type="button" class="secondary" style="padding: 6px 10px; font-size: 12px; margin-right: 5px;" onclick="window.openEdit('${r.reservationNumber}')">Edit</button>
@@ -372,11 +516,56 @@
                     }
                 }
                 
+                const foodContainer = document.getElementById('edit-foods-container');
+                if(r.reservationType === 'priority') {
+                    foodContainer.style.display = 'block';
+                    const arr = r.foods || [];
+                    document.getElementById('edit-foods').value = arr.join(', ');
+                    document.getElementById('edit-beef').value = r.beefNote || '';
+                } else {
+                    foodContainer.style.display = 'none';
+                    document.getElementById('edit-foods').value = '';
+                    document.getElementById('edit-beef').value = '';
+                }
+
                 document.getElementById('edit-modal').classList.remove('hidden');
             };
 
             window.closeEditModal = function() {
                 document.getElementById('edit-modal').classList.add('hidden');
+            };
+
+            window.openProofModal = function(r) {
+                const modal = document.getElementById('proof-modal');
+                const img = document.getElementById('proof-modal-img');
+                const noImg = document.getElementById('proof-modal-noimg');
+                const info = document.getElementById('proof-modal-info');
+
+                const name = r.customerName || 'Guest';
+                const ref = r.paymentRef || '—';
+                const amount = `₱${Number(r.paymentAmount || 0).toLocaleString()}`;
+                const resNum = r.reservationNumber || '';
+
+                info.innerHTML = `
+                    <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                        <tr><td style="padding:5px 0; color:#888; width:120px;">👤 Customer</td><td style="font-weight:700;">${name}</td></tr>
+                        <tr><td style="padding:5px 0; color:#888;">🔖 Reservation #</td><td style="font-weight:700;">${resNum}</td></tr>
+                        <tr><td style="padding:5px 0; color:#888;">💚 Amount Paid</td><td style="font-weight:700; color:#16a34a;">${amount}</td></tr>
+                        <tr><td style="padding:5px 0; color:#888;">🏦 Ref / Account</td><td style="font-weight:700;">${ref}</td></tr>
+                    </table>
+                `;
+
+                if (r.paymentProof) {
+                    img.src = r.paymentProof;
+                    img.style.display = 'block';
+                    noImg.style.display = 'none';
+                } else {
+                    img.src = '';
+                    img.style.display = 'none';
+                    noImg.style.display = 'block';
+                }
+
+                modal.style.display = 'flex';
             };
 
             window.saveEditModal = function() {
@@ -387,6 +576,14 @@
                     hist[idx].arrivalDate = document.getElementById('edit-date').value;
                     hist[idx].arrivalTime = document.getElementById('edit-time').value;
                     hist[idx].bookedTable = document.getElementById('edit-table').value;
+
+                    if (hist[idx].reservationType === 'priority') {
+                        const rawFoods = document.getElementById('edit-foods').value.trim();
+                        hist[idx].foods = rawFoods ? rawFoods.split(',').map(f => f.trim()).filter(f => f) : [];
+                        hist[idx].orderSummary = hist[idx].foods.join(', ');
+                        hist[idx].beefNote = document.getElementById('edit-beef').value.trim();
+                    }
+
                     // Re-calculate the display string
                     const dateObj = new Date(`${hist[idx].arrivalDate}T${hist[idx].arrivalTime}`);
                     hist[idx].arrivalDateTimeDisplay = isNaN(dateObj) ? `${hist[idx].arrivalDate} at ${hist[idx].arrivalTime}` : dateObj.toLocaleString(undefined, {
@@ -436,7 +633,12 @@
                     const t = document.createElement('div');
                     t.className = `ticket status-${status}`;
                     
-                    const foodsHtml = (r.foods || []).map(f => `<li>1x ${f}</li>`).join('');
+                    const foodsHtml = (r.foods || []).map(f => `<li>${f}</li>`).join('');
+                    const beefHtml = r.beefNote
+                        ? `<div style="margin-top:8px; padding:7px 10px; background:rgba(21,128,61,.12); border-left:3px solid #15803d; border-radius:4px; font-size:12px; font-weight:700; color:#14532d;">
+                              🥩 ${r.beefNote}
+                           </div>`
+                        : '';
                     
                     let btns = '';
                     if (status === 'pending') {
@@ -459,6 +661,7 @@
                             </div>
                         </div>
                         <ul class="food-list">${foodsHtml}</ul>
+                        ${beefHtml}
                         <div class="actions">${btns}</div>
                     `;
                     grid.appendChild(t);
@@ -475,52 +678,537 @@
             };
 
             // Hostess Logic
-            const ALL_TABLES = ["Table 1", "Table 2", "Table 3", "Table 4", "Table 5", "Table 6", "Table 7", "Table 8", "Table 9", "VIP 10"];
+            const ALL_TABLES = ["Table 1", "Table 2", "Table 3", "Table 4", "Table 5", "Table 6", "Table 7", "Table 8", "Table 9", "Table 10"];
             const cycleStatus = { 'available': 'reserved', 'reserved': 'seated', 'seated': 'cleaning', 'cleaning': 'available' };
 
             function renderFloorPlan() {
                 const overrides = safeJsonParse(localStorage.getItem('tableOverrides'), {});
                 const hist = getReservationHistory();
                 const fp = document.getElementById('hostess-grid');
-                if(!fp) return;
+                if (!fp) return;
                 fp.innerHTML = '';
 
                 ALL_TABLES.forEach(tId => {
-                    let status = overrides[tId] || 'available';
-                    if (status === 'unavailable') status = 'reserved';
-                    
-                    const res = hist.find(r => r.bookedTable === tId && !r.completedAt);
-                    const metaText = res ? `in queue @ ${res.arrivalTime || 'today'}` : '';
+                    const status = overrides[tId] || 'available';
+
+                    const tableReservations = hist.filter(r => r.bookedTable === tId);
+                    const nextRes = tableReservations.find(r => !r.completedAt);
+                    const metaText = nextRes ? `${nextRes.arrivalDate || ''} @ ${nextRes.arrivalTime || '?'}` : '';
 
                     const card = document.createElement('div');
                     card.className = `table-card card-${status}`;
-                    card.onclick = () => {
-                        const next = cycleStatus[status] || 'available';
-                        overrides[tId] = next;
-                        localStorage.setItem('tableOverrides', JSON.stringify(overrides));
-                        renderFloorPlan();
-                        renderTableManagement(); // update the simple overrides above too
-                    };
-                    
+                    card.style.cursor = 'pointer';
+
                     card.innerHTML = `
                         <div class="table-name">${tId}</div>
                         <div class="table-status">${status}</div>
-                        <div class="table-meta">${status === 'reserved' && metaText ? metaText : ''}</div>
+                        <div class="table-meta" style="font-size:11px; color:#666; margin-top:4px;">${status === 'reserved' && metaText ? metaText : ''}</div>
+                        <div style="font-size:11px; color:#2e7d32; margin-top:2px;">${tableReservations.length > 0 ? `📋 ${tableReservations.length} Reservation${tableReservations.length > 1 ? 's' : ''}` : ''}</div>
                     `;
+
+                    card.addEventListener('click', (e) => {
+                        // Open the toast panel for this table
+                        openFloorToast(tId, hist, overrides);
+                    });
+
                     fp.appendChild(card);
                 });
             }
+
+            // Open toast showing reservations for a table + status cycler
+            window.openFloorToast = function(tId, hist, overrides) {
+                const toast = document.getElementById('floor-toast');
+                const titleEl = document.getElementById('toast-table-title');
+                const listEl = document.getElementById('toast-reservations-list');
+                const noResEl = document.getElementById('toast-no-res');
+
+                titleEl.textContent = tId;
+                listEl.innerHTML = '';
+
+                const tableRes = hist.filter(r => r.bookedTable === tId);
+
+                if (tableRes.length === 0) {
+                    noResEl.style.display = 'block';
+                } else {
+                    noResEl.style.display = 'none';
+                    tableRes.forEach((res, i) => {
+                        const resIdx = hist.indexOf(res);
+                        const card = document.createElement('div');
+                        card.className = 'toast-res-card';
+                        card.innerHTML = `
+                            <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:8px;">
+                                <div>
+                                    <strong>${res.reservationNumber || 'RES'}</strong>
+                                    <span style="margin-left:10px; font-size:13px; color:#555;">${res.customerName || 'Guest'}</span>
+                                </div>
+                                <span style="background:${res.reservationType === 'priority' ? '#fef9c3' : '#e0f2fe'}; color:${res.reservationType === 'priority' ? '#92400e' : '#0369a1'}; font-size:12px; font-weight:700; padding:2px 8px; border-radius:20px;">
+                                    ${res.reservationType || 'standard'}
+                                </span>
+                            </div>
+                            <div style="font-size:13px; color:#444; margin-bottom:10px;">
+                                📅 ${res.arrivalDate || '—'} &nbsp;⏰ ${res.arrivalTime || '—'}
+                            </div>
+                            <div class="toast-edit-row">
+                                <div>
+                                    <label>Date</label>
+                                    <input type="date" id="toast-date-${resIdx}" value="${res.arrivalDate || ''}">
+                                </div>
+                                <div>
+                                    <label>Time</label>
+                                    <input type="time" id="toast-time-${resIdx}" value="${res.arrivalTime || ''}" min="10:30" max="21:00">
+                                </div>
+                                <button class="toast-save-btn" onclick="saveFloorToastEdit(${resIdx})">Save</button>
+                            </div>
+                        `;
+                        listEl.appendChild(card);
+                    });
+                }
+
+                // Status cycle button
+                const currentStatus = overrides[tId] || 'available';
+                const cycleMap = { 'available': 'reserved', 'reserved': 'seated', 'seated': 'cleaning', 'cleaning': 'available', 'unavailable': 'available' };
+                const nextStatus = cycleMap[currentStatus] || 'available';
+
+                const btnRow = document.createElement('div');
+                btnRow.style.display = 'flex';
+                btnRow.style.gap = '10px';
+                btnRow.style.marginTop = '14px';
+
+                const cycleBtn = document.createElement('button');
+                cycleBtn.textContent = `Set to: ${nextStatus.charAt(0).toUpperCase() + nextStatus.slice(1)}`;
+                cycleBtn.style.cssText = 'flex:1; background:#f1f5f9; border:1px solid #cbd5e1; color:#333; padding:9px 18px; border-radius:6px; cursor:pointer; font-weight:600; font-size:14px;';
+                cycleBtn.onclick = () => {
+                    overrides[tId] = nextStatus;
+                    localStorage.setItem('tableOverrides', JSON.stringify(overrides));
+                    renderFloorPlan();
+                    toast.style.display = 'none';
+                };
+
+                const overrideBtn = document.createElement('button');
+                const isUnavailable = currentStatus === 'unavailable';
+                overrideBtn.textContent = isUnavailable ? 'Make Available' : 'Mark Unavailable';
+                overrideBtn.style.cssText = `flex:1; background:${isUnavailable ? '#16a34a' : '#ef4444'}; color:white; border:none; padding:9px 18px; border-radius:6px; cursor:pointer; font-weight:700; font-size:14px;`;
+                overrideBtn.onclick = () => {
+                    overrides[tId] = isUnavailable ? 'available' : 'unavailable';
+                    localStorage.setItem('tableOverrides', JSON.stringify(overrides));
+                    renderFloorPlan();
+                    toast.style.display = 'none';
+                };
+
+                btnRow.appendChild(cycleBtn);
+                btnRow.appendChild(overrideBtn);
+                listEl.appendChild(btnRow);
+
+                toast.style.display = 'block';
+                // Re-run animation
+                toast.style.animation = 'none';
+                toast.offsetHeight; // reflow
+                toast.style.animation = 'slideUp 0.3s ease';
+            };
+
+            window.saveFloorToastEdit = function(idx) {
+                const hist = getReservationHistory();
+                if (idx >= 0 && idx < hist.length) {
+                    const newDate = document.getElementById(`toast-date-${idx}`)?.value || hist[idx].arrivalDate;
+                    const newTime = document.getElementById(`toast-time-${idx}`)?.value || hist[idx].arrivalTime;
+
+                    if (newTime < '10:30' || newTime > '21:00') {
+                        alert('Time must be between 10:30 AM and 9:00 PM.');
+                        return;
+                    }
+
+                    hist[idx].arrivalDate = newDate;
+                    hist[idx].arrivalTime = newTime;
+                    const d = new Date(`${newDate}T${newTime}`);
+                    hist[idx].arrivalDateTimeDisplay = isNaN(d) ? `${newDate} at ${newTime}` : d.toLocaleString(undefined, {
+                        weekday: 'short', month: 'short', day: 'numeric',
+                        hour: 'numeric', minute: '2-digit', hour12: true
+                    });
+                    localStorage.setItem('reservationHistory', JSON.stringify(hist));
+
+                    // Show a quick success flash on the button
+                    const btn = document.querySelector(`#toast-time-${idx}`)?.closest('.toast-edit-row')?.querySelector('.toast-save-btn');
+                    if (btn) { btn.textContent = '✓ Saved!'; btn.style.background = '#16a34a'; setTimeout(() => { btn.textContent = 'Save'; btn.style.background = '#2e7d32'; }, 1500); }
+
+                    renderFloorPlan();
+                    renderDashboard();
+                }
+            };
+
+
+            // Live chat admin logic
+            window.currentActiveChat = null;
+            
+            window.renderAdminChats = function(forceScroll = false) {
+                const allChats = safeJsonParse(localStorage.getItem('liveChats'), {});
+                const listEl = document.getElementById('adminChatList');
+                if(!listEl) return;
+                
+                const sessions = Object.keys(allChats);
+                if (sessions.length === 0) {
+                    listEl.innerHTML = '<div style="padding: 15px; color:#666; font-size:14px; text-align:center;">No active chats.</div>';
+                    return;
+                }
+
+                let listHtml = '';
+                sessions.forEach(sId => {
+                    const msgs = allChats[sId];
+                    if (msgs.length === 0) return;
+                    
+                    const lastMsg = msgs[msgs.length - 1];
+                    let cName = 'Guest';
+                    const custMsg = msgs.find(m => m.sender === 'customer');
+                    if(custMsg) cName = custMsg.name;
+                    
+                    const isActive = sId === window.currentActiveChat;
+                    
+                    listHtml += `
+                        <div class="chat-session-card ${isActive ? 'active' : ''}" onclick="selectAdminChat('${sId}')">
+                            <div class="chat-session-title">${cName}</div>
+                            <div class="chat-session-meta">${lastMsg.time} • ${msgs.length} messages</div>
+                        </div>
+                    `;
+                });
+                
+                if(listEl.innerHTML !== listHtml) {
+                    listEl.innerHTML = listHtml;
+                }
+
+                // If currently viewing a chat, refresh only its content via selectAdminChat silently
+                if (window.currentActiveChat) {
+                    const mainHasContent = document.getElementById('adminChatBody') !== null;
+                    if(!mainHasContent || forceScroll) {
+                        selectAdminChat(window.currentActiveChat, true);
+                    } else {
+                        // Silent update without re-focusing or ruining input
+                        const allChats2 = safeJsonParse(localStorage.getItem('liveChats'), {});
+                        const msgs2 = allChats2[window.currentActiveChat] || [];
+                        let bodyHtml = '';
+                        msgs2.forEach(m => {
+                            const isStaff = m.sender === 'staff';
+                            bodyHtml += `
+                                <div class="chat-msg-admin ${isStaff ? 'staff' : 'customer'}">
+                                    ${m.text}
+                                    <div class="chat-time-admin">${m.time}</div>
+                                </div>
+                            `;
+                        });
+                        const b = document.getElementById('adminChatBody');
+                        if (b) {
+                             const isAtBottom = b.scrollHeight - b.scrollTop <= b.clientHeight + 50;
+                             b.innerHTML = bodyHtml;
+                             if(isAtBottom) b.scrollTop = b.scrollHeight;
+                        }
+                    }
+                }
+            };
+
+            // Live payments logic
+            function renderPayments() {
+                const hist = getReservationHistory();
+                const pending = hist.filter(r => r.paymentStatus === 'pending');
+                const listEl = document.getElementById('payment-history-list');
+                const emptyEl = document.getElementById('payment-history-empty');
+
+                if (pending.length === 0) {
+                    listEl.innerHTML = '';
+                    emptyEl.style.display = 'block';
+                    return;
+                }
+
+                emptyEl.style.display = 'none';
+                let html = '';
+                
+                pending.forEach(r => {
+                    const rIdx = hist.findIndex(hr => hr.reservationNumber === r.reservationNumber);
+                    const amount = `₱${Number(r.paymentAmount || 0).toLocaleString()}`;
+                    
+                    html += `
+                        <div class="card" style="border-left: 4px solid #f59e0b;">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                                <strong style="font-size:16px;">${r.reservationNumber}</strong>
+                                <span class="pill" style="background:#fef3c7; color:#b45309;">${r.reservationType}</span>
+                            </div>
+                            <div style="font-size:14px; color:#555; margin-bottom:4px;">👤 <strong>${r.customerName}</strong></div>
+                            <div style="font-size:14px; color:#555; margin-bottom:4px;">💰 Amount: <strong style="color:#1b5e20;">${amount}</strong></div>
+                            <div style="font-size:14px; color:#555; margin-bottom:12px;">🏦 Ref: ${r.paymentRef || 'None'}</div>
+                            
+                            <button type="button" class="secondary" style="width:100%; margin-bottom:8px; padding:8px 0; font-size:13px;" onclick='window.openProofModal(${JSON.stringify(r)})'>🧾 View Payment Proof</button>
+                            
+                            <div style="display:flex; gap:8px;">
+                                <button type="button" style="flex:1; background:#ef4444; color:white; border:none; padding:8px 0; border-radius:6px; cursor:pointer;" onclick="rejectPayment(${rIdx})">Reject</button>
+                                <button type="button" style="flex:1; background:#10b981; color:white; border:none; padding:8px 0; border-radius:6px; cursor:pointer;" onclick="verifyPayment(${rIdx})">Verify</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                listEl.innerHTML = html;
+            }
+
+            window.verifyPayment = function(idx) {
+                if(!confirm("Verify and approve this payment?")) return;
+                const hist = getReservationHistory();
+                if(hist[idx]) {
+                    hist[idx].paymentStatus = 'verified';
+                    const resNo = hist[idx].reservationNumber;
+                    const custName = hist[idx].customerName || 'Guest';
+                    
+                    localStorage.setItem('reservationHistory', JSON.stringify(hist));
+
+                    // Inject receipt to chat
+                    let chats = safeJsonParse(localStorage.getItem('liveChats'), {});
+                    let targetChatId = null;
+                    
+                    // Match chat session to customer name
+                    for(let sId in chats) {
+                        if (chats[sId].some(m => m.sender === 'customer' && m.name === custName)) {
+                            targetChatId = sId;
+                            break;
+                        }
+                    }
+
+                    // Create chat session if none exists
+                    if (!targetChatId) {
+                        targetChatId = 'session_' + Math.random().toString(36).substr(2, 9);
+                        chats[targetChatId] = [{
+                            sender: 'customer',
+                            name: custName,
+                            text: 'Connected successfully.',
+                            time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                        }];
+                    }
+
+                    const receiptHtml = `
+                        <div style="background:#f0fdf4; border:1px solid #bbf7d0; padding:12px; border-radius:8px; margin-top:8px;">
+                            <div style="font-weight:bold; color:#1b5e20; margin-bottom:6px;">✅ Payment Verified</div>
+                            <div style="font-size:12px; margin-bottom:8px; color:#555;">Your reservation <strong>${resNo}</strong> is confirmed. Here is your receipt:</div>
+                            <a href="receipt.html?res=${resNo}" target="_blank" style="display:inline-block; background:#2e7d32; color:white; padding:6px 12px; border-radius:4px; text-decoration:none; font-size:12px; font-weight:bold;">🧾 View Receipt</a>
+                        </div>
+                    `;
+
+                    chats[targetChatId].push({
+                        sender: 'staff',
+                        text: receiptHtml,
+                        time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                    });
+                    
+                    localStorage.setItem('liveChats', JSON.stringify(chats));
+
+                    renderPayments();
+                    renderDashboard(); // Refresh full history
+                }
+            };
+
+            window.rejectPayment = function(idx) {
+                if(!confirm("Reject this payment? The customer will be forced to cancel and try again.")) return;
+                const hist = getReservationHistory();
+                if(hist[idx]) {
+                    hist.splice(idx, 1); // Delete completely so customer gets kicked back to start
+                    localStorage.setItem('reservationHistory', JSON.stringify(hist));
+                    renderPayments();
+                    renderDashboard();
+                }
+            };
+
+            window.selectAdminChat = function(sId, isSilent = false) {
+                window.currentActiveChat = sId;
+                const allChats = safeJsonParse(localStorage.getItem('liveChats'), {});
+                const msgs = allChats[sId] || [];
+                
+                let cName = 'Guest';
+                const custMsg = msgs.find(m => m.sender === 'customer');
+                if(custMsg) cName = custMsg.name;
+                
+                const mainEl = document.getElementById('adminChatMain');
+                
+                let bodyHtml = '';
+                msgs.forEach(m => {
+                    const isStaff = m.sender === 'staff';
+                    bodyHtml += `
+                        <div class="chat-msg-admin ${isStaff ? 'staff' : 'customer'}">
+                            ${m.text}
+                            <div class="chat-time-admin">${m.time}</div>
+                        </div>
+                    `;
+                });
+                
+                if(!isSilent) {
+                    mainEl.innerHTML = `
+                        <div class="chat-main-header">
+                            Chatting with: ${cName}
+                        </div>
+                        <div class="chat-main-body" id="adminChatBody">
+                            ${bodyHtml}
+                        </div>
+                        <div class="chat-reply-area">
+                            <label for="adminChatAttach" style="cursor:pointer; font-size:24px; color:#2e7d32; display:flex; align-items:center;">📷</label>
+                            <input type="file" id="adminChatAttach" accept="image/*" style="display:none;" onchange="sendAdminPhoto(this)">
+                            <input type="text" id="adminChatInput" class="chat-reply-input" placeholder="Type a reply..." onkeypress="if(event.key==='Enter') sendAdminReply()">
+                            <button class="chat-reply-btn" onclick="sendAdminReply()">Reply</button>
+                        </div>
+                    `;
+                    const body = document.getElementById('adminChatBody');
+                    if(body) body.scrollTop = body.scrollHeight;
+                }
+                
+                const listEl = document.getElementById('adminChatList');
+                if (listEl) {
+                    Array.from(listEl.children).forEach(child => {
+                        child.classList.remove('active');
+                        if(child.getAttribute('onclick') && child.getAttribute('onclick').includes(sId)) {
+                            child.classList.add('active');
+                        }
+                    });
+                }
+            };
+
+            window.sendAdminReply = function() {
+                if (!window.currentActiveChat) return;
+                const input = document.getElementById('adminChatInput');
+                if (!input) return;
+                const txt = input.value.trim();
+                if (!txt) return;
+                
+                const allChats = safeJsonParse(localStorage.getItem('liveChats'), {});
+                if (!allChats[window.currentActiveChat]) return;
+                
+                allChats[window.currentActiveChat].push({
+                    sender: 'staff',
+                    text: txt,
+                    time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                });
+                
+                localStorage.setItem('liveChats', JSON.stringify(allChats));
+                input.value = '';
+                selectAdminChat(window.currentActiveChat, false);
+            };
+
+            window.sendAdminPhoto = function(input) {
+                if (!window.currentActiveChat) return;
+                const file = input.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const b64 = e.target.result;
+                    const txt = `<img src="${b64}" style="max-width:100%; border-radius:8px; margin-top:5px; cursor:pointer;" onclick="window.open('${b64}')">`;
+                    
+                    const allChats = safeJsonParse(localStorage.getItem('liveChats'), {});
+                    if (!allChats[window.currentActiveChat]) return;
+                    
+                    allChats[window.currentActiveChat].push({
+                        sender: 'staff',
+                        text: txt,
+                        time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                    });
+                    
+                    localStorage.setItem('liveChats', JSON.stringify(allChats));
+                    input.value = '';
+                    selectAdminChat(window.currentActiveChat, false);
+                };
+                reader.readAsDataURL(file);
+            };
+
+            // Promotions logic
+            window.promoBase64 = '';
+            
+            window.previewPromoImage = function(input) {
+                const file = input.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    window.promoBase64 = e.target.result;
+                    const img = document.getElementById('promo-preview-img');
+                    img.src = window.promoBase64;
+                    img.style.display = 'inline-block';
+                };
+                reader.readAsDataURL(file);
+            };
+
+            window.addPromo = function() {
+                const title = document.getElementById('promo-title').value.trim();
+                const desc = document.getElementById('promo-desc').value.trim();
+                
+                if (!title || !desc || !window.promoBase64) {
+                    alert('Please provide a title, description, and upload an image.');
+                    return;
+                }
+
+                const promos = safeJsonParse(localStorage.getItem('activePromos'), []);
+                promos.push({
+                    id: 'promo_' + Date.now(),
+                    title: title,
+                    desc: desc,
+                    image: window.promoBase64,
+                    publishedAt: new Date().toLocaleDateString()
+                });
+                
+                localStorage.setItem('activePromos', JSON.stringify(promos));
+                
+                // Clear form
+                document.getElementById('promo-title').value = '';
+                document.getElementById('promo-desc').value = '';
+                document.getElementById('promo-preview-img').style.display = 'none';
+                document.getElementById('promo-preview-img').src = '';
+                window.promoBase64 = '';
+                document.getElementById('promo-upload-input').value = '';
+                
+                alert('Promotion published to homepage!');
+                renderPromosAdmin();
+            };
+
+            window.deletePromo = function(id) {
+                if(confirm('Are you sure you want to remove this promotion?')) {
+                    let promos = safeJsonParse(localStorage.getItem('activePromos'), []);
+                    promos = promos.filter(p => p.id !== id);
+                    localStorage.setItem('activePromos', JSON.stringify(promos));
+                    renderPromosAdmin();
+                }
+            };
+
+            window.renderPromosAdmin = function() {
+                const promos = safeJsonParse(localStorage.getItem('activePromos'), []);
+                const listEl = document.getElementById('promo-list');
+                const emptyEl = document.getElementById('promo-empty');
+                
+                if (!listEl) return;
+
+                if (promos.length === 0) {
+                    listEl.innerHTML = '';
+                    emptyEl.style.display = 'block';
+                    return;
+                }
+                
+                emptyEl.style.display = 'none';
+                let html = '';
+                promos.forEach(p => {
+                    html += `
+                        <div class="card" style="padding:15px;">
+                            <img src="${p.image}" style="width:100%; height:140px; object-fit:cover; border-radius:8px; margin-bottom:10px;">
+                            <div style="font-weight:700; font-size:16px; color:#1b5e20; margin-bottom:5px;">${p.title}</div>
+                            <div style="font-size:13px; color:#555; margin-bottom:12px; line-height:1.4;">${p.desc}</div>
+                            <button type="button" class="danger" style="width:100%; font-size:12px; padding:6px 0;" onclick="deletePromo('${p.id}')">Remove Promo</button>
+                        </div>
+                    `;
+                });
+                listEl.innerHTML = html;
+            };
 
             // Bind pollers
             if(!window.isPollingActive) {
                 setInterval(() => {
                     renderKitchenQueue();
                     renderFloorPlan();
+                    renderAdminChats();
+                    renderPayments();
+                    renderPromosAdmin();
                 }, 5000);
                 window.isPollingActive = true;
             }
             renderKitchenQueue();
             renderFloorPlan();
+            renderPayments();
+            renderPromosAdmin();
 
             window.deleteItem = function(resObjNum) {
                 if(confirm("Are you sure you want to delete this reservation? This cannot be undone.")) {
@@ -576,41 +1264,70 @@
                 ? byDateEntries.map(([d, c]) => `${d}: ${c}`).slice(-10).join(' | ')
                 : 'No arrival dates stored yet.';
 
-            // TABLE MANAGEMENT
-            function renderTableManagement() {
-                const grid = document.getElementById('admin-tables-grid');
-                if(!grid) return;
-                grid.innerHTML = '';
-                const overrides = safeJsonParse(localStorage.getItem('tableOverrides'), {});
-                // We have Table 1 to Table 10 in the seat-selection.html
-                for(let i=1; i<=10; i++) {
-                    const tId = `Table ${i}`;
-                    const isUnavailable = overrides[tId] === 'unavailable';
-                    
-                    const el = document.createElement('div');
-                    el.className = 'card';
-                    el.style.textAlign = 'center';
-                    el.style.padding = '14px 10px';
-                    
-                    el.innerHTML = `
-                        <div style="font-weight: 800; margin-bottom: 10px; color: #444; font-size: 15px;">${tId}</div>
-                        <button type="button" style="width: 100%; font-size: 13px; padding: 8px; ${isUnavailable ? 'background-color: #ef4444; border-color: #b91c1c; color: white;' : ''}" onclick="toggleTable('${tId}')">
-                            ${isUnavailable ? 'Unavailable' : 'Available'}
-                        </button>
-                    `;
-                    grid.appendChild(el);
-                }
+            // MENU MANAGEMENT
+            function renderMenuManagement() {
+                const container = document.getElementById('admin-menu-grid');
+                if(!container) return;
+                container.innerHTML = '';
+                const soldOut = safeJsonParse(localStorage.getItem('soldOutItems'), []);
+                
+                // Group to categories
+                const grouped = {};
+                menuData.forEach(item => {
+                    const cat = item.category || 'Other';
+                    if(!grouped[cat]) grouped[cat] = [];
+                    grouped[cat].push(item);
+                });
+
+                Object.keys(grouped).forEach(catName => {
+                    const catTitle = document.createElement('h3');
+                    catTitle.style.marginTop = '24px';
+                    catTitle.style.marginBottom = '12px';
+                    catTitle.style.fontFamily = "'Playfair Display', serif";
+                    catTitle.style.color = '#2e7d32';
+                    catTitle.style.borderBottom = '2px solid #e2e8f0';
+                    catTitle.style.paddingBottom = '6px';
+                    catTitle.style.fontSize = '18px';
+                    catTitle.textContent = catName;
+                    container.appendChild(catTitle);
+
+                    const grid = document.createElement('div');
+                    grid.className = 'grid';
+                    grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(200px, 1fr))';
+                    grid.style.gap = '12px';
+
+                    grouped[catName].forEach(item => {
+                        const isSoldOut = soldOut.includes(item.id);
+                        
+                        const el = document.createElement('div');
+                        el.className = 'card';
+                        el.style.textAlign = 'center';
+                        el.style.padding = '14px 10px';
+                        
+                        el.innerHTML = `
+                            <div style="font-weight: 700; margin-bottom: 6px; color: #444; font-size: 13px; min-height: 38px; display: flex; align-items: center; justify-content: center;">${item.title}</div>
+                            <button type="button" style="width: 100%; font-size: 13px; padding: 8px; ${isSoldOut ? 'background-color: #ef4444; border-color: #b91c1c; color: white;' : ''}" onclick="toggleMenuItem('${item.id}')">
+                                ${isSoldOut ? 'Sold Out' : 'Available'}
+                            </button>
+                        `;
+                        grid.appendChild(el);
+                    });
+                    container.appendChild(grid);
+                });
             }
-            
-            window.toggleTable = function(tId) {
-                const overrides = safeJsonParse(localStorage.getItem('tableOverrides'), {});
-                if (overrides[tId] === 'unavailable') overrides[tId] = 'available';
-                else overrides[tId] = 'unavailable';
-                localStorage.setItem('tableOverrides', JSON.stringify(overrides));
-                renderTableManagement(); // visually update
+
+            window.toggleMenuItem = function(id) {
+                let soldOut = safeJsonParse(localStorage.getItem('soldOutItems'), []);
+                if (soldOut.includes(id)) {
+                    soldOut = soldOut.filter(i => i !== id);
+                } else {
+                    soldOut.push(id);
+                }
+                localStorage.setItem('soldOutItems', JSON.stringify(soldOut));
+                renderMenuManagement();
             };
-            
-            renderTableManagement();
+
+            renderMenuManagement();
 
             // Export CSV
             const exportBtn = document.getElementById('export-csv-btn');
@@ -677,7 +1394,7 @@
             adminStatus.textContent = username ? `Signed in as ${username}` : '';
             logoutBtn.style.display = 'inline-block';
 
-            // --- ONLINE ACTIVITY TRACKING HEARTBEAT ---
+            // Online activity tracking heartbeat
             function updateOnlineStatus() {
                 const online = safeJsonParse(localStorage.getItem('onlineCustomers'), {});
                 const now = Date.now();
@@ -701,6 +1418,23 @@
             }
             updateOnlineStatus(); // Initial run
             setInterval(updateOnlineStatus, 5000); // Poll every 5 seconds
+            
+            // Staff heartbeat
+            setInterval(() => {
+                const me = localStorage.getItem('adminLoggedInUser');
+                if (me) {
+                    const onlineAdmins = safeJsonParse(localStorage.getItem('onlineAdmins'), {});
+                    onlineAdmins[me] = Date.now();
+                    
+                    // Cleanup stale admins
+                    for (const a in onlineAdmins) {
+                        if (Date.now() - onlineAdmins[a] > 15000) {
+                            delete onlineAdmins[a];
+                        }
+                    }
+                    localStorage.setItem('onlineAdmins', JSON.stringify(onlineAdmins));
+                }
+            }, 5000);
             
             // Delete removed cleanly
             window.addEventListener('beforeunload', () => {
@@ -729,22 +1463,6 @@
             if (!users.length) {
                 noAdminUsers.classList.remove('hidden');
                 adminLoginPanel.classList.add('hidden');
-
-                document.getElementById('create-admin-btn').addEventListener('click', async () => {
-                    const username = (document.getElementById('create-admin-username').value || '').trim();
-                    const password = document.getElementById('create-admin-password').value || '';
-
-                    authMsg.textContent = '';
-                    if (!username) return authMsg.textContent = 'Enter admin username.';
-                    if (password.length < 4) return authMsg.textContent = 'Password must be at least 4 characters.';
-
-                    const passwordHash = await sha256Hex(password);
-                    const newUsers = [{ username, passwordHash }];
-                    setUsers(newUsers);
-                    setAdminSession(username);
-                    renderDashboard();
-                });
-
                 return;
             }
 
@@ -768,18 +1486,6 @@
                 renderDashboard();
             });
 
-            // Reset admin credentials saved in this browser only.
-            const resetBtn = document.getElementById('reset-admin-btn');
-            resetBtn.addEventListener('click', () => {
-                const ok = confirm(
-                    'Reset admin credentials on this browser?\n\n' +
-                    'This deletes saved admin login data (adminUsers) so you can create a new admin account.'
-                );
-                if (!ok) return;
-                localStorage.removeItem('adminUsers');
-                localStorage.removeItem('adminLoggedInUser');
-                window.location.reload();
-            });
         }
 
         initAuth();

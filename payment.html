@@ -6,26 +6,7 @@
     <title>Priority Booking Payment | Roland's</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
-    <style>
-        #payment-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 70vh;
-            padding: 40px 20px;
-            text-align: center;
-        }
-        .payment-card {
-            background: white;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            max-width: 400px;
-            width: 100%;
-            border-top: 6px solid #fbbf24;
-        }
-    </style>
+    <link rel="stylesheet" href="css/gcash.css">
 </head>
 <body>
     <header id="main-header">
@@ -33,19 +14,77 @@
     </header>
 
     <section id="payment-section">
-        <div class="payment-card">
-            <h2 style="font-family: 'Playfair Display'; color: #2e7d32; margin-bottom: 10px; font-size: clamp(22px, 5vw, 32px);">Payment</h2>
-            <p>Please send the payment via GCash.</p>
-            <div style="background: #e2e8f0; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                <p style="margin: 0; font-size: 14px; color: #555;">GCash Number</p>
-                <h3 style="margin: 5px 0;">0912 345 6789</h3>
-                <p style="margin: 10px 0 0 0; font-size: 14px; color: #555;">Amount Due</p>
-                <h3 style="margin: 5px 0; color: #2e7d32;">₱<span id="display-amt"></span></h3>
+        <div class="payment-card" style="position: relative;">
+            <h2 style="font-family:'Playfair Display',serif; color:#2e7d32; margin:0 0 4px; font-size:clamp(22px,5vw,30px);">Complete Payment</h2>
+            <p style="color:#888; margin:0 0 8px; font-size:14px;">Scan or save the QR code, then upload your screenshot.</p>
+
+            <!-- Amount badge -->
+            <div class="amount-badge">
+                <p style="margin:0; font-size:12px; color:#555; text-transform:uppercase; letter-spacing:.5px;">Amount Due</p>
+                <p style="margin:6px 0 0; font-size:28px; font-weight:800; color:#1b5e20;">₱<span id="display-amt"></span></p>
             </div>
-            
-            <input type="text" id="ref-num" placeholder="Enter GCash Reference No." style="width:100%; padding:14px; margin-bottom:20px; border:1px solid #ccc; border-radius:6px; box-sizing: border-box;" required>
-            
-            <button id="confirm-payment-btn" style="width:100%;">Confirm Payment</button>
+
+            <!-- Animated toggle -->
+            <div class="pay-toggle" id="payToggle">
+                <div class="pay-toggle-slider" id="toggleSlider"></div>
+                <button class="pay-toggle-btn active" id="btnGcash" onclick="switchQR('gcash')">💙 GCash</button>
+                <button class="pay-toggle-btn" id="btnQrph" onclick="switchQR('qrph')">🔴 QR Ph</button>
+            </div>
+
+            <!-- QR Panels -->
+            <div class="qr-panels">
+
+                <!-- GCash Panel -->
+                <div class="qr-panel active" id="panel-gcash">
+                    <div class="qr-img-wrap">
+                        <img src="images/gcash-qr.png" alt="GCash QR Code">
+                    </div>
+                    <a href="images/gcash-qr.png" download="gcash-qr.png" class="save-btn gcash">
+                        💾 Save to Device
+                    </a>
+                </div>
+
+                <!-- QR Ph Panel -->
+                <div class="qr-panel" id="panel-qrph">
+                    <div class="qr-img-wrap">
+                        <img src="images/qrph-qr.png" alt="QR Ph Code">
+                    </div>
+                    <a href="images/qrph-qr.png" download="qrph-qr.png" class="save-btn qrph">
+                        💾 Save to Device
+                    </a>
+                </div>
+
+            </div>
+
+            <!-- Upload proof -->
+            <div style="margin-top: 28px; text-align:left;">
+                <label style="font-weight:700; font-size:13px; color:#333; text-transform:uppercase; letter-spacing:.5px; display:block; margin-bottom:8px;">
+                    Upload Payment Screenshot
+                </label>
+                <div class="upload-zone" id="uploadZone">
+                    <input type="file" id="proof-upload" accept="image/*" onchange="previewProof(this)">
+                    <div id="upload-placeholder">
+                        <div class="upload-icon">📤</div>
+                        <p style="margin:0; font-size:14px; color:#666;">Tap to upload your payment screenshot</p>
+                        <p style="margin:4px 0 0; font-size:12px; color:#aaa;">PNG, JPG supported</p>
+                    </div>
+                    <img id="upload-preview" class="upload-preview" alt="Payment screenshot preview">
+                </div>
+                <p id="upload-filename" style="font-size:12px; color:#2e7d32; margin:6px 0 0; font-weight:600;"></p>
+            </div>
+
+            <!-- Reference No. (optional backup) -->
+            <div style="margin-top:18px; text-align:left;">
+                <label style="font-weight:700; font-size:13px; color:#333; text-transform:uppercase; letter-spacing:.5px; display:block; margin-bottom:8px;">
+                    Reference No. <span style="font-weight:400; color:#aaa;">(optional)</span>
+                </label>
+                <input type="text" id="ref-num" placeholder="GCash / QR Ph reference number"
+                    style="width:100%; padding:13px 14px; border:1px solid #ddd; border-radius:10px; font-size:15px; box-sizing:border-box; font-family:'Roboto',sans-serif;">
+            </div>
+
+            <button id="confirm-payment-btn" style="width:100%; margin-top:22px; padding:16px; font-size:16px; border-radius:12px;">
+                ✅ Confirm & Submit Payment
+            </button>
         </div>
     </section>
 
@@ -53,50 +92,119 @@
         const total = localStorage.getItem('totalBill') || '0';
         document.getElementById('display-amt').textContent = Number(total).toLocaleString();
 
-        document.getElementById('confirm-payment-btn').addEventListener('click', () => {
+        function switchQR(type) {
+            const slider = document.getElementById('toggleSlider');
+            const btnGcash = document.getElementById('btnGcash');
+            const btnQrph = document.getElementById('btnQrph');
+            const panelGcash = document.getElementById('panel-gcash');
+            const panelQrph = document.getElementById('panel-qrph');
+
+            if(type === 'gcash') {
+                slider.classList.remove('right');
+                btnGcash.classList.add('active');
+                btnQrph.classList.remove('active');
+                panelGcash.classList.add('active');
+                panelQrph.classList.remove('active');
+            } else {
+                slider.classList.add('right');
+                btnGcash.classList.remove('active');
+                btnQrph.classList.add('active');
+                panelGcash.classList.remove('active');
+                panelQrph.classList.add('active');
+            }
+        }
+
+        function previewProof(input) {
+            const preview = document.getElementById('upload-preview');
+            const placeholder = document.getElementById('upload-placeholder');
+            const filename = document.getElementById('upload-filename');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    placeholder.style.display = 'none';
+                    filename.textContent = input.files[0].name;
+                    localStorage.setItem('tempPaymentUpload', e.target.result);
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        document.getElementById('confirm-payment-btn').addEventListener('click', async () => {
             const ref = document.getElementById('ref-num').value.trim();
-            if(!ref) return alert("Please enter the GCash reference number.");
-            
+            const fileInput = document.getElementById('proof-upload');
+            const hasFile = fileInput && fileInput.files && fileInput.files.length > 0;
+
+            if (!ref && !hasFile) {
+                return alert("Please upload your payment screenshot or enter the reference number.");
+            }
+
             document.getElementById('confirm-payment-btn').textContent = "Processing...";
             document.getElementById('confirm-payment-btn').disabled = true;
 
-            setTimeout(() => {
-                const resNo = 'RES-' + Math.floor(100000 + Math.random() * 900000);
-                localStorage.setItem('reservationNumber', resNo);
-                
-                const history = JSON.parse(localStorage.getItem('reservationHistory') || '[]');
-                
-                const orderText = localStorage.getItem('orderSummary') || '';
-                const foodArray = orderText ? orderText.split(', ') : [];
-                
-                const dateKey = localStorage.getItem('arrivalDate') || '';
-                const timeKey = localStorage.getItem('arrivalTime') || '';
-                const rawDateStr = dateKey + "T" + timeKey;
-                const d = new Date(rawDateStr);
-                const displayDt = isNaN(d) ? rawDateStr : d.toLocaleString(undefined, {
-                    weekday: 'short', month: 'short', day: 'numeric',
-                    hour: 'numeric', minute: '2-digit', hour12: true
+            const resNo = 'RES-' + Math.floor(100000 + Math.random() * 900000);
+            localStorage.setItem('reservationNumber', resNo);
+
+            const history = JSON.parse(localStorage.getItem('reservationHistory') || '[]');
+
+            const orderText = localStorage.getItem('orderSummary') || '';
+            const foodArray = orderText ? orderText.split(', ') : [];
+
+            const dateKey = localStorage.getItem('arrivalDate') || '';
+            const timeKey = localStorage.getItem('arrivalTime') || '';
+            const rawDateStr = dateKey + "T" + timeKey;
+            const d = new Date(rawDateStr);
+            const displayDt = isNaN(d) ? rawDateStr : d.toLocaleString(undefined, {
+                weekday: 'short', month: 'short', day: 'numeric',
+                hour: 'numeric', minute: '2-digit', hour12: true
+            });
+
+            localStorage.setItem('arrivalDateTimeDisplay', displayDt);
+
+            const reservationData = {
+                name:  localStorage.getItem('customerName'),
+                date:  dateKey,
+                time:  timeKey,
+                table: localStorage.getItem('bookedTable')
+            };
+
+            // Try to save to SQL Server; silently fall back to localStorage-only if offline
+            try {
+                const response = await fetch("http://localhost:3000/reserve", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(reservationData)
                 });
-                
-                localStorage.setItem('arrivalDateTimeDisplay', displayDt);
-                
-                history.push({
-                    reservationNumber: resNo,
-                    reservationType: 'priority',
-                    arrivalDate: dateKey,
-                    arrivalTime: timeKey,
-                    arrivalDateTimeDisplay: displayDt,
-                    customerName: localStorage.getItem('customerName'),
-                    bookedTable: localStorage.getItem('bookedTable'),
-                    orderSummary: orderText,
-                    foods: foodArray,
-                    paymentAmount: total,
-                    completedAt: new Date().toISOString()
-                });
-                
-                localStorage.setItem('reservationHistory', JSON.stringify(history));
-                window.location.href = "receipt.html";
-            }, 1000);
+                if (!response.ok) throw new Error("Server error");
+            } catch (err) {
+                console.warn('Server offline or error — reservation saved to localStorage only:', err);
+            }
+
+            let pendingResNo = resNo;
+            history.push({
+                reservationNumber: resNo,
+                reservationType: 'priority',
+                arrivalDate: dateKey,
+                arrivalTime: timeKey,
+                arrivalDateTimeDisplay: displayDt,
+                customerName: localStorage.getItem('customerName'),
+                bookedTable: localStorage.getItem('bookedTable'),
+                orderSummary: orderText,
+                foods: foodArray,
+                beefNote: localStorage.getItem('beefNote') || '',
+                paymentAmount: total,
+                paymentRef: ref,
+                paymentProof: localStorage.getItem('tempPaymentUpload') || '',
+                paymentStatus: 'pending',
+                completedAt: new Date().toISOString()
+            });
+
+            localStorage.removeItem('tempPaymentUpload');
+            localStorage.setItem('reservationHistory', JSON.stringify(history));
+
+            alert('Payment submitted! Please open the Live Chat support to receive your official receipt once staff verifies your payment.');
+            window.location.href = "index.html";
         });
     </script>
 </body>

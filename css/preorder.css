@@ -462,3 +462,120 @@ body {
     .menu-title { font-size: 13px; }
     .menu-price { font-size: 15px; }
 }
+
+/* ══════════════════════════════════════════════════════════
+   CUSTOM MODAL SYSTEM (Green & White Style)
+══════════════════════════════════════════════════════════ */
+.super-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    padding: 20px;
+    animation: fadeInModal 0.25s ease-out;
+}
+
+.super-modal-box {
+    background: white;
+    width: 100%;
+    max-width: 420px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(27, 94, 32, 0.1);
+}
+
+.super-modal-header {
+    background: #1b5e20;
+    padding: 18px 25px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.super-modal-header h3 {
+    margin: 0;
+    color: white;
+    font-size: 18px;
+    font-family: 'Playfair Display', serif;
+}
+
+.super-modal-body {
+    padding: 25px;
+}
+
+.super-modal-body p {
+    margin: 0 0 15px 0;
+    color: #475569;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.super-modal-input {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #f8fafc;
+    font-size: 18px;
+    letter-spacing: 4px;
+    text-align: center;
+    font-weight: 800;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
+}
+
+.super-modal-input:focus {
+    outline: none;
+    border-color: #1b5e20;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(27, 94, 32, 0.1);
+}
+
+.super-modal-footer {
+    padding: 0 25px 25px 25px;
+    display: flex;
+    gap: 12px;
+}
+
+.super-modal-btn {
+    flex: 1;
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.super-modal-btn.confirm {
+    background: #1b5e20;
+    color: white;
+    border: none;
+}
+
+.super-modal-btn.confirm:hover {
+    background: #2e7d32;
+    transform: translateY(-2px);
+}
+
+.super-modal-btn.cancel {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+
+.super-modal-btn.cancel:hover {
+    background: #e2e8f0;
+}
+
+@keyframes fadeInModal {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}

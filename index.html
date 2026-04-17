@@ -674,46 +674,66 @@
             }
         }, 3000);
 
-        // Payment verified polling
+        // Payment status polling (Verified/Rejected)
         setInterval(() => {
             const hist = JSON.parse(localStorage.getItem('reservationHistory') || '[]');
             const myName = localStorage.getItem('customerName');
             if (!myName) return;
 
             let newlyVerified = false;
+            let newlyRejected = false;
+            
             hist.forEach(r => {
-                if (r.customerName === myName && r.paymentStatus === 'verified' && !r.receiptAcknowledged) {
-                    newlyVerified = true;
-                    // Mark as acknowledged so it doesn't trigger again
-                    r.receiptAcknowledged = true;
+                if (r.customerName === myName) {
+                    if (r.paymentStatus === 'verified' && !r.receiptAcknowledged) {
+                        newlyVerified = true;
+                        r.receiptAcknowledged = true;
+                    } else if (r.paymentStatus === 'rejected' && !r.rejectionAcknowledged) {
+                        newlyRejected = true;
+                        r.rejectionAcknowledged = true;
+                    }
                 }
             });
 
-            if (newlyVerified) {
+            if (newlyVerified || newlyRejected) {
                 localStorage.setItem('reservationHistory', JSON.stringify(hist));
+                
                 const overlay = document.createElement('div');
-                overlay.style.cssText = "position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:9999; display:flex; align-items:center; justify-content:center;";
-                overlay.innerHTML = `
-                    <div style="background:white; padding:40px; border-radius:12px; text-align:center; max-width:400px; width:90%; position:relative; box-shadow:0 10px 40px rgba(0,0,0,0.5); animation: zoomIn 0.3s ease;">
-                        <div style="font-size:60px; margin-bottom:20px;">✅</div>
-                        <h2 style="font-family:'Playfair Display',serif; color:#1b5e20; margin-bottom:10px;">Payment Verified!</h2>
-                        <p style="color:#555; margin-bottom:25px; line-height:1.5;">Your payment has been successfully verified! Your receipt is now available in your Live Chat.</p>
-                        <button onclick="closeVerifiedPopup(this.parentElement.parentElement)" style="background:#2e7d32; color:white; border:none; padding:12px 24px; border-radius:8px; font-weight:bold; cursor:pointer; width:100%; font-size:16px;">View Receipt in Chat</button>
-                    </div>
-                    <style>@keyframes zoomIn { from { transform: scale(0.9); opacity:0; } to { transform: scale(1); opacity:1; } }</style>
-                `;
+                overlay.style.cssText = "position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:9999; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(5px);";
+                
+                if (newlyVerified) {
+                    overlay.innerHTML = `
+                        <div style="background:white; padding:40px; border-radius:24px; text-align:center; max-width:420px; width:90%; position:relative; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5); animation: zoomIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);">
+                            <div style="font-size:70px; margin-bottom:20px;">✅</div>
+                            <h2 style="font-family:'Playfair Display',serif; color:#1b5e20; margin-bottom:12px; font-size:28px;">Payment Verified!</h2>
+                            <p style="color:#64748b; margin-bottom:30px; line-height:1.6; font-size:16px;">Your payment has been successfully verified! Your receipt is now available in your Live Chat support.</p>
+                            <button onclick="closeStatusPopup(this.parentElement.parentElement, true)" style="background:#1b5e20; color:white; border:none; padding:16px 24px; border-radius:12px; font-weight:700; cursor:pointer; width:100%; font-size:16px; transition:0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">View Receipt in Chat</button>
+                        </div>
+                        <style>@keyframes zoomIn { from { transform: scale(0.9); opacity:0; } to { transform: scale(1); opacity:1; } }</style>
+                    `;
+                } else if (newlyRejected) {
+                    overlay.innerHTML = `
+                        <div style="background:white; padding:40px; border-radius:24px; text-align:center; max-width:420px; width:90%; position:relative; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5); animation: zoomIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);">
+                            <div style="font-size:70px; margin-bottom:20px;">⚠️</div>
+                            <h2 style="font-family:'Playfair Display',serif; color:#b91c1c; margin-bottom:12px; font-size:28px;">Payment Invalid</h2>
+                            <p style="color:#64748b; margin-bottom:30px; line-height:1.6; font-size:16px;">Sorry, your payment is invalid after checking. Please check your transaction details and re-upload your proof of payment.</p>
+                            <button onclick="closeStatusPopup(this.parentElement.parentElement, false)" style="background:#b91c1c; color:white; border:none; padding:16px 24px; border-radius:12px; font-weight:700; cursor:pointer; width:100%; font-size:16px; transition:0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">I Understand</button>
+                        </div>
+                        <style>@keyframes zoomIn { from { transform: scale(0.9); opacity:0; } to { transform: scale(1); opacity:1; } }</style>
+                    `;
+                }
+                
                 document.body.appendChild(overlay);
                 
-                window.closeVerifiedPopup = function(el) {
+                window.closeStatusPopup = function(el, openChat) {
                     el.remove();
-                    // Open the chat window automatically
-                    const panel = document.getElementById('chatPanel');
-                    if(!panel.classList.contains('active')) {
-                        toggleChat();
+                    if (openChat) {
+                        const panel = document.getElementById('chatPanel');
+                        if(!panel.classList.contains('active')) toggleChat();
                     }
-                }
+                };
             }
-        }, 2000);
+        }, 3000);
     </script>
     
     <!-- CHAT WIDGET -->

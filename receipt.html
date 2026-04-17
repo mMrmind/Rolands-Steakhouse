@@ -9,6 +9,7 @@
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@400;500;700&display=swap"
         rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link rel="stylesheet" href="css/receipt.css">
 </head>
 
@@ -60,35 +61,11 @@
             <div class="center" style="margin-top: 20px;">
                 <p>Thank you for dining with us!<br>Please present this receipt.</p>
                 
-                <!-- Fake visual barcode -->
-                <div style="margin-top: 15px; display: inline-block;">
-                    <svg id="barcode-svg" width="200" height="40" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="0" y="0" width="4" height="40" fill="#000"/>
-                        <rect x="8" y="0" width="2" height="40" fill="#000"/>
-                        <rect x="14" y="0" width="6" height="40" fill="#000"/>
-                        <rect x="24" y="0" width="2" height="40" fill="#000"/>
-                        <rect x="30" y="0" width="10" height="40" fill="#000"/>
-                        <rect x="44" y="0" width="4" height="40" fill="#000"/>
-                        <rect x="52" y="0" width="2" height="40" fill="#000"/>
-                        <rect x="58" y="0" width="6" height="40" fill="#000"/>
-                        <rect x="68" y="0" width="4" height="40" fill="#000"/>
-                        <rect x="76" y="0" width="2" height="40" fill="#000"/>
-                        <rect x="82" y="0" width="8" height="40" fill="#000"/>
-                        <rect x="94" y="0" width="2" height="40" fill="#000"/>
-                        <rect x="100" y="0" width="4" height="40" fill="#000"/>
-                        <rect x="108" y="0" width="8" height="40" fill="#000"/>
-                        <rect x="120" y="0" width="2" height="40" fill="#000"/>
-                        <rect x="126" y="0" width="6" height="40" fill="#000"/>
-                        <rect x="136" y="0" width="4" height="40" fill="#000"/>
-                        <rect x="144" y="0" width="8" height="40" fill="#000"/>
-                        <rect x="156" y="0" width="2" height="40" fill="#000"/>
-                        <rect x="162" y="0" width="6" height="40" fill="#000"/>
-                        <rect x="172" y="0" width="4" height="40" fill="#000"/>
-                        <rect x="180" y="0" width="8" height="40" fill="#000"/>
-                        <rect x="192" y="0" width="2" height="40" fill="#000"/>
-                        <rect x="198" y="0" width="2" height="40" fill="#000"/>
-                    </svg>
+                <!-- POS Scannable QR CODE -->
+                <div id="qrcode-container" style="margin-top: 25px; display: flex; justify-content: center;">
+                    <div id="qrcode"></div>
                 </div>
+                <p style="font-size: 10px; color: #94a3b8; margin-top: 8px; text-transform: uppercase; letter-spacing: 1px;">Scan to Verify Order</p>
             </div>
         </div>
 
@@ -172,6 +149,16 @@
                 li.innerHTML = `<span>${item}</span> <span>(Paid)</span>`;
                 list.appendChild(li);
             }
+        });
+
+        // Initialize QR Code
+        new QRCode(document.getElementById("qrcode"), {
+            text: reservationNumber,
+            width: 120,
+            height: 120,
+            colorDark: "#1e293b",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
         });
     </script>
 </body>

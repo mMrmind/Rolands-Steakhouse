@@ -7,11 +7,115 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/gcash.css">
+    <style>
+        @keyframes modalFadeIn  { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes modalSlideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        /* ══════════════════════════════════════════════════════════
+           CUSTOM MODAL SYSTEM (Green & White Style)
+        ══════════════════════════════════════════════════════════ */
+        .super-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            padding: 20px;
+            animation: fadeInModal 0.25s ease-out;
+        }
+
+        .super-modal-box {
+            background: white;
+            width: 100%;
+            max-width: 420px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(27, 94, 32, 0.1);
+        }
+
+        .super-modal-header {
+            background: #1b5e20;
+            padding: 18px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .super-modal-header h3 {
+            margin: 0;
+            color: white;
+            font-size: 18px;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .super-modal-body {
+            padding: 25px;
+            text-align: left;
+        }
+
+        .super-modal-body p {
+            margin: 0 0 15px 0;
+            color: #475569;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .super-modal-footer {
+            padding: 0 25px 25px 25px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .super-modal-btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .super-modal-btn.confirm {
+            background: #1b5e20;
+            color: white;
+        }
+
+        .super-modal-btn.confirm:hover {
+            background: #2e7d32;
+            transform: translateY(-2px);
+        }
+
+        .super-modal-btn.cancel {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+        }
+
+        .super-modal-btn.cancel:hover {
+            background: #e2e8f0;
+        }
+
+        @keyframes fadeInModal {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
 </head>
 <body>
     <header id="main-header">
         <div class="logo"><img src="images/rolandsLOGO.jpg" alt="Logo"></div>
     </header>
+
+    <!-- CUSTOM MODAL ROOT -->
+    <div id="super-modal-root"></div>
 
     <section id="payment-section">
         <div class="payment-card" style="position: relative;">
@@ -24,11 +128,15 @@
                 <p style="margin:6px 0 0; font-size:28px; font-weight:800; color:#1b5e20;">₱<span id="display-amt"></span></p>
             </div>
 
-            <!-- Animated toggle -->
-            <div class="pay-toggle" id="payToggle">
+            <!-- iOS-style toggle with logos -->
+            <div class="pay-toggle" id="payToggle" style="align-items: center;">
                 <div class="pay-toggle-slider" id="toggleSlider"></div>
-                <button class="pay-toggle-btn active" id="btnGcash" onclick="switchQR('gcash')">💙 GCash</button>
-                <button class="pay-toggle-btn" id="btnQrph" onclick="switchQR('qrph')">🔴 QR Ph</button>
+                <button class="pay-toggle-btn active" id="btnGcash" onclick="switchQR('gcash')">
+                    <img src="images/gcash_logo-removebg-preview.png" alt="GCash" style="height: 38px; object-fit: contain; pointer-events: none;">
+                </button>
+                <button class="pay-toggle-btn" id="btnQrph" onclick="switchQR('qrph')">
+                    <img src="images/download-removebg-preview.png" alt="QR Ph" style="height: 38px; object-fit: contain; pointer-events: none;">
+                </button>
             </div>
 
             <!-- QR Panels -->
@@ -39,9 +147,9 @@
                     <div class="qr-img-wrap">
                         <img src="images/gcash-qr.png" alt="GCash QR Code">
                     </div>
-                    <a href="images/gcash-qr.png" download="gcash-qr.png" class="save-btn gcash">
+                    <button type="button" class="save-btn gcash" onclick="downloadQR('images/gcash-qr.png', 'rolands-gcash-qr.png')">
                         💾 Save to Device
-                    </a>
+                    </button>
                 </div>
 
                 <!-- QR Ph Panel -->
@@ -49,9 +157,9 @@
                     <div class="qr-img-wrap">
                         <img src="images/qrph-qr.png" alt="QR Ph Code">
                     </div>
-                    <a href="images/qrph-qr.png" download="qrph-qr.png" class="save-btn qrph">
+                    <button type="button" class="save-btn qrph" onclick="downloadQR('images/qrph-qr.png', 'rolands-qrph-qr.png')">
                         💾 Save to Device
-                    </a>
+                    </button>
                 </div>
 
             </div>
@@ -73,7 +181,7 @@
                 <p id="upload-filename" style="font-size:12px; color:#2e7d32; margin:6px 0 0; font-weight:600;"></p>
             </div>
 
-            <!-- Reference No. (optional backup) -->
+            <!-- Reference No. -->
             <div style="margin-top:18px; text-align:left;">
                 <label style="font-weight:700; font-size:13px; color:#333; text-transform:uppercase; letter-spacing:.5px; display:block; margin-bottom:8px;">
                     Reference No. <span style="font-weight:400; color:#aaa;">(optional)</span>
@@ -82,9 +190,22 @@
                     style="width:100%; padding:13px 14px; border:1px solid #ddd; border-radius:10px; font-size:15px; box-sizing:border-box; font-family:'Roboto',sans-serif;">
             </div>
 
+            <!-- Actions -->
             <button id="confirm-payment-btn" style="width:100%; margin-top:22px; padding:16px; font-size:16px; border-radius:12px;">
-                ✅ Confirm & Submit Payment
+                ✅ Confirm &amp; Submit Payment
             </button>
+
+            <button type="button" onclick="cancelBooking()"
+                style="width:100%; margin-top:12px; padding:14px; font-size:15px; border-radius:12px;
+                       background: transparent; color: #ef4444; border: 2px solid #fca5a5;
+                       font-weight: 700; cursor: pointer; font-family:'Roboto',sans-serif; transition: all 0.2s ease;"
+                onmouseover="this.style.background='#fef2f2'; this.style.borderColor='#ef4444';"
+                onmouseout="this.style.background='transparent'; this.style.borderColor='#fca5a5';">
+                ✕ Cancel Booking
+            </button>
+            <p style="text-align:center; font-size:12px; color:#aaa; margin: 8px 0 0;">
+                Cancellation will remove your reservation and return you to the homepage.
+            </p>
         </div>
     </section>
 
@@ -92,14 +213,93 @@
         const total = localStorage.getItem('totalBill') || '0';
         document.getElementById('display-amt').textContent = Number(total).toLocaleString();
 
-        function switchQR(type) {
-            const slider = document.getElementById('toggleSlider');
-            const btnGcash = document.getElementById('btnGcash');
-            const btnQrph = document.getElementById('btnQrph');
-            const panelGcash = document.getElementById('panel-gcash');
-            const panelQrph = document.getElementById('panel-qrph');
+        // ─────────────────────────────────────────────────────────
+        // MODAL HELPER
+        // ─────────────────────────────────────────────────────────
+        const modalOverlay = document.getElementById('super-modal-root');
 
-            if(type === 'gcash') {
+        window.superModal = function ({ title = 'Notice', message = '', type = 'alert', confirmText = 'Confirm', cancelText = 'Cancel' }) {
+            return new Promise((resolve) => {
+                const html = `
+                    <div class="super-modal-overlay">
+                        <div class="super-modal-box">
+                            <div class="super-modal-header">
+                                <h3>${title}</h3>
+                            </div>
+                            <div class="super-modal-body">
+                                <p>${message}</p>
+                            </div>
+                            <div class="super-modal-footer">
+                                ${type === 'confirm' ? `<button class="super-modal-btn cancel" id="modal-cancel-btn">${cancelText}</button>` : ''}
+                                <button class="super-modal-btn confirm" id="modal-confirm-btn">${confirmText}</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                modalOverlay.innerHTML = html;
+
+                const confirmBtn = document.getElementById('modal-confirm-btn');
+                const cancelBtn = document.getElementById('modal-cancel-btn');
+
+                confirmBtn.onclick = () => {
+                    modalOverlay.innerHTML = '';
+                    resolve(true);
+                };
+                if (cancelBtn) {
+                    cancelBtn.onclick = () => {
+                        modalOverlay.innerHTML = '';
+                        resolve(false);
+                    };
+                }
+            });
+        };
+
+        /* ────────────────────────────────────────
+           Back Button Protection
+        ──────────────────────────────────────── */
+        (function initBackProtection() {
+            history.pushState(null, null, window.location.href);
+            window.addEventListener('popstate', function () {
+                history.pushState(null, null, window.location.href);
+                cancelBooking();
+            });
+
+            window.onbeforeunload = function() {
+                return "Are you sure you want to cancel your booking? Progress will be lost.";
+            };
+        })();
+
+        /* Cancel booking */
+        async function cancelBooking() {
+            const confirmed = await superModal({
+                title: 'Cancel Payment? ⚠️',
+                message: 'Are you sure you want to cancel? Your reservation will be removed and you will be returned to the pre-order area.',
+                type: 'confirm',
+                confirmText: 'Yes, Cancel',
+                cancelText: 'Stay Here'
+            });
+
+            if (confirmed) {
+                localStorage.removeItem('totalBill');
+                localStorage.removeItem('cartItems');
+                localStorage.removeItem('reservationData');
+                localStorage.removeItem('tempPaymentUpload');
+                localStorage.removeItem('pendingReservation');
+                
+                window.onbeforeunload = null;
+                window.location.href = 'pre-order.html';
+            }
+        }
+
+        /* QR Toggle */
+        function switchQR(type) {
+            const slider    = document.getElementById('toggleSlider');
+            const btnGcash  = document.getElementById('btnGcash');
+            const btnQrph   = document.getElementById('btnQrph');
+            const panelGcash = document.getElementById('panel-gcash');
+            const panelQrph  = document.getElementById('panel-qrph');
+
+            if (type === 'gcash') {
                 slider.classList.remove('right');
                 btnGcash.classList.add('active');
                 btnQrph.classList.remove('active');
@@ -114,97 +314,151 @@
             }
         }
 
+        /* Canvas-based download — works on file:// */
+        function downloadQR(src, filename) {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = function () {
+                const canvas = document.createElement('canvas');
+                canvas.width  = img.naturalWidth;
+                canvas.height = img.naturalHeight;
+                canvas.getContext('2d').drawImage(img, 0, 0);
+                canvas.toBlob(function (blob) {
+                    const url = URL.createObjectURL(blob);
+                    const a   = document.createElement('a');
+                    a.href     = url;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    setTimeout(() => URL.revokeObjectURL(url), 1000);
+                }, 'image/png');
+            };
+            img.onerror = () => window.open(src, '_blank');
+            img.src = src;
+        }
+
+        /* Proof photo preview */
         function previewProof(input) {
-            const preview = document.getElementById('upload-preview');
+            const preview     = document.getElementById('upload-preview');
             const placeholder = document.getElementById('upload-placeholder');
-            const filename = document.getElementById('upload-filename');
+            const filename    = document.getElementById('upload-filename');
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                     preview.src = e.target.result;
                     preview.style.display = 'block';
                     placeholder.style.display = 'none';
                     filename.textContent = input.files[0].name;
                     localStorage.setItem('tempPaymentUpload', e.target.result);
-                }
+                };
                 reader.readAsDataURL(input.files[0]);
             }
         }
 
+        /* Confirm payment */
         document.getElementById('confirm-payment-btn').addEventListener('click', async () => {
-            const ref = document.getElementById('ref-num').value.trim();
+            const ref      = document.getElementById('ref-num').value.trim();
             const fileInput = document.getElementById('proof-upload');
-            const hasFile = fileInput && fileInput.files && fileInput.files.length > 0;
+            const hasFile  = fileInput && fileInput.files && fileInput.files.length > 0;
 
             if (!ref && !hasFile) {
-                return alert("Please upload your payment screenshot or enter the reference number.");
+                await superModal({
+                    title: 'Missing Info 📋',
+                    message: 'Please upload your payment screenshot or enter the reference number.'
+                });
+                return;
             }
 
-            document.getElementById('confirm-payment-btn').textContent = "Processing...";
-            document.getElementById('confirm-payment-btn').disabled = true;
+            const btn = document.getElementById('confirm-payment-btn');
+            btn.textContent = 'Processing…';
+            btn.disabled = true;
 
             const resNo = 'RES-' + Math.floor(100000 + Math.random() * 900000);
             localStorage.setItem('reservationNumber', resNo);
 
             const history = JSON.parse(localStorage.getItem('reservationHistory') || '[]');
 
+            // Inventory stock deduction
+            const currentCartStr = localStorage.getItem('currentCartObj');
+            if (currentCartStr) {
+                try {
+                    const cart   = JSON.parse(currentCartStr);
+                    const invStr = localStorage.getItem('inventoryItems');
+                    if (invStr) {
+                        let invItems = JSON.parse(invStr);
+                        for (const id in cart) {
+                            const idx = invItems.findIndex(i => i.id === id);
+                            if (idx > -1) {
+                                invItems[idx].sold_stock = (invItems[idx].sold_stock || 0) + cart[id].qty;
+                                // Maintain legacy virtual 'stock' for backward-compat in pre-order area
+                                invItems[idx].stock = Math.max(0, (invItems[idx].total_stock || 0) + (invItems[idx].added_stock||0) - invItems[idx].sold_stock);
+                            }
+                        }
+                        localStorage.setItem('inventoryItems', JSON.stringify(invItems));
+                    }
+                    localStorage.removeItem('currentCartObj');
+                } catch (e) {
+                    console.error('Failed to deduct inventory stock', e);
+                }
+            }
+
             const orderText = localStorage.getItem('orderSummary') || '';
             const foodArray = orderText ? orderText.split(', ') : [];
-
-            const dateKey = localStorage.getItem('arrivalDate') || '';
-            const timeKey = localStorage.getItem('arrivalTime') || '';
-            const rawDateStr = dateKey + "T" + timeKey;
-            const d = new Date(rawDateStr);
-            const displayDt = isNaN(d) ? rawDateStr : d.toLocaleString(undefined, {
+            const dateKey   = localStorage.getItem('arrivalDate') || '';
+            const timeKey   = localStorage.getItem('arrivalTime') || '';
+            const d         = new Date(dateKey + 'T' + timeKey);
+            const displayDt = isNaN(d) ? dateKey + ' ' + timeKey : d.toLocaleString(undefined, {
                 weekday: 'short', month: 'short', day: 'numeric',
                 hour: 'numeric', minute: '2-digit', hour12: true
             });
-
             localStorage.setItem('arrivalDateTimeDisplay', displayDt);
 
-            const reservationData = {
-                name:  localStorage.getItem('customerName'),
-                date:  dateKey,
-                time:  timeKey,
-                table: localStorage.getItem('bookedTable')
-            };
-
-            // Try to save to SQL Server; silently fall back to localStorage-only if offline
+            // Try server; silent fallback
             try {
-                const response = await fetch("http://localhost:3000/reserve", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(reservationData)
+                const response = await fetch('http://localhost:3000/reserve', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name:  localStorage.getItem('customerName'),
+                        date:  dateKey,
+                        time:  timeKey,
+                        table: localStorage.getItem('bookedTable')
+                    })
                 });
-                if (!response.ok) throw new Error("Server error");
+                if (!response.ok) throw new Error('Server error');
             } catch (err) {
-                console.warn('Server offline or error — reservation saved to localStorage only:', err);
+                console.warn('Server offline — saved to localStorage only:', err);
             }
 
-            let pendingResNo = resNo;
             history.push({
-                reservationNumber: resNo,
-                reservationType: 'priority',
-                arrivalDate: dateKey,
-                arrivalTime: timeKey,
+                reservationNumber:      resNo,
+                reservationType:        'priority',
+                arrivalDate:            dateKey,
+                arrivalTime:            timeKey,
                 arrivalDateTimeDisplay: displayDt,
-                customerName: localStorage.getItem('customerName'),
-                bookedTable: localStorage.getItem('bookedTable'),
-                orderSummary: orderText,
-                foods: foodArray,
-                beefNote: localStorage.getItem('beefNote') || '',
-                paymentAmount: total,
-                paymentRef: ref,
-                paymentProof: localStorage.getItem('tempPaymentUpload') || '',
-                paymentStatus: 'pending',
-                completedAt: new Date().toISOString()
+                customerName:           localStorage.getItem('customerName'),
+                bookedTable:            localStorage.getItem('bookedTable'),
+                orderSummary:           orderText,
+                foods:                  foodArray,
+                beefNote:               localStorage.getItem('beefNote') || '',
+                paymentAmount:          total,
+                paymentRef:             ref,
+                paymentProof:           localStorage.getItem('tempPaymentUpload') || '',
+                paymentStatus:          'pending',
+                completedAt:            new Date().toISOString()
             });
 
             localStorage.removeItem('tempPaymentUpload');
             localStorage.setItem('reservationHistory', JSON.stringify(history));
 
-            alert('Payment submitted! Please open the Live Chat support to receive your official receipt once staff verifies your payment.');
-            window.location.href = "index.html";
+            window.onbeforeunload = null;
+
+            await superModal({
+                title: 'Payment Submitted! 🎉',
+                message: 'pls wait for the verification of the payment'
+            });
+            window.location.href = 'index.html';
         });
     </script>
 </body>

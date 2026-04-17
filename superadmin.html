@@ -9,6 +9,9 @@
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500;700&display=swap"
         rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link rel="stylesheet" href="css/superadmin.css">
 </head>
 
@@ -42,106 +45,428 @@
 
         <!-- DASHBOARD SECTION -->
         <div id="dashboard-section" class="hidden">
-            <h2 class="section-title">System Overview</h2>
-            <div class="grid">
-                <div class="card">
-                    <h3>Total Reservations</h3>
-                    <div class="value" id="stat-total">0</div>
+            <!-- TAB BAR -->
+            <div class="superadmin-tabs">
+                <button class="tab-link active" onclick="switchTab('overview', this)">Overview & Analytics</button>
+                <button class="tab-link" onclick="switchTab('records', this)">Global Records</button>
+                <button class="tab-link" onclick="switchTab('staff', this)">Staff Accounts</button>
+                <button class="tab-link" onclick="switchTab('inventory', this)">Inventory</button>
+                <button class="tab-link" onclick="switchTab('kitchen', this)">🍳 Kitchen Settings</button>
+                <button class="tab-link" style="color: #ef4444;" onclick="switchTab('danger', this)">Danger
+                    Zone</button>
+            </div>
+
+            <!-- OVERVIEW TAB -->
+            <div id="tab-overview" class="superadmin-tab-content active">
+                <div class="stat-filter-row">
+                    <h2 class="section-title" style="margin: 0; border: none; padding: 0;">System Overview</h2>
+                    <div class="stat-filter-switch">
+                        <button class="filter-btn active" onclick="setStatFilter('all')">All Time</button>
+                        <button class="filter-btn" onclick="setStatFilter('year')">This Year</button>
+                        <button class="filter-btn" onclick="setStatFilter('week')">This Week</button>
+                        <button class="filter-btn" onclick="setStatFilter('day')">Today</button>
+                    </div>
                 </div>
-                <div class="card">
-                    <h3>Priority Booking %</h3>
-                    <div class="value" id="stat-priority-pct">0%</div>
+                <div class="grid">
+                    <div class="card">
+                        <h3>Total Reservations</h3>
+                        <div class="value" id="stat-total">0</div>
+                    </div>
+                    <div class="card">
+                        <h3>Priority Booking %</h3>
+                        <div class="value" id="stat-priority-pct">0%</div>
+                    </div>
+                    <div class="card">
+                        <h3>Total Revenue</h3>
+                        <div class="value" id="stat-revenue">₱0</div>
+                    </div>
+                    <div class="card">
+                        <h3>Staff Admins Registered</h3>
+                        <div class="value" id="stat-admins">0</div>
+                    </div>
+                    <div class="card">
+                        <h3>Walk-in Reservations</h3>
+                        <div class="value" id="stat-walkins">0</div>
+                    </div>
+                    <div class="card" style="border: 1px solid #4ade80; background: rgba(74, 222, 128, 0.05);">
+                        <h3 style="color: #4ade80;">Live Customers</h3>
+                        <div class="value" id="super-stat-online">0</div>
+                        <div class="muted" id="super-online-list"
+                            style="margin-top: 6px; font-weight: bold; color: #f8fafc;">None</div>
+                    </div>
                 </div>
-                <div class="card">
-                    <h3>Total Revenue</h3>
-                    <div class="value" id="stat-revenue">₱0</div>
-                </div>
-                <div class="card">
-                    <h3>Staff Admins Registered</h3>
-                    <div class="value" id="stat-admins">0</div>
-                </div>
-                <div class="card" style="border: 1px solid #4ade80; background: rgba(74, 222, 128, 0.05);">
-                    <h3 style="color: #4ade80;">Live Customers</h3>
-                    <div class="value" id="super-stat-online">0</div>
-                    <div class="muted" id="super-online-list" style="margin-top: 6px; font-weight: bold; color: #f8fafc;">None</div>
+
+                <!-- VISUAL ANALYTICS -->
+                <h2 class="section-title">Analytics</h2>
+                <div class="graph-container">
+                    <div class="card">
+                        <h3>Booking Activity (Estimated over Next/Past 7 Days)</h3>
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                    <div class="card"
+                        style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                        <h3 style="align-self: flex-start;">Reservation Types</h3>
+                        <canvas id="typeChart"></canvas>
+                    </div>
                 </div>
             </div>
 
-            <!-- VISUAL ANALYTICS -->
-            <h2 class="section-title">Analytics</h2>
-            <div class="graph-container">
-                <div class="card">
-                    <h3>Booking Activity (Estimated over Next/Past 7 Days)</h3>
-                    <canvas id="trendChart"></canvas>
+            <!-- RECORDS TAB -->
+            <div id="tab-records" class="superadmin-tab-content">
+                <h2 class="section-title" style="margin-top: 0;">Management & Records</h2>
+                <div class="row">
+                    <input id="search-input" type="text" placeholder="Search across all records...">
+                    <button type="button" id="export-csv-btn" class="secondary" title="Excel Compatible CSV">Export
+                        Analytics (Excel)</button>
                 </div>
-                <div class="card"
-                    style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                    <h3 style="align-self: flex-start;">Reservation Types</h3>
-                    <canvas id="typeChart"></canvas>
-                </div>
-            </div>
 
-            <h2 class="section-title">Management & Records</h2>
-            <div class="row">
-                <input id="search-input" type="text" placeholder="Search across all records...">
-                <button type="button" id="export-csv-btn" class="secondary" title="Excel Compatible CSV">Export
-                    Analytics (Excel)</button>
-            </div>
+                <div class="muted" id="summary-line"></div>
+                <div style="height: 12px;"></div>
 
-            <div class="muted" id="summary-line"></div>
-            <div style="height: 12px;"></div>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>Reserv. #</th>
-                        <th>Arrival</th>
-                        <th>Customer / Contact</th>
-                        <th>Table</th>
-                        <th>Type</th>
-                        <th>Foods / Notes</th>
-                        <th>Paid</th>
-                    </tr>
-                </thead>
-                <tbody id="history-tbody">
-                    <!-- Filled by JS -->
-                </tbody>
-            </table>
-
-            <h2 class="section-title">Staff Admin Management</h2>
-            <div class="card" style="margin-bottom: 30px;">
-                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                    <input type="text" id="new-staff-username" placeholder="New Staff Username" style="flex: 1; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
-                    <input type="password" id="new-staff-password" placeholder="Passphrase" style="flex: 1; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
-                    <button type="button" id="create-staff-btn" style="background: #2e7d32; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold;">Create Account</button>
-                </div>
-                <div id="staff-error-msg" style="color: #ef4444; margin-bottom: 15px; font-size: 14px; display: none;"></div>
                 <table>
                     <thead>
                         <tr>
-                            <th>Username</th>
-                            <th style="width: 100px;">Action</th>
+                            <th>Reserv. #</th>
+                            <th>Arrival</th>
+                            <th>Customer / Contact</th>
+                            <th>Table</th>
+                            <th>Type</th>
+                            <th>Foods / Notes</th>
+                            <th>Paid</th>
                         </tr>
                     </thead>
-                    <tbody id="staff-list-tbody">
+                    <tbody id="history-tbody">
                         <!-- Filled by JS -->
                     </tbody>
                 </table>
             </div>
 
-            <h2 class="section-title">Danger Zone</h2>
-            <div class="settings-panel">
-                <h3>System Overrides (Irreversible Actions)</h3>
-                <p class="muted" style="margin-bottom: 15px;">Use extreme caution. These actions apply to all local
-                    browser storage for this application.</p>
-                <div class="danger-actions">
-                    <button type="button" id="clear-history-btn" class="danger">Purge All Reservations</button>
-                    <button type="button" id="clear-admins-btn" class="danger">Revoke All Staff Admin Accounts</button>
+            <!-- STAFF TAB -->
+            <div id="tab-staff" class="superadmin-tab-content">
+                <h2 class="section-title" style="margin-top: 0;">Staff Admin Management</h2>
+                <div class="card" style="margin-bottom: 30px;">
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <input type="text" id="new-staff-username" placeholder="New Staff Username"
+                            style="flex: 1; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
+                        <input type="password" id="new-staff-password" placeholder="Passphrase"
+                            style="flex: 1; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
+                        <button type="button" id="create-staff-btn"
+                            style="background: #2e7d32; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold;">Create
+                            Account</button>
+                    </div>
+                    <div id="staff-error-msg"
+                        style="color: #ef4444; margin-bottom: 15px; font-size: 14px; display: none;"></div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th style="width: 100px;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="staff-list-tbody">
+                            <!-- Filled by JS -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
-            <div style="height: 40px;"></div>
+            <!-- INVENTORY TAB -->
+            <div id="tab-inventory" class="superadmin-tab-content">
+                <div class="stat-filter-row">
+                    <h2 class="section-title" style="margin: 0; border: none; padding: 0;">Inventory Intelligence</h2>
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <button type="button" class="filter-btn" onclick="openOCRModal()"
+                            style="background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%); color: white; box-shadow: 0 4px 10px rgba(27,94,32,0.2); border: none;">📂
+                            Scan Handwritten Sheet</button>
+                        <button type="button" class="filter-btn secondary" onclick="exportInventoryReport()"
+                            style="border: 1px solid #e2e8f0; background: white;">📊 Export Report</button>
+                        <button type="button" class="filter-btn" onclick="openInventoryModal()"
+                            style="background: linear-gradient(135deg, #2e7d32 0%, #388e3c 100%); color: white; box-shadow: 0 4px 10px rgba(46,125,50,0.2); border: none;">+
+                            Add Item</button>
+                    </div>
+                </div>
+
+                <!-- INVENTORY DASHBOARD -->
+                <div class="grid" style="margin-bottom: 24px;">
+                    <div class="card" style="border-left: 4px solid #ef4444;">
+                        <h3>Low Stock Alerts</h3>
+                        <div class="value" id="inv-stat-low" style="color: #ef4444;">0</div>
+                        <p class="muted">Items needing restock</p>
+                    </div>
+                    <div class="card" style="border-left: 4px solid #1b5e20;">
+                        <h3>Total Inventory Items</h3>
+                        <div class="value" id="inv-stat-total">0</div>
+                        <p class="muted" id="inv-stat-categories">Categories Active</p>
+                    </div>
+                    <div class="card" style="border-left: 4px solid #3b82f6;">
+                        <h3>Today's Consumption</h3>
+                        <div class="value" id="inv-stat-sold" style="color: #3b82f6;">0</div>
+                        <p class="muted">Items sold/used today</p>
+                    </div>
+                    <div class="card" style="border-left: 4px solid #f59e0b;">
+                        <h3>Predictive Pulse</h3>
+                        <div class="value" id="inv-stat-out-predict" style="color: #f59e0b;">0</div>
+                        <p class="muted">Items likely out in 48h</p>
+                    </div>
+                </div>
+
+                <div class="superadmin-tabs" id="inv-category-tabs"
+                    style="margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 0; flex-wrap: wrap; gap: 5px;">
+                    <button class="tab-link active" onclick="switchInvCat('All', this)">All</button>
+                    <button class="tab-link" onclick="switchInvCat('Beef', this)">🥩 Beef</button>
+                    <button class="tab-link" onclick="switchInvCat('T-Bone', this)">🦴 T-Bone</button>
+                    <button class="tab-link" onclick="switchInvCat('Sirloin Steak', this)">🥩 Sirloin</button>
+                    <button class="tab-link" onclick="switchInvCat('Chicken & Fish', this)">🍗 Chicken/Fish</button>
+                    <button class="tab-link" onclick="switchInvCat('Sandwich', this)">🍔 Sandwich</button>
+                    <button class="tab-link" onclick="switchInvCat('Side Orders', this)">🍟 Sides</button>
+                    <button class="tab-link" onclick="switchInvCat('Drinks', this)">🍹 Drinks</button>
+                    <button class="tab-link" onclick="switchInvCat('Wines', this)">🍷 Wines</button>
+                    <button class="tab-link" onclick="switchInvCat('Supplies', this)">🧺 Supplies</button>
+                </div>
+
+                <div class="card" style="padding: 0; overflow: hidden; border: 1px solid #e2e8f0; border-radius: 12px;">
+                    <table style="margin: 0; border: none;">
+                        <thead style="background: #f8fafc;">
+                            <tr>
+                                <th>Item Name</th>
+                                <th>Total Stock</th>
+                                <th>In Chiller</th>
+                                <th>Added</th>
+                                <th>Sold</th>
+                                <th>End of Day</th>
+                                <th>Status</th>
+                                <th style="width: 100px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventory-tbody">
+                            <!-- Filled by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Inventory Edit Modal -->
+                <div id="inv-modal" class="hidden super-modal-overlay">
+                    <div class="super-modal-box" style="max-width: 500px;">
+                        <div class="super-modal-header">
+                            <h3 id="inv-modal-title">Manage Inventory Item</h3>
+                            <div class="close-btn" onclick="closeInventoryModal()">&times;</div>
+                        </div>
+                        <div class="super-modal-body">
+                            <input type="hidden" id="inv-id">
+
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+                                <div>
+                                    <label
+                                        style="display:block; margin-bottom:8px; font-weight:700; font-size:13px; color:#64748b;">Item
+                                        Name</label>
+                                    <input type="text" id="inv-title"
+                                        style="width: 100%; padding:12px; border:1px solid #e2e8f0; border-radius:10px; background:#f8fafc;">
+                                </div>
+                                <div>
+                                    <label
+                                        style="display:block; margin-bottom:8px; font-weight:700; font-size:13px; color:#64748b;">Category
+                                        (Auto If Empty)</label>
+                                    <select id="inv-category"
+                                        style="width: 100%; padding:12px; border:1px solid #e2e8f0; border-radius:10px; background:#f8fafc;">
+                                        <option value="">Auto-Detect</option>
+                                        <option value="Beef">Beef Steaks</option>
+                                        <option value="T-Bone">T-Bone</option>
+                                        <option value="Sirloin Steak">Sirloin Steak</option>
+                                        <option value="Chicken & Fish">Chicken & Fish</option>
+                                        <option value="Sandwich">Sandwich</option>
+                                        <option value="Side Orders">Side Orders</option>
+                                        <option value="Drinks">Drinks</option>
+                                        <option value="Wines">Wines</option>
+                                        <option value="Supplies">Supplies</option>
+                                        <option value="Others">Others</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-top:20px;">
+                                <div>
+                                    <label
+                                        style="display:block; margin-bottom:8px; font-weight:700; font-size:13px; color:#64748b;">Initial
+                                        Stock</label>
+                                    <input type="number" id="inv-stock"
+                                        style="width: 100%; padding:12px; border:1px solid #e2e8f0; border-radius:10px; background:#f8fafc;"
+                                        value="0">
+                                </div>
+                                <div>
+                                    <label
+                                        style="display:block; margin-bottom:8px; font-weight:700; font-size:13px; color:#64748b;">In
+                                        Chiller</label>
+                                    <input type="number" id="inv-chiller"
+                                        style="width: 100%; padding:12px; border:1px solid #e2e8f0; border-radius:10px; background:#f8fafc;"
+                                        value="0">
+                                </div>
+                            </div>
+
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-top:20px;">
+                                <div>
+                                    <label
+                                        style="display:block; margin-bottom:8px; font-weight:700; font-size:13px; color:#64748b;">Added
+                                        Today</label>
+                                    <input type="number" id="inv-added"
+                                        style="width: 100%; padding:12px; border:1px solid #e2e8f0; border-radius:10px; background:#f0fdf4;"
+                                        value="0">
+                                </div>
+                                <div>
+                                    <label
+                                        style="display:block; margin-bottom:8px; font-weight:700; font-size:13px; color:#64748b;">Sold/Used
+                                        Today</label>
+                                    <input type="number" id="inv-sold"
+                                        style="width: 100%; padding:12px; border:1px solid #e2e8f0; border-radius:10px; background:#fef2f2;"
+                                        value="0">
+                                </div>
+                            </div>
+
+                            <div style="margin-top:20px;">
+                                <label
+                                    style="display:block; margin-bottom:8px; font-weight:700; font-size:13px; color:#64748b;">End
+                                    of Day Calculated</label>
+                                <div id="inv-calc-eod"
+                                    style="background: #f1f5f9; padding: 14px; border-radius: 10px; font-weight: 800; border: 2px dashed #cbd5e1; text-align: center; color: #1b5e20; font-size: 18px;">
+                                    0</div>
+                            </div>
+                        </div>
+                        <div class="super-modal-footer">
+                            <button type="button" class="super-modal-btn cancel"
+                                onclick="closeInventoryModal()">Cancel</button>
+                            <button type="button" class="super-modal-btn confirm" onclick="saveInventoryItem()">Update
+                                Stock</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- OCR SCANNER MODAL -->
+                <div id="ocr-modal" class="hidden super-modal-overlay">
+                    <div class="super-modal-box" style="max-width: 800px;">
+                        <div class="super-modal-header">
+                            <h3>Scan Handwritten Inventory</h3>
+                            <div class="close-btn" onclick="closeOCRModal()">&times;</div>
+                        </div>
+                        <div class="super-modal-body">
+                            <div id="ocr-upload-area"
+                                style="text-align:center; border: 2px dashed #cbd5e1; padding: 60px 40px; border-radius: 16px; cursor: pointer; background: #f8fafc; transition: all 0.2s;"
+                                onmouseover="this.style.background='#f0fdf4'; this.style.borderColor='#1b5e20'"
+                                onmouseout="this.style.background='#f8fafc'; this.style.borderColor='#cbd5e1'"
+                                onclick="document.getElementById('ocr-file-input').click()">
+                                <div style="font-size: 56px; margin-bottom: 15px;">📄</div>
+                                <h4 style="margin: 0 0 8px; color: #1e293b; font-size: 18px;">Click to upload inventory
+                                    photo</h4>
+                                <p class="muted" style="margin: 0;">Supported: PNG, JPG, JPEG (Handwritten sheets)</p>
+                                <input type="file" id="ocr-file-input" style="display:none;" accept="image/*"
+                                    onchange="processOCRImage(this)">
+                            </div>
+
+                            <div id="ocr-processing" class="hidden" style="text-align: center; padding: 60px;">
+                                <div class="loader" style="margin: 0 auto 20px;"></div>
+                                <h4 style="margin: 0 0 8px; color: #1e293b;">AI is reading your handwriting...</h4>
+                                <p id="ocr-status-msg" class="muted">Analyzing image layout and extracting text
+                                    patterns...</p>
+                            </div>
+
+                            <div id="ocr-results" class="hidden">
+                                <h4
+                                    style="margin: 0 0 15px; color: #1b5e20; font-family: 'Playfair Display', serif; font-size: 20px;">
+                                    Detected Items (Review & Finalize)</h4>
+                                <div
+                                    style="max-height: 400px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 24px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
+                                    <table style="margin:0; border: none;">
+                                        <thead style="position: sticky; top: 0; background: #f8fafc; z-index: 10;">
+                                            <tr>
+                                                <th style="padding: 12px 16px;">Match Item</th>
+                                                <th>Total</th>
+                                                <th>Chiller</th>
+                                                <th>Add</th>
+                                                <th>Sold</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="ocr-results-tbody"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="ocr-results-footer" class="super-modal-footer hidden">
+                            <button type="button" class="super-modal-btn cancel"
+                                onclick="closeOCRModal()">Discard</button>
+                            <button type="button" class="super-modal-btn confirm" onclick="commitOCRData()">Save to
+                                Database</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+    </div>
+    </div>
+
+    <!-- KITCHEN & POS TAB -->
+    <div id="tab-kitchen" class="superadmin-tab-content">
+        <h2 class="section-title" style="margin-top: 0;">Operations Security Control</h2>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+            <!-- Kitchen Access -->
+            <div class="card">
+                <div style="font-size: 32px; margin-bottom: 15px;">🍳</div>
+                <h3 style="margin: 0 0 10px; color: #1b5e20;">Kitchen Area Security</h3>
+                <p style="color:#64748b; font-size:13px; margin-bottom: 20px; min-height: 40px;">Set the 4-digit access
+                    code for the independent Cook Area. Kitchen staff will need this code to view the live queue.</p>
+
+                <label
+                    style="display:block; margin-bottom:8px; font-weight:700; color:#444; font-size: 12px; text-transform: uppercase;">Kitchen
+                    Access Code</label>
+                <div style="display:flex; gap:10px;">
+                    <input id="kitchen-password-input" type="password" placeholder="••••" maxlength="4"
+                        style="flex:1; padding:12px; border:1px solid #cbd5e1; border-radius:8px; font-size:16px; letter-spacing:8px; text-align: center; background: #f8fafc;">
+                    <button type="button" onclick="window.saveKitchenPassword()"
+                        style="background:#2e7d32; color:white; border:none; padding:0 20px; border-radius:8px; font-weight:bold; cursor:pointer; transition: 0.2s;"
+                        onmouseover="this.style.background='#1b5e20'" onmouseout="this.style.background='#2e7d32'">
+                        Update
+                    </button>
+                </div>
+            </div>
+
+            <!-- POS Access -->
+            <div class="card">
+                <div style="font-size: 32px; margin-bottom: 15px;">🏛️</div>
+                <h3 style="margin: 0 0 10px; color: #1b5e20;">POS Terminal Security</h3>
+                <p style="color:#64748b; font-size:13px; margin-bottom: 20px; min-height: 40px;">Set the 4-digit access
+                    code for the POS Terminal. Cashiers will need this code to process payments and verify receipts.</p>
+
+                <label
+                    style="display:block; margin-bottom:8px; font-weight:700; color:#444; font-size: 12px; text-transform: uppercase;">POS
+                    Access Code</label>
+                <div style="display:flex; gap:10px;">
+                    <input id="pos-password-input" type="password" placeholder="••••" maxlength="4"
+                        style="flex:1; padding:12px; border:1px solid #cbd5e1; border-radius:8px; font-size:16px; letter-spacing:8px; text-align: center; background: #f8fafc;">
+                    <button type="button" onclick="window.savePosPassword()"
+                        style="background:#2e7d32; color:white; border:none; padding:0 20px; border-radius:8px; font-weight:bold; cursor:pointer; transition: 0.2s;"
+                        onmouseover="this.style.background='#1b5e20'" onmouseout="this.style.background='#2e7d32'">
+                        Update
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DANGER TAB -->
+    <div id="tab-danger" class="superadmin-tab-content">
+        <h2 class="section-title" style="margin-top: 0;">Danger Zone</h2>
+        <div class="settings-panel">
+            <h3>System Overrides (Irreversible Actions)</h3>
+            <p class="muted" style="margin-bottom: 15px;">Use extreme caution. These actions apply to all local
+                browser storage for this application.</p>
+            <div class="danger-actions">
+                <button type="button" id="clear-history-btn" class="danger">Purge All Reservations</button>
+                <button type="button" id="clear-admins-btn" class="danger">Revoke All Staff Admin
+                    Accounts</button>
+            </div>
+        </div>
+    </div>
+
+    <div style="height: 40px;"></div>
+    </div>
     </div>
 
     <script>
@@ -161,7 +486,12 @@
         }
 
         function getReservationHistory() {
-            return safeJsonParse(localStorage.getItem('reservationHistory'), []) || [];
+            const hist = safeJsonParse(localStorage.getItem('reservationHistory'), []) || [];
+            return hist.sort((a, b) => {
+                const ta = a.completedAt ? new Date(a.completedAt).getTime() : 0;
+                const tb = b.completedAt ? new Date(b.completedAt).getTime() : 0;
+                return tb - ta;
+            });
         }
 
         function getAdminUsers() {
@@ -179,19 +509,145 @@
             window.location.reload();
         }
 
-        // Dashboard rendering
+        window.switchTab = function (tabId, btn) {
+            document.querySelectorAll('.tab-link').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('.superadmin-tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+        };
+
+        // --- DASHBOARD FILTER LOGIC ---
+        let currentStatFilter = 'all'; // all, year, week, day
+        let trendChart = null;
+        let typeChart = null;
+
+        window.setStatFilter = function (filter) {
+            currentStatFilter = filter;
+            // Update UI buttons
+            const btns = document.querySelectorAll('.filter-btn');
+            btns.forEach(b => {
+                b.classList.toggle('active', b.getAttribute('onclick').includes(`'${filter}'`));
+            });
+            renderDashboard();
+        };
+
+        function getFilteredHistory() {
+            const history = getReservationHistory();
+            const now = new Date();
+            const todayStr = now.toISOString().split('T')[0];
+
+            if (currentStatFilter === 'day') {
+                return history.filter(r => r.arrivalDate === todayStr);
+            } else if (currentStatFilter === 'week') {
+                // Last 7 days
+                const weekAgo = new Date();
+                weekAgo.setDate(now.getDate() - 7);
+                weekAgo.setHours(0, 0, 0, 0);
+                return history.filter(r => {
+                    if (!r.arrivalDate) return false;
+                    const d = new Date(r.arrivalDate);
+                    return d >= weekAgo && d <= now;
+                });
+            } else if (currentStatFilter === 'year') {
+                const thisYear = now.getFullYear();
+                return history.filter(r => {
+                    if (!r.arrivalDate) return false;
+                    const d = new Date(r.arrivalDate);
+                    return d.getFullYear() === thisYear;
+                });
+            }
+            return history;
+        }
+
+        // Kitchen Password Logic
+        window.saveKitchenPassword = async function () {
+            const pass = document.getElementById('kitchen-password-input').value.trim();
+            if (!pass) {
+                return await superModal({
+                    title: '⚠️ Input Missing',
+                    message: 'Please enter a valid Kitchen Access Code.',
+                    confirmText: 'OK'
+                });
+            }
+
+            // Pincode Security
+            const pin = await superModal({
+                title: '🔒 Security Authorization',
+                message: 'Enter Pincode to authorize changing the Kitchen Access Code:',
+                showInput: true,
+                placeholder: 'Enter 6-digit pin',
+                confirmText: 'Authorize Update'
+            });
+
+            if (pin === "789456") {
+                localStorage.setItem('kitchenPassword', pass);
+                await superModal({
+                    title: '✅ Success',
+                    message: 'Kitchen Access Code has been updated successfully. Staff will need this code to access the queue.',
+                    confirmText: 'Done'
+                });
+            } else if (pin !== null) {
+                await superModal({
+                    title: '❌ Denied',
+                    message: 'Incorrect pincode. Update cancelled.',
+                    confirmText: 'Close'
+                });
+            }
+        };
+
+        window.savePosPassword = async function () {
+            const pass = document.getElementById('pos-password-input').value.trim();
+            if (!pass) {
+                return await superModal({
+                    title: '⚠️ Input Missing',
+                    message: 'Please enter a valid POS Access Code.',
+                    confirmText: 'OK'
+                });
+            }
+
+            const pin = await superModal({
+                title: '🔒 Security Authorization',
+                message: 'Enter Master PIN to authorize changing the POS Access Code:',
+                showInput: true,
+                placeholder: 'Enter 6-digit pin',
+                confirmText: 'Authorize Update'
+            });
+
+            if (pin === "789456") {
+                localStorage.setItem('posPassword', pass);
+                await superModal({
+                    title: '✅ Success',
+                    message: 'POS Terminal Access Code has been updated successfully.',
+                    confirmText: 'Done'
+                });
+            } else if (pin !== null) {
+                await superModal({
+                    title: '❌ Denied',
+                    message: 'Incorrect pincode. Update cancelled.',
+                    confirmText: 'Close'
+                });
+            }
+        };
+
         function renderDashboard() {
+            // ... inside renderDashboard
+            const kPass = localStorage.getItem('kitchenPassword') || '';
+            document.getElementById('kitchen-password-input').value = kPass;
+            const pPass = localStorage.getItem('posPassword') || '';
+            if (document.getElementById('pos-password-input')) document.getElementById('pos-password-input').value = pPass;
             const dashboard = document.getElementById('dashboard-section');
             const auth = document.getElementById('auth-section');
             const adminStatus = document.getElementById('admin-status');
             const logoutBtn = document.getElementById('logout-admin-btn');
 
-            const history = getReservationHistory();
+            const historyTotal = getReservationHistory();
+            const history = getFilteredHistory();
             const adminUsers = getAdminUsers();
             const priorityHistory = history.filter(r => r.reservationType === 'priority');
 
             const total = history.length;
             const priorityCount = priorityHistory.length;
+            const walkinCount = history.filter(r => r.bookedBy === 'staff').length;
             const revenue = priorityHistory.reduce((sum, r) => sum + Number(r.paymentAmount || 0), 0);
             const adminCount = adminUsers.length;
 
@@ -199,6 +655,7 @@
 
             document.getElementById('stat-total').textContent = total;
             document.getElementById('stat-priority-pct').textContent = `${priorityPct}%`;
+            document.getElementById('stat-walkins').textContent = walkinCount;
             document.getElementById('stat-revenue').textContent = `₱${Number(revenue).toLocaleString()}`;
             document.getElementById('stat-admins').textContent = adminCount;
 
@@ -208,7 +665,7 @@
                 const now = Date.now();
                 const activeNames = [];
                 let count = 0;
-                for(const [custId, data] of Object.entries(online)) {
+                for (const [custId, data] of Object.entries(online)) {
                     if (now - data.time < 15000) {
                         count++;
                         activeNames.push(data.name);
@@ -217,12 +674,18 @@
                     }
                 }
                 localStorage.setItem('onlineCustomers', JSON.stringify(online));
-                
+
                 const onlineValue = document.getElementById('super-stat-online');
                 const onlineList = document.getElementById('super-online-list');
                 if (onlineValue) onlineValue.textContent = count;
                 if (onlineList) {
                     onlineList.textContent = activeNames.length ? activeNames.join(', ') : 'No customers browsing right now.';
+                }
+
+                // REFRESH RECORDS TABLE (to update NEW highlights)
+                if (document.getElementById('tab-danger') && document.getElementById('tab-danger').classList.contains('hidden')) {
+                    // Check if not in danger zone (simple proxy for being in records/overview)
+                    applySearch();
                 }
 
                 // Update staff management table too
@@ -266,8 +729,19 @@
                 rows.forEach(r => {
                     const tr = document.createElement('tr');
 
+                    // NEW HIGHLIGHT LOGIC: Less than 1 minute old
+                    const createdTime = r.completedAt ? new Date(r.completedAt).getTime() : 0;
+                    const isNew = createdTime && (Date.now() - createdTime < 60000);
+
+                    if (isNew) {
+                        tr.classList.add('new-order-row');
+                    }
+
                     tr.innerHTML = `
-                        <td><strong>${r.reservationNumber || 'N/A'}</strong></td>
+                        <td>
+                            ${isNew ? '<span class="new-badge">NEW</span>' : ''}
+                            <strong>${r.reservationNumber || 'N/A'}</strong>
+                        </td>
                         <td>${r.arrivalDateTimeDisplay || r.arrivalDate || ''}</td>
                         <td>${r.customerName || 'Unknown'}</td>
                         <td>${r.bookedTable || 'None'}</td>
@@ -283,26 +757,26 @@
 
             function applySearch() {
                 const q = (searchInput.value || '').trim().toLowerCase();
-                const filtered = !q ? history : history.filter(r => {
+                const filtered = !q ? historyTotal : historyTotal.filter(r => {
                     return (r.reservationNumber || '').toLowerCase().includes(q) ||
                         (r.customerName || '').toLowerCase().includes(q);
                 });
                 renderRows(filtered);
-                summaryLine.textContent = `Showing ${filtered.length} of ${history.length} global records.`;
+                summaryLine.textContent = `Showing ${filtered.length} of ${historyTotal.length} global records.`;
             }
 
-            renderRows(history);
-            summaryLine.textContent = `Showing ${history.length} of ${history.length} global records.`;
+            renderRows(historyTotal); // Always show all in records tab
+            summaryLine.textContent = `Showing ${historyTotal.length} of ${historyTotal.length} global records.`;
             searchInput.addEventListener('input', applySearch);
 
             // Staff admin management
             const staffTbody = document.getElementById('staff-list-tbody');
-            
+
             function renderStaffManagement(isPolling = false) {
                 const users = getAdminUsers();
                 const onlineAdmins = safeJsonParse(localStorage.getItem('onlineAdmins'), {});
                 const now = Date.now();
-                
+
                 staffTbody.innerHTML = '';
                 if (users.length === 0) {
                     staffTbody.innerHTML = '<tr><td colspan="2" class="muted" style="text-align: center;">No staff accounts registered.</td></tr>';
@@ -310,10 +784,10 @@
                 }
                 users.forEach((u, i) => {
                     const isOnline = onlineAdmins[u.username] && (now - onlineAdmins[u.username] < 15000);
-                    const statusBadge = isOnline 
+                    const statusBadge = isOnline
                         ? `<span style="background:#dcfce7; color:#16a34a; font-size:11px; padding:2px 8px; border-radius:12px; margin-left:8px; font-weight:bold;">🟢 Online</span>`
                         : `<span style="background:#f1f5f9; color:#94a3b8; font-size:11px; padding:2px 8px; border-radius:12px; margin-left:8px; font-weight:bold;">⚪ Offline</span>`;
-                        
+
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td><strong style="color: #0f172a;">${u.username}</strong> ${statusBadge}</td>
@@ -323,51 +797,484 @@
                 });
             }
 
-            window.deleteStaffUser = function(index) {
-                if (confirm('Delete this staff account?')) {
-                    const users = getAdminUsers();
+            window.deleteStaffUser = async function (index) {
+                const users = getAdminUsers();
+                const targetUser = users[index];
+
+                const pin = await superModal({
+                    title: '🔒 Security Authorization',
+                    message: `Enter Pincode to DELETE staff account: <b>${targetUser.username}</b>`,
+                    showInput: true,
+                    placeholder: 'Enter 6-digit pin',
+                    confirmText: 'Delete Account'
+                });
+
+                if (pin === "789456") {
                     users.splice(index, 1);
                     localStorage.setItem('adminUsers', JSON.stringify(users));
                     // Update stats
-                    document.getElementById('stat-admins').textContent = users.length;
+                    const statCount = document.getElementById('stat-admins');
+                    if (statCount) statCount.textContent = users.length;
+
+                    await superModal({
+                        title: '✅ Success',
+                        message: `Staff account <b>${targetUser.username}</b> has been permanently removed.`,
+                        confirmText: 'OK'
+                    });
                     renderStaffManagement();
+                } else if (pin !== null) {
+                    await superModal({
+                        title: '❌ Access Denied',
+                        message: 'Invalid Pincode. Operation cancelled.',
+                        confirmText: 'Back to Safety'
+                    });
                 }
             };
 
             document.getElementById('create-staff-btn').onclick = async () => {
                 const uInput = document.getElementById('new-staff-username');
                 const pInput = document.getElementById('new-staff-password');
-                const errorEl = document.getElementById('staff-error-msg');
                 const username = uInput.value.trim();
                 const password = pInput.value;
 
-                errorEl.style.display = 'none';
-
                 if (!username || password.length < 4) {
-                    errorEl.textContent = 'Username required, and password must be at least 4 characters long.';
-                    errorEl.style.display = 'block';
-                    return;
+                    return await superModal({
+                        title: '⚠️ Input Required',
+                        message: 'Please provide a username and a password (min. 4 characters).',
+                        confirmText: 'Got it'
+                    });
                 }
 
                 const users = getAdminUsers();
                 if (users.some(u => u.username === username)) {
-                    errorEl.textContent = 'Username already exists.';
-                    errorEl.style.display = 'block';
-                    return;
+                    return await superModal({
+                        title: '⚠️ Duplicate Username',
+                        message: `The username <b>${username}</b> is already taken.`,
+                        confirmText: 'Try Another'
+                    });
                 }
 
-                const passwordHash = await sha256Hex(password);
-                users.push({ username, passwordHash });
-                localStorage.setItem('adminUsers', JSON.stringify(users));
+                // Show Pincode Modal
+                const pin = await superModal({
+                    title: '🔒 Security Authorization',
+                    message: `Enter Pincode to authorize the creation of a new staff account: <b>${username}</b>`,
+                    showInput: true,
+                    placeholder: 'Enter 6-digit pin',
+                    confirmText: 'Authorize Creation'
+                });
 
-                uInput.value = '';
-                pInput.value = '';
-                alert("Staff account created successfully!");
-                document.getElementById('stat-admins').textContent = users.length;
-                renderStaffManagement();
+                if (pin === "789456") {
+                    const passwordHash = await sha256Hex(password);
+                    users.push({ username, passwordHash });
+                    localStorage.setItem('adminUsers', JSON.stringify(users));
+
+                    uInput.value = '';
+                    pInput.value = '';
+
+                    const statCount = document.getElementById('stat-admins');
+                    if (statCount) statCount.textContent = users.length;
+
+                    await superModal({
+                        title: '✅ Success',
+                        message: `Staff account for <b>${username}</b> has been created successfully!`,
+                        confirmText: 'Done'
+                    });
+                    renderStaffManagement();
+                } else if (pin !== null) {
+                    await superModal({
+                        title: '❌ Denied',
+                        message: 'Incorrect pincode. Staff creation aborted.',
+                        confirmText: 'Close'
+                    });
+                }
             };
 
             renderStaffManagement();
+
+            // --- INVENTORY MANAGEMENT LOGIC ---
+            // --- INVENTORY MANAGEMENT LOGIC ---
+            function getInventory() {
+                let inv = localStorage.getItem('inventoryItems');
+                if (!inv) {
+                    const defaultMenu = [
+                        { id: 'm5', title: 'Fillet Mignon', category: 'Beef', total_stock: 50 },
+                        { id: 't1', title: 'T-Bone Medium', category: 'T-Bone', total_stock: 50 },
+                        { id: 's1', title: 'Sirloin Mini', category: 'Sirloin Steak', total_stock: 50 },
+                        { id: 'm1', title: 'Whole Chicken', category: 'Chicken & Fish', total_stock: 50 },
+                        { id: 'sw1', title: 'Big Sunny Burger', category: 'Sandwich', total_stock: 50 },
+                        { id: 'sd1', title: 'Cream of Mushroom Soup', category: 'Side Orders', total_stock: 50 },
+                        { id: 'd1', title: 'Mango Juice', category: 'Drinks', total_stock: 50 },
+                        { id: 'w1', title: 'Carlo Rossi (Red)', category: 'Wines', total_stock: 50 }
+                    ];
+                    inv = JSON.stringify(defaultMenu);
+                    localStorage.setItem('inventoryItems', inv);
+                }
+
+                let items = JSON.parse(inv);
+                let mutated = false;
+
+                // DATA MIGRATION: Old 'stock' -> New 'total_stock'
+                items = items.map(i => {
+                    if (i.total_stock === undefined && i.stock !== undefined) {
+                        i.total_stock = i.stock;
+                        mutated = true;
+                    }
+                    const validCats = ['Drinks', 'Food Ingredients', 'Supplies', 'Others'];
+                    if (!validCats.includes(i.category)) {
+                        i.category = getAutoCategory(i.title || i.name || '');
+                        mutated = true;
+                    }
+                    return i;
+                });
+
+                if (mutated) {
+                    localStorage.setItem('inventoryItems', JSON.stringify(items));
+                }
+                return items;
+            }
+
+            // --- ADVANCED INVENTORY LOGIC ---
+            let currentInvCat = 'All';
+
+            window.switchInvCat = function (cat, btn) {
+                currentInvCat = cat;
+                document.querySelectorAll('#inv-category-tabs .tab-link').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                renderInventory();
+            };
+
+            function getAutoCategory(name) {
+                const n = name.toLowerCase();
+                if (n.match(/fillet mignon|tenderloin|rib eye|hamburger steak|beef|ribeye/)) return 'Beef';
+                if (n.match(/t-bone|porterhouse|porter house/)) return 'T-Bone';
+                if (n.match(/sirloin/)) return 'Sirloin Steak';
+                if (n.match(/chicken|fish|bangus|salmon/)) return 'Chicken & Fish';
+                if (n.match(/burger|sandwich|hamburger|cheeseburger/)) return 'Sandwich';
+                if (n.match(/rice|fries|salad|soup|bread|garlic|potato|mash/)) return 'Side Orders';
+                if (n.match(/wine|carlo rossi|adega/)) return 'Wines';
+                if (n.match(/juice|tea|coffee|coke|sprite|water|royal|pilsen|lemonade|calamansi/)) return 'Drinks';
+                if (n.match(/tissue|soap|cleaner|cups|towel|napkin|toothpick|placemat|pen|paper|clip|rubber|alcohol|dishwashing|bleach|glade|spoon|fork|knife/)) return 'Supplies';
+                return 'Others';
+            }
+
+            function refreshInvStats() {
+                const items = getInventory();
+                const lowCount = items.filter(i => (i.total_stock + (i.added_stock || 0) - (i.sold_stock || 0)) <= (i.threshold || 5)).length;
+                const totalSold = items.reduce((sum, i) => sum + (i.sold_stock || 0), 0);
+
+                document.getElementById('inv-stat-low').textContent = lowCount;
+                document.getElementById('inv-stat-total').textContent = items.length;
+                document.getElementById('inv-stat-sold').textContent = totalSold;
+
+                // Predictive: if stock < daily_sold * 2
+                const predictOut = items.filter(i => {
+                    const eod = (i.total_stock + (i.added_stock || 0) - (i.sold_stock || 0));
+                    return eod > 0 && eod < ((i.sold_stock || 1) * 2);
+                }).length;
+                document.getElementById('inv-stat-out-predict').textContent = predictOut;
+            }
+
+            function renderInventory() {
+                const items = getInventory();
+                const tbody = document.getElementById('inventory-tbody');
+                if (!tbody) return;
+                tbody.innerHTML = '';
+
+                const filtered = currentInvCat === 'All' ? items : items.filter(i => i.category === currentInvCat);
+
+                if (filtered.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="8" class="muted" style="text-align:center; padding:40px;">No items found in this category.</td></tr>`;
+                }
+
+                filtered.forEach((item) => {
+                    const total = parseInt(item.total_stock || 0);
+                    const add = parseInt(item.added_stock || 0);
+                    const sold = parseInt(item.sold_stock || 0);
+                    const eod = total + add - sold;
+
+                    const isLow = eod <= (item.threshold || 5);
+                    const isOut = eod <= 0;
+                    const statusLabel = isOut ? 'OUT OF STOCK' : (isLow ? 'LOW STOCK' : 'NORMAL');
+                    const statusColor = isOut ? '#ef4444' : (isLow ? '#f59e0b' : '#16a34a');
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="font-weight:700; color:#1e293b;">${item.title}</td>
+                        <td>${total}</td>
+                        <td>${item.in_chiller || 0}</td>
+                        <td style="color:#16a34a;">+${add}</td>
+                        <td style="color:#ef4444;">-${sold}</td>
+                        <td style="font-weight:800; background:#f8fafc;">${eod}</td>
+                        <td><span style="color:${statusColor}; font-weight:bold; font-size:11px; padding:4px 8px; background:${statusColor}15; border-radius:12px;">${statusLabel}</span></td>
+                        <td>
+                            <button type="button" class="secondary" style="padding: 4px 8px; font-size: 11px;" onclick="openInventoryModal('${item.id}')">Edit</button>
+                            <button type="button" class="danger" style="padding: 4px 8px; font-size: 11px;" onclick="deleteInventoryItem('${item.id}')">Delete</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                refreshInvStats();
+            }
+
+            window.openInventoryModal = function (id = null) {
+                document.getElementById('inv-modal').classList.remove('hidden');
+                const calcEOD = document.getElementById('inv-calc-eod');
+
+                const updateEOD = () => {
+                    const t = parseInt(document.getElementById('inv-stock').value) || 0;
+                    const a = parseInt(document.getElementById('inv-added').value) || 0;
+                    const s = parseInt(document.getElementById('inv-sold').value) || 0;
+                    calcEOD.textContent = t + a - s;
+                };
+
+                ['inv-stock', 'inv-added', 'inv-sold'].forEach(id => {
+                    document.getElementById(id).oninput = updateEOD;
+                });
+
+                if (id) {
+                    const item = getInventory().find(i => i.id === id);
+                    document.getElementById('inv-modal-title').textContent = 'Edit Item: ' + item.title;
+                    document.getElementById('inv-id').value = item.id;
+                    document.getElementById('inv-title').value = item.title;
+                    document.getElementById('inv-category').value = item.category || '';
+                    document.getElementById('inv-stock').value = item.total_stock || 0;
+                    document.getElementById('inv-chiller').value = item.in_chiller || 0;
+                    document.getElementById('inv-added').value = item.added_stock || 0;
+                    document.getElementById('inv-sold').value = item.sold_stock || 0;
+                } else {
+                    document.getElementById('inv-modal-title').textContent = 'Add New Inventory Item';
+                    document.getElementById('inv-id').value = '';
+                    document.getElementById('inv-title').value = '';
+                    document.getElementById('inv-category').value = '';
+                    document.getElementById('inv-stock').value = 0;
+                    document.getElementById('inv-chiller').value = 0;
+                    document.getElementById('inv-added').value = 0;
+                    document.getElementById('inv-sold').value = 0;
+                }
+                updateEOD();
+            };
+
+            window.closeInventoryModal = () => {
+                document.getElementById('inv-modal').classList.add('hidden');
+            };
+
+            window.saveInventoryItem = async function () {
+                const id = document.getElementById('inv-id').value;
+                const title = document.getElementById('inv-title').value.trim();
+                let category = document.getElementById('inv-category').value;
+                const total_stock = parseInt(document.getElementById('inv-stock').value) || 0;
+                const in_chiller = parseInt(document.getElementById('inv-chiller').value) || 0;
+                const added_stock = parseInt(document.getElementById('inv-added').value) || 0;
+                const sold_stock = parseInt(document.getElementById('inv-sold').value) || 0;
+
+                if (!title) {
+                    return superModal({
+                        title: 'Missing Info',
+                        message: 'Item name is required.'
+                    });
+                }
+                if (!category) category = getAutoCategory(title);
+
+                const items = getInventory();
+                const itemData = {
+                    title, category, total_stock, in_chiller, added_stock, sold_stock,
+                    last_updated: new Date().toISOString()
+                };
+
+                if (id) {
+                    const idx = items.findIndex(i => i.id === id);
+                    if (idx > -1) Object.assign(items[idx], itemData);
+                } else {
+                    items.push({ id: 'itm_' + Date.now(), ...itemData });
+                }
+
+                localStorage.setItem('inventoryItems', JSON.stringify(items));
+                document.getElementById('inv-modal').classList.add('hidden');
+                renderInventory();
+                window.dispatchEvent(new Event('storage'));
+
+                await superModal({
+                    title: id ? 'Item Updated! ✨' : 'Item Added! 🎉',
+                    message: `${title} has been successfully ${id ? 'updated' : 'added to the inventory'}.`
+                });
+            };
+
+            window.deleteInventoryItem = async function (id) {
+                const confirm = await superModal({
+                    title: 'Delete Item? 🗑️',
+                    message: 'Are you sure you want to delete this item permanently? This action cannot be undone.',
+                    type: 'confirm',
+                    confirmText: 'Delete Permanently',
+                    cancelText: 'Keep Item'
+                });
+
+                if (confirm) {
+                    const items = getInventory().filter(i => i.id !== id);
+                    localStorage.setItem('inventoryItems', JSON.stringify(items));
+                    renderInventory();
+
+                    superModal({
+                        title: 'Item Deleted',
+                        message: 'The item has been removed from your inventory records.'
+                    });
+                }
+            };
+
+            // OCR LOGIC
+            let ocrData = [];
+            window.openOCRModal = () => document.getElementById('ocr-modal').classList.remove('hidden');
+            window.closeOCRModal = () => {
+                document.getElementById('ocr-modal').classList.add('hidden');
+                document.getElementById('ocr-upload-area').classList.remove('hidden');
+                document.getElementById('ocr-processing').classList.add('hidden');
+                document.getElementById('ocr-results').classList.add('hidden');
+                document.getElementById('ocr-results-footer').classList.add('hidden');
+            };
+
+            window.processOCRImage = async function (input) {
+                if (!input.files?.[0]) return;
+
+                const uploadArea = document.getElementById('ocr-upload-area');
+                const procArea = document.getElementById('ocr-processing');
+                const status = document.getElementById('ocr-status-msg');
+
+                uploadArea.classList.add('hidden');
+                procArea.classList.remove('hidden');
+
+                try {
+                    status.textContent = "Initializing Tesseract engine...";
+                    const worker = await Tesseract.createWorker({
+                        logger: m => {
+                            if (m.status === 'recognizing text') {
+                                status.textContent = `Reading Handwriting: ${Math.round(m.progress * 100)}%`;
+                            }
+                        }
+                    });
+                    await worker.loadLanguage('eng');
+                    await worker.initialize('eng');
+
+                    const { data: { text } } = await worker.recognize(input.files[0]);
+                    await worker.terminate();
+
+                    status.textContent = "Parsing structured data...";
+                    parseOCRResults(text);
+                } catch (e) {
+                    console.error(e);
+                    alert("OCR Failed: " + e.message);
+                    closeOCRModal();
+                }
+            };
+
+            function parseOCRResults(text) {
+                const lines = text.split('\n');
+                ocrData = [];
+                const tbody = document.getElementById('ocr-results-tbody');
+                tbody.innerHTML = '';
+
+                // Simple parser: Look for [Name] [Numbers...]
+                lines.forEach(line => {
+                    const parts = line.trim().split(/\s+/);
+                    if (parts.length >= 2) {
+                        const name = parts.filter(p => isNaN(p)).join(' ');
+                        const nums = parts.filter(p => !isNaN(p)).map(Number);
+
+                        if (name && name.length > 2) {
+                            const row = {
+                                name: name,
+                                total: nums[0] || 0,
+                                chiller: nums[1] || 0,
+                                add: nums[2] || 0,
+                                sold: nums[3] || 0
+                            };
+                            ocrData.push(row);
+
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = `
+                                <td><input type="text" value="${row.name}" onchange="ocrData[${ocrData.length - 1}].name=this.value"></td>
+                                <td><input type="number" value="${row.total}" onchange="ocrData[${ocrData.length - 1}].total=parseInt(this.value)"></td>
+                                <td><input type="number" value="${row.chiller}" onchange="ocrData[${ocrData.length - 1}].chiller=parseInt(this.value)"></td>
+                                <td><input type="number" value="${row.add}" onchange="ocrData[${ocrData.length - 1}].add=parseInt(this.value)"></td>
+                                <td><input type="number" value="${row.sold}" onchange="ocrData[${ocrData.length - 1}].sold=parseInt(this.value)"></td>
+                            `;
+                            tbody.appendChild(tr);
+                        }
+                    }
+                });
+
+                document.getElementById('ocr-processing').classList.add('hidden');
+                document.getElementById('ocr-results').classList.remove('hidden');
+                document.getElementById('ocr-results-footer').classList.remove('hidden');
+            }
+
+            window.commitOCRData = function () {
+                const items = getInventory();
+                ocrData.forEach(ocrRow => {
+                    const existingIdx = items.findIndex(i => i.title.toLowerCase() === ocrRow.name.toLowerCase());
+                    const itemData = {
+                        title: ocrRow.name,
+                        category: getAutoCategory(ocrRow.name),
+                        total_stock: ocrRow.total,
+                        in_chiller: ocrRow.chiller,
+                        added_stock: ocrRow.add,
+                        sold_stock: ocrRow.sold,
+                        last_updated: new Date().toISOString()
+                    };
+
+                    if (existingIdx > -1) {
+                        Object.assign(items[existingIdx], itemData);
+                    } else {
+                        items.push({ id: 'itm_' + Date.now() + Math.random(), ...itemData });
+                    }
+                });
+
+                localStorage.setItem('inventoryItems', JSON.stringify(items));
+                renderInventory();
+                closeOCRModal();
+                superModal({
+                    title: 'Import Successful! 📦',
+                    message: `Successfully synchronized ${items.length} items to the database.`
+                });
+            };
+
+            // EXPORT LOGIC
+            window.exportInventoryReport = async function () {
+                const confirm = await superModal({
+                    title: 'Generate Report? 📊',
+                    message: 'Would you like to generate and download the complete daily inventory report for today?',
+                    type: 'confirm',
+                    confirmText: 'Generate Excel',
+                    cancelText: 'Cancel'
+                });
+
+                if (confirm) {
+                    const items = getInventory();
+
+                    // 1. Excel Export
+                    const wsData = [
+                        ["Item Name", "Category", "Total Stock", "Chiller", "Added", "Sold", "End of Day", "Status"]
+                    ];
+                    items.forEach(i => {
+                        wsData.push([
+                            i.title, i.category, i.total_stock, i.in_chiller, i.added_stock, i.sold_stock,
+                            (i.total_stock + (i.added_stock || 0) - (i.sold_stock || 0)),
+                            (i.total_stock + (i.added_stock || 0) - (i.sold_stock || 0)) <= 0 ? 'OUT' : 'OK'
+                        ]);
+                    });
+                    const wb = XLSX.utils.book_new();
+                    const ws = XLSX.utils.aoa_to_sheet(wsData);
+                    XLSX.utils.book_append_sheet(wb, ws, "Daily Inventory");
+                    XLSX.writeFile(wb, `Inventory_Report_${new Date().toLocaleDateString()}.xlsx`);
+
+                    superModal({
+                        title: 'Export Generated! 📊',
+                        message: 'Your Excel inventory report has been downloaded successfully.'
+                    });
+                }
+            };
+
+            renderInventory();
+            // --- END ADVANCED INVENTORY LOGIC ---
+            // --- END INVENTORY LOGIC ---
 
             // Chart.js integration
 
@@ -402,7 +1309,8 @@
             });
 
             const ctxTrend = document.getElementById('trendChart').getContext('2d');
-            new Chart(ctxTrend, {
+            if (trendChart) trendChart.destroy();
+            trendChart = new Chart(ctxTrend, {
                 type: 'line',
                 data: {
                     labels: dates,
@@ -437,7 +1345,8 @@
 
             // 2. Reservation Type Breakdown (Doughnut Chart)
             const ctxType = document.getElementById('typeChart').getContext('2d');
-            new Chart(ctxType, {
+            if (typeChart) typeChart.destroy();
+            typeChart = new Chart(ctxType, {
                 type: 'doughnut',
                 data: {
                     labels: ['Priority (PRO)', 'Standard (STD)'],
@@ -509,22 +1418,40 @@
             };
 
             // Danger Actions
-            document.getElementById('clear-history-btn').onclick = () => {
-                const ok = confirm('CRITICAL WARNING: This will permanently delete ALL reservation history. Are you absolutely sure?');
-                if (ok) {
+            document.getElementById('clear-history-btn').onclick = async () => {
+                const pin = await superModal({
+                    title: '☢️ Danger Zone',
+                    message: 'Enter Pincode to <b>PURGE ALL RESERVATIONS</b>. This cannot be undone!',
+                    showInput: true,
+                    placeholder: 'Enter 6-digit pin',
+                    confirmText: 'Purge Records'
+                });
+
+                if (pin === "789456") {
                     localStorage.removeItem('reservationHistory');
-                    alert("History purged.");
+                    await superModal({ title: '✅ Success', message: 'All reservations have been cleared.', confirmText: 'OK' });
                     window.location.reload();
+                } else if (pin !== null) {
+                    await superModal({ title: '❌ Error', message: 'Unauthorized. Action blocked.', confirmText: 'Close' });
                 }
             };
 
-            document.getElementById('clear-admins-btn').onclick = () => {
-                const ok = confirm('CRITICAL WARNING: This will delete all staff admin accounts. They will need to register again. Proceed?');
-                if (ok) {
+            document.getElementById('clear-admins-btn').onclick = async () => {
+                const pin = await superModal({
+                    title: 'Danger Zone',
+                    message: 'Enter Pincode to <b>REVOKE ALL STAFF ACCOUNTS</b>. All active staff will be logged out and deleted!',
+                    showInput: true,
+                    placeholder: 'Enter 6-digit pin',
+                    confirmText: 'Revoke All'
+                });
+
+                if (pin === "789456") {
                     localStorage.removeItem('adminUsers');
                     localStorage.removeItem('adminLoggedInUser');
-                    alert("Staff admin accounts revoked.");
+                    await superModal({ title: '✅ Success', message: 'All staff accounts have been deleted.', confirmText: 'OK' });
                     window.location.reload();
+                } else if (pin !== null) {
+                    await superModal({ title: '❌ Error', message: 'Invalid pin code.', confirmText: 'Close' });
                 }
             };
 
@@ -571,6 +1498,94 @@
         }
 
         initAuth();
+
+        // ── CUSTOM MODAL SYSTEM ──
+        const modalOverlay = document.createElement('div');
+        modalOverlay.id = 'super-modal-root';
+        document.body.appendChild(modalOverlay);
+
+        /**
+         * Generic Custom Modal Helper (Green & White Style)
+         */
+        window.superModal = function ({ title = 'Notice', message = '', type = 'alert', showInput = false, placeholder = '...', confirmText = 'Confirm', cancelText = 'Cancel' }) {
+            return new Promise((resolve) => {
+                const html = `
+                    <div class="super-modal-overlay">
+                        <div class="super-modal-box">
+                            <div class="super-modal-header">
+                                <h3>${title}</h3>
+                            </div>
+                            <div class="super-modal-body" style="padding-top: 30px;">
+                                <p style="margin-bottom: 25px; color: #64748b; font-size: 15px;">${message}</p>
+                                ${showInput ? `
+                                    <div class="premium-pin-wrap">
+                                        <div class="pin-display" id="pin-display-boxes">
+                                            <div class="pin-box"></div>
+                                            <div class="pin-box"></div>
+                                            <div class="pin-box"></div>
+                                            <div class="pin-box"></div>
+                                            <div class="pin-box"></div>
+                                            <div class="pin-box"></div>
+                                        </div>
+                                        <input type="password" id="modal-pincode" class="hidden-pin-input" maxlength="6" autofocus autocomplete="off">
+                                    </div>
+                                    <style>
+                                        .premium-pin-wrap { position: relative; display: flex; justify-content: center; margin-bottom: 30px; }
+                                        .pin-display { display: flex; gap: 12px; }
+                                        .pin-box { width: 45px; height: 55px; border: 2px solid #e2e8f0; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; transition: 0.2s; background: #f8fafc; }
+                                        .pin-box.active { border-color: #1b5e20; box-shadow: 0 0 10px rgba(27, 94, 32, 0.1); background: white; }
+                                        .pin-box.filled::after { content: "•"; color: #1b5e20; font-size: 32px; }
+                                        .hidden-pin-input { position: absolute; opacity: 0; width: 100%; height: 100%; cursor: default; }
+                                    </style>
+                                ` : ''}
+                            </div>
+                            <div class="super-modal-footer">
+                                ${type === 'confirm' || showInput ? `<button class="super-modal-btn cancel" id="modal-cancel-btn">${cancelText}</button>` : ''}
+                                <button class="super-modal-btn confirm" id="modal-confirm-btn">${confirmText}</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                modalOverlay.innerHTML = html;
+
+                const confirmBtn = document.getElementById('modal-confirm-btn');
+                const cancelBtn = document.getElementById('modal-cancel-btn');
+                const inputField = document.getElementById('modal-pincode');
+                const boxes = document.querySelectorAll('.pin-box');
+
+                if (inputField) {
+                    inputField.focus();
+
+                    // Sync boxes with input
+                    inputField.addEventListener('input', () => {
+                        const val = inputField.value;
+                        boxes.forEach((box, i) => {
+                            box.classList.toggle('filled', i < val.length);
+                            box.classList.toggle('active', i === val.length);
+                        });
+                        if (val.length === 6) {
+                            setTimeout(() => confirmBtn.click(), 300);
+                        }
+                    });
+
+                    // Clicking boxes focuses input
+                    document.querySelector('.premium-pin-wrap').addEventListener('click', () => inputField.focus());
+
+                }
+
+                confirmBtn.onclick = () => {
+                    const val = inputField ? inputField.value : true;
+                    modalOverlay.innerHTML = '';
+                    resolve(val);
+                };
+                if (cancelBtn) {
+                    cancelBtn.onclick = () => {
+                        modalOverlay.innerHTML = '';
+                        resolve(null);
+                    };
+                }
+            });
+        };
     </script>
 </body>
 

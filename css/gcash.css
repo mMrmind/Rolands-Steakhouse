@@ -228,48 +228,54 @@ body {
     border-top: 6px solid #fbbf24;
 }
 
-/* Toggle Switch */
+/* Toggle Switch — iOS Segmented Control Style */
 .pay-toggle {
     display: flex;
-    background: #f1f5f9;
-    border-radius: 50px;
-    padding: 4px;
+    background: #e5e7eb;
+    border-radius: 14px;
+    padding: 5px;
     margin: 20px 0 28px;
     position: relative;
+    gap: 4px;
 }
 
 .pay-toggle-btn {
     flex: 1;
     border: none;
     background: transparent;
-    padding: 10px 0;
-    border-radius: 50px;
+    padding: 14px 0;
+    border-radius: 10px;
     font-size: 15px;
     font-weight: 700;
     cursor: pointer;
-    color: #888;
-    transition: color 0.3s;
+    color: #6b7280;
+    transition: color 0.25s;
     z-index: 2;
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: none;
 }
 
-.pay-toggle-btn.active { color: white; }
+.pay-toggle-btn.active { color: #111827; }
+.pay-toggle-btn:hover  { transform: none; background: transparent; }
 
 .pay-toggle-slider {
     position: absolute;
-    top: 4px;
-    bottom: 4px;
-    left: 4px;
-    width: calc(50% - 4px);
-    background: #0071bc;
-    border-radius: 50px;
-    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), background 0.35s;
+    top: 5px;
+    bottom: 5px;
+    left: 5px;
+    width: calc(50% - 7px);
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.14), 0 1px 3px rgba(0,0,0,0.08);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 1;
 }
 
 .pay-toggle-slider.right {
-    transform: translateX(calc(100% + 0px));
-    background: #c0392b;
+    transform: translateX(calc(100% + 4px));
 }
 
 /* QR Panels */

@@ -6,13 +6,14 @@
     <title>Admin Dashboard | Roland's</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/admin.css">
+    <script src="https://unpkg.com/html5-qrcode"></script>
 </head>
 <body>
     <header>
         <div class="brand">Roland's Staff Admin</div>
         <div class="actions">
             <div id="admin-status" class="muted"></div>
-            <button class="secondary" id="logout-admin-btn" type="button" style="display:none;">Logout</button>
+            <button class="secondary hidden" id="logout-admin-btn" type="button">Logout</button>
         </div>
     </header>
 
@@ -44,6 +45,22 @@
                     <div class="msg" id="auth-message-2"></div>
                 </div>
             </div>
+
+            <!-- TERMINAL LAUNCH CENTER (Publicly accessible 'outside' the dashboard) -->
+            <div id="launch-center" style="margin-top: 40px; text-align: center; border-top: 1px dashed #cbd5e1; padding-top: 30px;">
+                <h3 style="font-family: 'Playfair Display', serif; color: #1b5e20; font-size: 20px; margin-bottom: 20px;">Terminal Launch Center</h3>
+                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                    <button type="button" onclick="window.open('kitchen.html', '_blank')" 
+                        style="background:#3b82f6; border-radius:10px; padding: 12px 20px; display:flex; align-items:center; gap:8px; border:none; color:white; font-weight:700; cursor:pointer;">
+                        👩‍🍳 Launch Cook Area
+                    </button>
+                    <button type="button" onclick="window.open('pos.html', '_blank')" 
+                        style="background:#1b5e20; border-radius:10px; padding: 12px 20px; display:flex; align-items:center; gap:8px; color:white; border:none; cursor:pointer;">
+                        📱 Launch POS Terminal
+                    </button>
+                </div>
+                <p style="margin-top: 15px; font-size: 12px; color: #64748b; font-style: italic;">Note: Terminals run independently for cashier and kitchen staff.</p>
+            </div>
             <div style="text-align: center; margin-top: 25px;">
                 <a href="superadmin.html" style="color: #2e7d32; font-size: 14px; text-decoration: none; transition: 0.2s; font-weight: 600;" onmouseover="this.style.color='#1b5e20'" onmouseout="this.style.color='#2e7d32'">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: middle;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
@@ -55,12 +72,109 @@
         <div id="dashboard-section" class="hidden">
             <div class="admin-tabs">
                 <button class="tab-link active" onclick="switchAdminTab('overview', this)">Dashboard Overview</button>
-                <button class="tab-link" onclick="switchAdminTab('kitchen', this)">Kitchen Queue</button>
+                <button class="tab-link" onclick="switchAdminTab('walkin', this)">📋 Walk-in Reservation</button>
                 <button class="tab-link" onclick="switchAdminTab('floorplan', this)">Floor Plan</button>
-                <button class="tab-link" onclick="switchAdminTab('menu', this)">Menu Availability</button>
+                <button class="tab-link" onclick="switchAdminTab('menu', this)">Live Inventory</button>
                 <button class="tab-link" onclick="switchAdminTab('chat', this)">Live Chat</button>
                 <button class="tab-link" onclick="switchAdminTab('promotions', this)">🎉 Promotions</button>
                 <button class="tab-link" onclick="switchAdminTab('payments', this)">💳 Payments</button>
+            </div>
+
+            <!-- WALK-IN RESERVATION TAB -->
+            <div id="tab-walkin" class="admin-tab-content hidden">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+                    <h2 style="margin:0; font-family:'Playfair Display',serif; color:#2e7d32; font-size:26px;">📋 Walk-in Reservation</h2>
+                    <span class="muted" style="font-weight:700;">Book a table directly for a walk-in or phone customer</span>
+                </div>
+
+                <!-- Success toast -->
+                <div id="walkin-toast" style="display:none; background:#dcfce7; border:1px solid #86efac; border-radius:10px; padding:14px 18px; margin-bottom:20px; color:#166534; font-weight:600; font-size:14px;"></div>
+
+                <div class="card">
+                    <!-- Type Toggle -->
+                    <div style="display:flex; gap:10px; margin-bottom:22px;">
+                        <button type="button" id="walkin-type-priority"
+                            onclick="setWalkinType('priority')"
+                            style="flex:1; padding:12px; border-radius:8px; border:2px solid #1b5e20; background:#1b5e20; color:white; font-weight:700; font-size:14px; cursor:pointer; transition:all 0.2s;">
+                            ⭐ Priority
+                        </button>
+                        <button type="button" id="walkin-type-standard"
+                            onclick="setWalkinType('standard')"
+                            style="flex:1; padding:12px; border-radius:8px; border:2px solid #cbd5e1; background:white; color:#64748b; font-weight:700; font-size:14px; cursor:pointer; transition:all 0.2s;">
+                            🪑 Standard
+                        </button>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
+                        <div>
+                            <label style="display:block; margin-bottom:5px; font-weight:700; font-size:13px; color:#555;">Customer Name *</label>
+                            <input type="text" id="walkin-name" placeholder="e.g. Juan Dela Cruz" style="width:100%; padding:11px 13px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-size:14px;">
+                        </div>
+                        <div>
+                            <label style="display:block; margin-bottom:5px; font-weight:700; font-size:13px; color:#555;">Contact Number</label>
+                            <input type="text" id="walkin-contact" placeholder="e.g. 09XX-XXX-XXXX" style="width:100%; padding:11px 13px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-size:14px;">
+                        </div>
+                        <div>
+                            <label style="display:block; margin-bottom:5px; font-weight:700; font-size:13px; color:#555;">Arrival Date *</label>
+                            <input type="date" id="walkin-date" style="width:100%; padding:11px 13px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-size:14px;">
+                        </div>
+                        <div>
+                            <label style="display:block; margin-bottom:5px; font-weight:700; font-size:13px; color:#555;">Arrival Time *</label>
+                            <input type="time" id="walkin-time" style="width:100%; padding:11px 13px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-size:14px;">
+                        </div>
+                        <div>
+                            <label style="display:block; margin-bottom:5px; font-weight:700; font-size:13px; color:#555;">Table *</label>
+                            <select id="walkin-table" style="width:100%; padding:11px 13px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-size:14px; background:white;">
+                                <option value="">-- Select Table --</option>
+                                <option>Table 1</option><option>Table 2</option><option>Table 3</option>
+                                <option>Table 4</option><option>Table 5</option><option>Table 6</option>
+                                <option>Table 7</option><option>Table 8</option><option>Table 9</option>
+                                <option>Table 10</option><option>VIP Room</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display:block; margin-bottom:5px; font-weight:700; font-size:13px; color:#555;">Number of Guests</label>
+                            <input type="number" id="walkin-guests" placeholder="e.g. 4" min="1" max="20" style="width:100%; padding:11px 13px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-size:14px;">
+                        </div>
+                    </div>
+
+                    <!-- Priority fields -->
+                    <div id="walkin-priority-fields">
+                        <div style="margin-bottom:14px;">
+                            <label style="display:block; margin-bottom:5px; font-weight:700; font-size:13px; color:#555;">Food Selection *</label>
+                            <button type="button" onclick="openWalkinFoodPicker()" 
+                                style="width:100%; padding:10px; border-radius:8px; border:1px solid #1b5e20; background:white; color:#1b5e20; font-weight:700; font-size:14px; cursor:pointer; transition:0.2s;">
+                                🍽️ Select Menu Items
+                            </button>
+                            <div id="walkin-order-summary" style="margin-top:8px; padding:10px; border-radius:8px; background:#f9fafb; border:1px dashed #d1d5db; min-height:40px; font-size:13px; color:#4b5563;">
+                                No items selected yet.
+                            </div>
+                        </div>
+                        <div style="margin-bottom:14px;">
+                            <label style="display:block; margin-bottom:5px; font-weight:700; font-size:13px; color:#555;">Payment Amount (₱)</label>
+                            <input type="number" id="walkin-payment" placeholder="e.g. 1500" min="0" style="width:100%; padding:11px 13px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-size:14px;">
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom:20px;">
+                        <label style="display:block; margin-bottom:5px; font-weight:700; font-size:13px; color:#555;">Notes / Special Requests</label>
+                        <textarea id="walkin-notes" placeholder="e.g. Birthday celebration, window seat preferred..." rows="3" style="width:100%; padding:11px 13px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-size:14px; font-family:inherit; resize:vertical;"></textarea>
+                    </div>
+
+                    <div id="walkin-error" style="display:none; color:#ef4444; font-size:13px; font-weight:600; margin-bottom:12px;"></div>
+
+                    <button type="button" onclick="submitWalkinReservation()"
+                        style="width:100%; padding:15px; font-size:15px; border-radius:10px; border:none; background:#1b5e20; color:white; font-weight:700; cursor:pointer; transition:all 0.2s;"
+                        onmouseover="this.style.background='#2e7d32'" onmouseout="this.style.background='#1b5e20'">
+                        ✅ Save Reservation
+                    </button>
+                </div>
+
+                <!-- Recent walk-in log -->
+                <h3 style="margin: 28px 0 14px; color:#1b5e20; font-size:16px; text-transform:uppercase; letter-spacing:.5px;">Recent Walk-in Reservations</h3>
+                <div id="walkin-recent-list">
+                    <div style="color:#aaa; font-style:italic; text-align:center; padding:20px;">No walk-in reservations yet.</div>
+                </div>
             </div>
 
             <!-- LIVE CHAT TAB -->
@@ -124,10 +238,46 @@
             <!-- MENU ITEM OVERRIDES TAB -->
             <div id="tab-menu" class="admin-tab-content hidden">
                 <div class="card" style="margin-bottom: 24px;">
-                    <h2 style="font-family: 'Playfair Display', serif; color: #2e7d32; margin: 0 0 12px 0; font-size: 20px;">Toggle Menu Availability</h2>
-                    <p style="color: #666; margin: 0 0 20px 0; font-size: 14px;">Click an item below to mark it as Sold Out. It will be immediately greyed out and unavailable for order on the Pre-Order page.</p>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                        <h2 style="font-family: 'Playfair Display', serif; color: #2e7d32; margin: 0; font-size: 20px;">Live Inventory View</h2>
+                        <span style="font-size:12px; color:#666; font-weight:700;">Stock syncs with Super Admin</span>
+                    </div>
+                    <p style="color: #666; margin: 0 0 20px 0; font-size: 14px;">Monitor real-time stock levels of products here. Only a Super Admin can add or modify the total stock items.</p>
                     <div id="admin-menu-grid">
                         <!-- Menu items rendered via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- WALK-IN FOOD PICKER MODAL -->
+            <div id="walkin-food-modal" class="hidden" style="position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.5); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center;">
+                <div style="background:white; border-radius:20px; width:90%; max-width:600px; max-height:85vh; display:flex; flex-direction:column; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); overflow:hidden;">
+                    <!-- Header -->
+                    <div style="padding:20px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center; background:#f8fafc;">
+                        <h3 style="margin:0; font-family:'Playfair Display',serif; color:#1b5e20; font-size:20px;">Select Menu Items</h3>
+                        <button onclick="closeWalkinFoodPicker()" style="background:none; border:none; color:#64748b; cursor:pointer; padding:5px; font-size:20px;">✕</button>
+                    </div>
+                    
+                    <!-- Search -->
+                    <div style="padding:15px 20px; border-bottom:1px solid #f1f5f9;">
+                        <input type="text" id="walkin-food-search" placeholder="Search menu items..." onkeyup="filterWalkinFoods(this.value)" 
+                            style="width:100%; padding:10px 14px; border:1px solid #e2e8f0; border-radius:10px; font-size:14px; box-sizing:border-box;">
+                    </div>
+
+                    <!-- Scrollable List -->
+                    <div id="walkin-food-content" style="flex:1; overflow-y:auto; padding:20px; background:#f9fafb;">
+                        <!-- Categories and items will be rendered here -->
+                    </div>
+
+                    <!-- Footer -->
+                    <div style="padding:20px; border-top:1px solid #f1f5f9; background:#f8fafc; display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <div style="font-size:12px; color:#64748b; text-transform:uppercase; letter-spacing:0.5px; font-weight:700;">Estimate Total</div>
+                            <div style="font-size:24px; font-weight:800; color:#1b5e20;">₱<span id="walkin-modal-total">0</span></div>
+                        </div>
+                        <button onclick="confirmWalkinFoodSelection()" style="background:#1b5e20; color:white; border:none; padding:12px 24px; border-radius:10px; font-weight:700; cursor:pointer; transition:0.2s;">
+                            Confirm Selection
+                        </button>
                     </div>
                 </div>
             </div>
@@ -145,6 +295,10 @@
                 <div class="card">
                     <h3>Total Revenue (Priority)</h3>
                     <div class="value" id="stat-revenue">₱0</div>
+                </div>
+                <div class="card">
+                    <h3>Walk-in Reservations</h3>
+                    <div class="value" id="stat-walkins">0</div>
                 </div>
                 <div class="card" style="border-left: 4px solid #4ade80;">
                     <h3>Online Customers</h3>
@@ -237,13 +391,6 @@
 
             </div> <!-- End tab-overview -->
 
-            <div id="tab-kitchen" class="admin-tab-content hidden">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h2 style="margin:0; font-family: 'Playfair Display', serif; color: #2e7d32; font-size: 26px;">Kitchen Operations</h2>
-                    <span class="muted" style="font-weight: 700;">Automatic Sync active</span>
-                </div>
-                <div class="ticket-grid" id="kds-grid">Loading queue...</div>
-            </div>
 
             <div id="tab-floorplan" class="admin-tab-content hidden">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -300,48 +447,82 @@
             try { return JSON.parse(value || ''); } catch (e) { return fallback; }
         }
 
-        const menuData = [
-            { id:'m5', title:'Fillet Mignon', category:'Beef' },
-            { id:'m6', title:'Tenderloin Steak (200g)', category:'Beef' },
-            { id:'m7', title:'Tenderloin Tips (200g)', category:'Beef' },
-            { id:'m8', title:'Rib Eye Steak (200-350g)', category:'Beef' },
-            { id:'m9', title:'Hamburger Steak (204g)', category:'Beef' },
-            { id:'t1', title:'T-Bone Medium (250-400g)', category:'T-Bone & Sirloin' },
-            { id:'t2', title:'T-Bone Large (450-500g)', category:'T-Bone & Sirloin' },
-            { id:'t3', title:'T-Bone Extra Large (551-500g)', category:'T-Bone & Sirloin' },
-            { id:'t4', title:'T-Bone XX Large (551-500g)', category:'T-Bone & Sirloin' },
-            { id:'t5', title:'Porter House (551-600g)', category:'T-Bone & Sirloin' },
-            { id:'s1', title:'Sirloin Mini (250-300g)', category:'T-Bone & Sirloin' },
-            { id:'s2', title:'Sirloin Small (251-350g)', category:'T-Bone & Sirloin' },
-            { id:'s3', title:'Sirloin Mid Size (351-450g)', category:'T-Bone & Sirloin' },
-            { id:'s4', title:'Sirloin Big Size (401-450g)', category:'T-Bone & Sirloin' },
-            { id:'m1', title:'Whole Chicken', category:'Chicken & Fish' },
-            { id:'m2', title:'Half Chicken', category:'Chicken & Fish' },
-            { id:'m3', title:'Fish Steak (Tanigue)', category:'Chicken & Fish' },
-            { id:'m4', title:'Bangus Steak', category:'Chicken & Fish' },
-            { id:'sw1', title:'Big Sunny Burger with Fries', category:'Sandwich & Sides' },
-            { id:'sw2', title:'Big Sunny Steak Sandwich', category:'Sandwich & Sides' },
-            { id:'sw3', title:'Steak Sandwich', category:'Sandwich & Sides' },
-            { id:'sw4', title:'Cheeseburger', category:'Sandwich & Sides' },
-            { id:'sd1', title:'Cream of Mushroom Soup', category:'Sandwich & Sides' },
-            { id:'sd2', title:'Cream of Chicken Soup', category:'Sandwich & Sides' },
-            { id:'sd3', title:'Potato Salad', category:'Sandwich & Sides' },
-            { id:'sd4', title:'French Fries', category:'Sandwich & Sides' },
-            { id:'sd5', title:'Mashed Potato', category:'Sandwich & Sides' },
-            { id:'sd6', title:'Garlic Rice', category:'Sandwich & Sides' },
-            { id:'sd7', title:'Plain Rice', category:'Sandwich & Sides' },
-            { id:'d1', title:'Mango Juice', category:'Drinks' },
-            { id:'d2', title:'Pineapple Juice', category:'Drinks' },
-            { id:'d3', title:'Four Seasons', category:'Drinks' },
-            { id:'d4', title:'Iced Tea', category:'Drinks' },
-            { id:'d5', title:'Blue Lemonade', category:'Drinks' },
-            { id:'d6', title:'Coke in Can', category:'Drinks' },
-            { id:'d7', title:'San Mig Light', category:'Drinks' },
-            { id:'d8', title:'Drip Coffee', category:'Drinks' },
-            { id:'d9', title:'Bottled Water (500ml)', category:'Drinks' },
-            { id:'w1', title:'Carlo Rossi (Red)', category:'Drinks' },
-            { id:'w2', title:'Adega De Pegões', category:'Drinks' }
+        const defaultMenuData = [
+            // BEEF (Pure Beef Steaks)
+            { id:'m5', title:'Fillet Mignon',                category:'Beef', price:935, stock: 50 },
+            { id:'m6', title:'Tenderloin Steak (200g)',       category:'Beef', price:740, stock: 50 },
+            { id:'m7', title:'Tenderloin Tips (200g)',        category:'Beef', price:740, stock: 50 },
+            { id:'m8', title:'Rib Eye Steak (200-350g)',      category:'Beef', price:675, stock: 50 },
+            { id:'m9', title:'Hamburger Steak (204g)',        category:'Beef', price:505, stock: 50 },
+            // T-BONE
+            { id:'t1', title:'T-Bone Medium (250-400g)',      category:'T-Bone', price:715, stock: 50 },
+            { id:'t2', title:'T-Bone Large (450-500g)',       category:'T-Bone', price:790, stock: 50 },
+            { id:'t3', title:'T-Bone Extra Large (551-500g)', category:'T-Bone', price:865, stock: 50 },
+            { id:'t4', title:'T-Bone XX Large (551-500g)',    category:'T-Bone', price:940, stock: 50 },
+            { id:'t5', title:'Porter House (551-600g)',       category:'T-Bone', price:1015, stock: 50 },
+            // SIRLOIN STEAK
+            { id:'s1', title:'Sirloin Mini (250-300g)',        category:'Sirloin Steak', price:485, stock: 50 },
+            { id:'s2', title:'Sirloin Small (251-350g)',       category:'Sirloin Steak', price:545, stock: 50 },
+            { id:'s3', title:'Sirloin Mid Size (351-450g)',    category:'Sirloin Steak', price:605, stock: 50 },
+            { id:'s4', title:'Sirloin Big Size (401-450g)',    category:'Sirloin Steak', price:670, stock: 50 },
+            // CHICKEN & FISH
+            { id:'m1', title:'Whole Chicken',                 category:'Chicken & Fish', price:660, stock: 50 },
+            { id:'m2', title:'Half Chicken',                  category:'Chicken & Fish', price:335, stock: 50 },
+            { id:'m3', title:'Fish Steak (Tanigue)',          category:'Chicken & Fish', price:495, stock: 50 },
+            { id:'m4', title:'Bangus Steak',                  category:'Chicken & Fish', price:510, stock: 50 },
+            // SANDWICH
+            { id:'sw1', title:'Big Sunny Burger with Fries',  category:'Sandwich', price:430, stock: 50 },
+            { id:'sw2', title:'Big Sunny Steak Sandwich with Fries', category:'Sandwich', price:400, stock: 50 },
+            { id:'sw3', title:'Steak Sandwich',               category:'Sandwich', price:165, stock: 50 },
+            { id:'sw4', title:'Cheeseburger',                 category:'Sandwich', price:170, stock: 50 },
+            { id:'sw5', title:'Hamburger',                    category:'Sandwich', price:160, stock: 50 },
+            // SIDE ORDERS
+            { id:'sd1', title:'Cream of Mushroom Soup',       category:'Side Orders', price:80, stock: 50 },
+            { id:'sd2', title:'Cream of Chicken Soup',        category:'Side Orders', price:80, stock: 50 },
+            { id:'sd3', title:'Potato Salad',                 category:'Side Orders', price:155, stock: 50 },
+            { id:'sd4', title:'French Fries',                  category:'Side Orders', price:155, stock: 50 },
+            { id:'sd5', title:'Mashed Potato',                category:'Side Orders', price:90, stock: 50 },
+            { id:'sd6', title:'Garlic Rice',                  category:'Side Orders', price:55, stock: 50 },
+            { id:'sd7', title:'Plain Rice',                   category:'Side Orders', price:40, stock: 50 },
+            { id:'sd8', title:'Garlic Bread',                 category:'Side Orders', price:45, stock: 50 },
+            // DRINKS
+            { id:'d1', title:'Mango Juice',                   category:'Drinks', price:135, stock: 50 },
+            { id:'d2', title:'Pineapple Juice',               category:'Drinks', price:95, stock: 50 },
+            { id:'d3', title:'Four Seasons',                   category:'Drinks', price:95, stock: 50 },
+            { id:'d4', title:'Iced Tea',                       category:'Drinks', price:85, stock: 50 },
+            { id:'d5', title:'Blue Lemonade',                  category:'Drinks', price:95, stock: 50 },
+            { id:'d6', title:'Cucumber Juice',                 category:'Drinks', price:90, stock: 50 },
+            { id:'d7', title:'Pine-Orange Juice',              category:'Drinks', price:90, stock: 50 },
+            { id:'d8', title:'Calamansi Juice (Hot/Cold)',     category:'Drinks', price:70, stock: 50 },
+            { id:'d9', title:'Coke in Can',                    category:'Drinks', price:95, stock: 50 },
+            { id:'d10', title:'Sprite / Royal in Can',        category:'Drinks', price:95, stock: 50 },
+            { id:'d11', title:'San Mig Pale Pilsen',           category:'Drinks', price:85, stock: 50 },
+            { id:'d12', title:'San Mig Light',                 category:'Drinks', price:95, stock: 50 },
+            { id:'d13', title:'Hot Tea',                       category:'Drinks', price:70, stock: 50 },
+            { id:'d14', title:'Drip Coffee',                   category:'Drinks', price:85, stock: 50 },
+            { id:'d15', title:'Coffee with Cream',             category:'Drinks', price:55, stock: 50 },
+            { id:'d16', title:'Bottled Water (500ml)',         category:'Drinks', price:35, stock: 50 },
+            // WINES
+            { id:'w1', title:'Carlo Rossi (Red)',             category:'Wines', price:700, stock: 50 },
+            { id:'w2', title:'Carlo Rossi (White)',           category:'Wines', price:700, stock: 50 },
+            { id:'w3', title:'Adega De Pegões',               category:'Wines', price:600, stock: 50 }
         ];
+
+        const CATEGORIES = [
+            { key: 'Beef',              label: '🥩 Beef Steaks' },
+            { key: 'T-Bone',            label: '🦴 T-Bone' },
+            { key: 'Sirloin Steak',     label: '🥩 Sirloin Steak' },
+            { key: 'Chicken & Fish',    label: '🍗 Chicken & Fish' },
+            { key: 'Sandwich',          label: '🍔 Sandwich' },
+            { key: 'Side Orders',       label: '🍟 Side Orders' },
+            { key: 'Drinks',            label: '🍹 Drinks' },
+            { key: 'Wines',             label: '🍷 Wines' }
+        ];
+
+        function getInventory() {
+            let inv = localStorage.getItem('inventoryItems');
+            return inv ? JSON.parse(inv) : defaultMenuData;
+        }
 
         function getUsers() {
             return safeJsonParse(localStorage.getItem('adminUsers'), []) || [];
@@ -386,15 +567,21 @@
             const adminStatus = document.getElementById('admin-status');
             const logoutBtn = document.getElementById('logout-admin-btn');
 
-            const history = getReservationHistory();
+            const history = getReservationHistory().sort((a, b) => {
+                const ta = a.completedAt ? new Date(a.completedAt).getTime() : 0;
+                const tb = b.completedAt ? new Date(b.completedAt).getTime() : 0;
+                return tb - ta;
+            });
             const priorityHistory = history.filter(r => r.reservationType === 'priority');
 
             const total = history.length;
             const priorityCount = priorityHistory.length;
+            const walkinCount = history.filter(r => r.bookedBy === 'staff').length;
             const revenue = priorityHistory.reduce((sum, r) => sum + Number(r.paymentAmount || 0), 0);
 
             document.getElementById('stat-total').textContent = total;
             document.getElementById('stat-priority').textContent = priorityCount;
+            document.getElementById('stat-walkins').textContent = walkinCount;
             document.getElementById('stat-revenue').textContent = `₱${Number(revenue).toLocaleString()}`;
 
             const historyTbody = document.getElementById('history-tbody');
@@ -448,10 +635,26 @@
 
                 rows.forEach(r => {
                     const tr = document.createElement('tr');
+                    
+                    // NEW HIGHLIGHT LOGIC: Less than 1 minute old
+                    const createdTime = r.completedAt ? new Date(r.completedAt).getTime() : 0;
+                    const isNew = createdTime && (Date.now() - createdTime < 60000);
+                    
+                    if (isNew) {
+                        tr.classList.add('new-order-row');
+                    }
+
                     const foods = foodText(r);
 
                     const tdReservation = document.createElement('td');
-                    tdReservation.textContent = r.reservationNumber || '';
+                    if (isNew) {
+                        const badge = document.createElement('span');
+                        badge.className = 'new-badge';
+                        badge.textContent = 'NEW';
+                        tdReservation.appendChild(badge);
+                    }
+                    const resNumText = document.createTextNode(r.reservationNumber || '');
+                    tdReservation.appendChild(resNumText);
 
                     const tdArrival = document.createElement('td');
                     tdArrival.textContent = formatArrival(r);
@@ -604,77 +807,6 @@
                 
                 document.querySelectorAll('.tab-link').forEach(el => el.classList.remove('active'));
                 if(btnElement) btnElement.classList.add('active');
-            };
-
-            // KItchen Logic
-            function renderKitchenQueue() {
-                const hist = getReservationHistory();
-                const grid = document.getElementById('kds-grid');
-                if(!grid) return;
-                
-                grid.innerHTML = '';
-                const foodOrders = hist.filter(r => r.foods && r.foods.length > 0 && r.kdsStatus !== 'served');
-                
-                foodOrders.sort((a, b) => {
-                    if (a.kdsStatus === 'ready' && b.kdsStatus !== 'ready') return 1;
-                    if (b.kdsStatus === 'ready' && a.kdsStatus !== 'ready') return -1;
-                    if (a.arrivalTime && b.arrivalTime) return a.arrivalTime.localeCompare(b.arrivalTime);
-                    return 0;
-                });
-                
-                if (foodOrders.length === 0) {
-                    grid.innerHTML = `<div class="kds-empty">No Active Pre-Orders in Queue</div>`;
-                    return;
-                }
-
-                foodOrders.forEach(r => {
-                    const realIdx = hist.findIndex(hr => hr.reservationNumber === r.reservationNumber);
-                    const status = r.kdsStatus || 'pending';
-                    const t = document.createElement('div');
-                    t.className = `ticket status-${status}`;
-                    
-                    const foodsHtml = (r.foods || []).map(f => `<li>${f}</li>`).join('');
-                    const beefHtml = r.beefNote
-                        ? `<div style="margin-top:8px; padding:7px 10px; background:rgba(21,128,61,.12); border-left:3px solid #15803d; border-radius:4px; font-size:12px; font-weight:700; color:#14532d;">
-                              🥩 ${r.beefNote}
-                           </div>`
-                        : '';
-                    
-                    let btns = '';
-                    if (status === 'pending') {
-                        btns = `<button class="btn-cook" onclick="updateKDSStatus(${realIdx}, 'cooking')">Start Cooking</button>`;
-                    } else if (status === 'cooking') {
-                        btns = `<button class="btn-ready" onclick="updateKDSStatus(${realIdx}, 'ready')">Mark Ready</button>`;
-                    } else if (status === 'ready') {
-                        btns = `<button class="btn-clear" onclick="updateKDSStatus(${realIdx}, 'served')">Dismiss</button>`;
-                    }
-
-                    t.innerHTML = `
-                        <div class="ticket-header">
-                            <div>
-                                <div class="ticket-table">${r.bookedTable || 'Waiting'}</div>
-                                <div class="ticket-name">${r.customerName}</div>
-                            </div>
-                            <div class="ticket-meta">
-                                <div class="ticket-time">${r.arrivalTime || 'ASAP'}</div>
-                                <div class="ticket-status status-text-${status}">${status}</div>
-                            </div>
-                        </div>
-                        <ul class="food-list">${foodsHtml}</ul>
-                        ${beefHtml}
-                        <div class="actions">${btns}</div>
-                    `;
-                    grid.appendChild(t);
-                });
-            }
-
-            window.updateKDSStatus = function(idx, newStatus) {
-                const hist = getReservationHistory();
-                if(hist[idx]) {
-                    hist[idx].kdsStatus = newStatus;
-                    localStorage.setItem('reservationHistory', JSON.stringify(hist));
-                    renderKitchenQueue();
-                }
             };
 
             // Hostess Logic
@@ -1001,13 +1133,18 @@
             };
 
             window.rejectPayment = function(idx) {
-                if(!confirm("Reject this payment? The customer will be forced to cancel and try again.")) return;
+                if(!confirm("Reject this payment? The reservation will be kept but moved back to the pre-order area.")) return;
                 const hist = getReservationHistory();
                 if(hist[idx]) {
-                    hist.splice(idx, 1); // Delete completely so customer gets kicked back to start
+                    // Reset payment fields so it effectively goes back to "Unpaid/Pre-order" status
+                    hist[idx].paymentStatus = 'rejected';
+                    hist[idx].paymentProof = null;
+                    hist[idx].paymentRef = '';
+                    hist[idx].rejectionAcknowledged = false;
+                    
                     localStorage.setItem('reservationHistory', JSON.stringify(hist));
                     renderPayments();
-                    renderDashboard();
+                    renderDashboard(); // Refresh full history table
                 }
             };
 
@@ -1197,7 +1334,6 @@
             // Bind pollers
             if(!window.isPollingActive) {
                 setInterval(() => {
-                    renderKitchenQueue();
                     renderFloorPlan();
                     renderAdminChats();
                     renderPayments();
@@ -1205,10 +1341,66 @@
                 }, 5000);
                 window.isPollingActive = true;
             }
-            renderKitchenQueue();
             renderFloorPlan();
             renderPayments();
             renderPromosAdmin();
+
+            // Kitchen Alarm Logic (Listen for status changes from Independent Cook Area)
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'reservationHistory') {
+                    const oldVal = safeJsonParse(e.oldValue, []);
+                    const newVal = safeJsonParse(e.newValue, []);
+                    
+                    // Detect if any order was marked 'ready'
+                    const newlyReady = newVal.find(res => {
+                        const prev = oldVal.find(p => p.reservationNumber === res.reservationNumber);
+                        return res.kdsStatus === 'ready' && (!prev || prev.kdsStatus !== 'ready');
+                    });
+
+                    if (newlyReady) {
+                        playKitchenAlarm(newlyReady.bookedTable);
+                    }
+                    
+                    renderDashboard();
+                }
+            });
+
+            function playKitchenAlarm(tableName) {
+                try {
+                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioCtx.createOscillator();
+                    const gainNode = audioCtx.createGain();
+
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // High pitch
+                    oscillator.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.3);
+
+                    gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+
+                    oscillator.start();
+                    oscillator.stop(audioCtx.currentTime + 0.3);
+                } catch(e) { console.warn("Audio alarm blocked"); }
+
+                // Breadcrumb/Notification
+                const notify = document.createElement('div');
+                notify.style.cssText = `
+                    position: fixed; top: 20px; right: 20px; z-index: 10000;
+                    background: #16a34a; color: white; padding: 15px 25px;
+                    border-radius: 12px; font-weight: 800; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                    border: 1px solid rgba(255,255,255,0.2); animation: slideUp 0.3s ease;
+                `;
+                notify.innerHTML = `🛎️ ${tableName || 'Order'} is Cooked!`;
+                document.body.appendChild(notify);
+                setTimeout(() => {
+                    notify.style.opacity = '0';
+                    notify.style.transition = '0.5s';
+                    setTimeout(() => notify.remove(), 500);
+                }, 5000);
+            }
 
             window.deleteItem = function(resObjNum) {
                 if(confirm("Are you sure you want to delete this reservation? This cannot be undone.")) {
@@ -1236,50 +1428,56 @@
             summaryLine.textContent = `Showing ${history.length} of ${history.length} reservations.`;
             searchInput.addEventListener('input', applySearch);
 
-            // Top foods
-            const foodCounts = {};
-            priorityHistory.forEach(r => {
-                (Array.isArray(r.foods) ? r.foods : []).forEach(f => {
-                    const key = f.trim();
-                    if (!key) return;
-                    foodCounts[key] = (foodCounts[key] || 0) + 1;
+            const CATEGORIES = [
+                { key: 'Drinks', label: '🍹 Drinks' },
+                { key: 'Food Ingredients', label: '🥩 Food Ingredients' },
+                { key: 'Supplies', label: '🧺 Supplies' },
+                { key: 'Others', label: '📦 Others' },
+                // Legacy support for menu display if needed
+                { key: 'Beef', label: '🥩 Pure Beef Steaks' },
+                { key: 'T-Bone & Sirloin', label: '🦴 T-Bone & Sirloin' },
+                { key: 'Chicken & Fish', label: '🍗 Chicken & Fish' },
+                { key: 'Sandwich & Sides', label: '🍟 Sandwiches & Sides' }
+            ];
+
+            function getAutoCategory(name) {
+                const n = name.toLowerCase();
+                if (n.match(/coke|juice|tea|mango|pineapple|orange|water|pilsen|light|coffee|sugar|creamer|wine|tea/)) return 'Drinks';
+                if (n.match(/rice|meat|fish|sauce|beef|chicken|bangus|mayo|soup|mustard|knorr|lea|tabasco|steak|ribeye|sirloin|t-bone|fillet|mignon|pork|chop|tenderloin/)) return 'Food Ingredients';
+                if (n.match(/tissue|soap|cleaner|cups|towel|napkin|toothpick|placemat|pen|paper|clip|rubber|alcohol|dishwashing|bleach|glade|spoon|fork|knife/)) return 'Supplies';
+                return 'Others';
+            }
+
+            function getInventory() {
+                let inv = localStorage.getItem('inventoryItems');
+                if (!inv) return [];
+                let items = JSON.parse(inv);
+                let mutated = false;
+                items = items.map(i => {
+                    if (i.total_stock === undefined && i.stock !== undefined) {
+                        i.total_stock = i.stock;
+                        mutated = true;
+                    }
+                    if (!i.category) {
+                        i.category = getAutoCategory(i.title || i.name || '');
+                        mutated = true;
+                    }
+                    // Virtual stock for legacy UI
+                    i.stock = (i.total_stock||0) + (i.added_stock||0) - (i.sold_stock||0);
+                    return i;
                 });
-            });
-            const topFoods = Object.entries(foodCounts)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 8);
-            document.getElementById('top-foods').textContent = topFoods.length
-                ? topFoods.map(([f, c]) => `${f} (${c})`).join(', ')
-                : 'No priority foods data yet.';
+                if (mutated) localStorage.setItem('inventoryItems', JSON.stringify(items));
+                return items;
+            }
 
-            // By date
-            const byDate = {};
-            history.forEach(r => {
-                const day = r.arrivalDate || '';
-                if (!day) return;
-                byDate[day] = (byDate[day] || 0) + 1;
-            });
-            const byDateEntries = Object.entries(byDate).sort((a, b) => a[0].localeCompare(b[0]));
-            document.getElementById('by-date').textContent = byDateEntries.length
-                ? byDateEntries.map(([d, c]) => `${d}: ${c}`).slice(-10).join(' | ')
-                : 'No arrival dates stored yet.';
-
-            // MENU MANAGEMENT
+            // Live Inventory View using global helpers
             function renderMenuManagement() {
                 const container = document.getElementById('admin-menu-grid');
                 if(!container) return;
                 container.innerHTML = '';
-                const soldOut = safeJsonParse(localStorage.getItem('soldOutItems'), []);
+                const items = getInventory();
                 
-                // Group to categories
-                const grouped = {};
-                menuData.forEach(item => {
-                    const cat = item.category || 'Other';
-                    if(!grouped[cat]) grouped[cat] = [];
-                    grouped[cat].push(item);
-                });
-
-                Object.keys(grouped).forEach(catName => {
+                CATEGORIES.forEach(cat => {
                     const catTitle = document.createElement('h3');
                     catTitle.style.marginTop = '24px';
                     catTitle.style.marginBottom = '12px';
@@ -1288,7 +1486,7 @@
                     catTitle.style.borderBottom = '2px solid #e2e8f0';
                     catTitle.style.paddingBottom = '6px';
                     catTitle.style.fontSize = '18px';
-                    catTitle.textContent = catName;
+                    catTitle.textContent = cat.label;
                     container.appendChild(catTitle);
 
                     const grid = document.createElement('div');
@@ -1296,8 +1494,14 @@
                     grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(200px, 1fr))';
                     grid.style.gap = '12px';
 
-                    grouped[catName].forEach(item => {
-                        const isSoldOut = soldOut.includes(item.id);
+                    const catItems = items.filter(i => i.category === cat.key);
+                    catItems.forEach(item => {
+                        const isOut = item.stock <= 0;
+                        const isLow = item.stock > 0 && item.stock <= (item.threshold || 5);
+                        const statusColor = isOut ? '#ef4444' : (isLow ? '#f59e0b' : '#16a34a');
+                        const statusLabel = isOut ? 'Sold Out' : (isLow ? 'Low Stock' : 'Available');
+
+                        const imgSrc = item.image ? item.image : `https://placehold.co/400x300/f0fdf4/2e7d32?text=${encodeURIComponent(item.title.substring(0,2))}`;
                         
                         const el = document.createElement('div');
                         el.className = 'card';
@@ -1305,10 +1509,16 @@
                         el.style.padding = '14px 10px';
                         
                         el.innerHTML = `
-                            <div style="font-weight: 700; margin-bottom: 6px; color: #444; font-size: 13px; min-height: 38px; display: flex; align-items: center; justify-content: center;">${item.title}</div>
-                            <button type="button" style="width: 100%; font-size: 13px; padding: 8px; ${isSoldOut ? 'background-color: #ef4444; border-color: #b91c1c; color: white;' : ''}" onclick="toggleMenuItem('${item.id}')">
-                                ${isSoldOut ? 'Sold Out' : 'Available'}
-                            </button>
+                            <div style="position:relative;">
+                                <img src="${imgSrc}" style="width:100%; height:90px; object-fit:cover; border-radius:4px; margin-bottom:8px;">
+                            </div>
+                            <div style="font-weight: 700; margin-bottom: 2px; color: #444; font-size: 13px; min-height: 20px;">${item.title}</div>
+                            <div style="font-size: 11px; color: #64748b; margin-bottom: 8px; font-style: italic;">Needed: ${item.ingredients || 'None listed'}</div>
+                            
+                            <div style="font-size: 15px; font-weight: bold; margin-bottom: 8px;">Stock: <span style="color: ${statusColor}">${item.stock || 0}</span></div>
+                            <div style="width: 100%; font-size: 12px; font-weight: 700; padding: 6px; border-radius: 4px; box-sizing: border-box; background: ${statusColor}15; color: ${statusColor}; border: 1px solid ${statusColor}40;">
+                                ${statusLabel.toUpperCase()}
+                            </div>
                         `;
                         grid.appendChild(el);
                     });
@@ -1316,18 +1526,28 @@
                 });
             }
 
-            window.toggleMenuItem = function(id) {
-                let soldOut = safeJsonParse(localStorage.getItem('soldOutItems'), []);
-                if (soldOut.includes(id)) {
-                    soldOut = soldOut.filter(i => i !== id);
-                } else {
-                    soldOut.push(id);
-                }
-                localStorage.setItem('soldOutItems', JSON.stringify(soldOut));
-                renderMenuManagement();
-            };
-
             renderMenuManagement();
+
+            window.deleteInventoryPhoto = function(id) {
+                if(!confirm("Delete this item's photo? It will revert to the default placeholder.")) return;
+                
+                let items = getInventory();
+                const idx = items.findIndex(i => i.id === id);
+                if(idx > -1) {
+                    // If it's the first time modifying an item from defaultMenuData, 
+                    // it will be saved to inventoryItems in localStorage
+                    if (!localStorage.getItem('inventoryItems')) {
+                        // Initialize local storage from defaults if it doesn't exist
+                        items = JSON.parse(JSON.stringify(items));
+                    }
+                    items[idx].image = null;
+                    localStorage.setItem('inventoryItems', JSON.stringify(items));
+                    
+                    // Refresh UIs
+                    renderMenuManagement();
+                    if(typeof renderWalkinFoodPicker === 'function') renderWalkinFoodPicker(document.getElementById('walkin-food-search')?.value || "");
+                }
+            };
 
             // Export CSV
             const exportBtn = document.getElementById('export-csv-btn');
@@ -1392,7 +1612,7 @@
 
             const username = localStorage.getItem('adminLoggedInUser') || '';
             adminStatus.textContent = username ? `Signed in as ${username}` : '';
-            logoutBtn.style.display = 'inline-block';
+            logoutBtn.classList.remove('hidden');
 
             // Online activity tracking heartbeat
             function updateOnlineStatus() {
@@ -1415,6 +1635,21 @@
                 const onlineList = document.getElementById('online-list');
                 if (statOnline) statOnline.textContent = `${count} Active`;
                 if (onlineList) onlineList.textContent = activeNames.length ? activeNames.join(', ') : 'None';
+
+                // REFRESH RESERVATION TABLE (to update NEW highlights)
+                if (document.getElementById('tab-overview') && !document.getElementById('tab-overview').classList.contains('hidden')) {
+                    const q = (searchInput.value || '').trim().toLowerCase();
+                    const hist = getReservationHistory().sort((a, b) => {
+                        const ta = a.completedAt ? new Date(a.completedAt).getTime() : 0;
+                        const tb = b.completedAt ? new Date(b.completedAt).getTime() : 0;
+                        return tb - ta;
+                    });
+                    const filtered = !q ? hist : hist.filter(r => {
+                        return (r.reservationNumber || '').toLowerCase().includes(q) ||
+                               (r.customerName || '').toLowerCase().includes(q);
+                    });
+                    renderRows(filtered);
+                }
             }
             updateOnlineStatus(); // Initial run
             setInterval(updateOnlineStatus, 5000); // Poll every 5 seconds
@@ -1489,6 +1724,295 @@
         }
 
         initAuth();
+
+        /* ────────────────────────────────────
+           WALK-IN RESERVATION LOGIC
+        ──────────────────────────────────── */
+        let walkinType = 'priority';
+
+        window.setWalkinType = function(type) {
+            walkinType = type;
+            const pBtn = document.getElementById('walkin-type-priority');
+            const sBtn = document.getElementById('walkin-type-standard');
+            const pFields = document.getElementById('walkin-priority-fields');
+
+            if (type === 'priority') {
+                pBtn.style.cssText = 'flex:1; padding:12px; border-radius:8px; border:2px solid #1b5e20; background:#1b5e20; color:white; font-weight:700; font-size:14px; cursor:pointer; transition:all 0.2s;';
+                sBtn.style.cssText = 'flex:1; padding:12px; border-radius:8px; border:2px solid #cbd5e1; background:white; color:#64748b; font-weight:700; font-size:14px; cursor:pointer; transition:all 0.2s;';
+                pFields.style.display = 'block';
+            } else {
+                sBtn.style.cssText = 'flex:1; padding:12px; border-radius:8px; border:2px solid #1b5e20; background:#1b5e20; color:white; font-weight:700; font-size:14px; cursor:pointer; transition:all 0.2s;';
+                pBtn.style.cssText = 'flex:1; padding:12px; border-radius:8px; border:2px solid #cbd5e1; background:white; color:#64748b; font-weight:700; font-size:14px; cursor:pointer; transition:all 0.2s;';
+                pFields.style.display = 'none';
+            }
+        };
+
+        /* ── Food Picker Modal Logic ── */
+        let tempWalkinOrder = {}; // { id: qty }
+        let currentSelection = {}; // Confirmed selection
+
+        window.openWalkinFoodPicker = function() {
+            document.getElementById('walkin-food-modal').classList.remove('hidden');
+            tempWalkinOrder = JSON.parse(JSON.stringify(currentSelection)); // Clone current
+            renderWalkinFoodPicker();
+            updateWalkinModalTotal();
+        };
+
+        window.closeWalkinFoodPicker = function() {
+            document.getElementById('walkin-food-modal').classList.add('hidden');
+        };
+
+        window.filterWalkinFoods = function(val) {
+            renderWalkinFoodPicker(val.toLowerCase());
+        };
+
+        function renderWalkinFoodPicker(filter = "") {
+            const container = document.getElementById('walkin-food-content');
+            const items = getInventory();
+            
+            let hasResults = false;
+            container.innerHTML = CATEGORIES.map(cat => {
+                const filteredItems = items.filter(item => {
+                    if (item.category !== cat.key) return false;
+                    if (!filter) return true;
+                    return item.title.toLowerCase().includes(filter);
+                });
+
+                if (filteredItems.length === 0) return '';
+                hasResults = true;
+
+                return `
+                    <div style="margin-bottom:24px;">
+                        <div style="font-size:13px; font-weight:800; color:#1b5e20; text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid #e2e8f0; padding-bottom:6px; margin-bottom:12px;">${cat.label}</div>
+                        ${filteredItems.map(item => {
+                            const qty = tempWalkinOrder[item.id] || 0;
+                            const isSoldOut = item.stock <= 0;
+                            return `
+                                <div style="display:flex; align-items:center; background:white; padding:10px; border-radius:12px; border:1px solid #f1f5f9; margin-bottom:8px; opacity: ${isSoldOut ? '0.6' : '1'}">
+                                    <img src="${item.image || `https://placehold.co/100x100?text=${encodeURIComponent(item.title.substring(0,3))}`}" style="width:50px; height:50px; object-fit:cover; border-radius:8px; margin-right:12px;">
+                                    <div style="flex:1;">
+                                        <div style="font-weight:700; font-size:14px; color:#1e293b;">${item.title}</div>
+                                        <div style="font-size:13px; color:#1b5e20; font-weight:600;">₱${item.price?.toLocaleString()}</div>
+                                    </div>
+                                    ${isSoldOut ? '<div style="font-size:11px; font-weight:700; color:#ef4444; text-transform:uppercase;">Sold Out</div>' : `
+                                    <div style="display:flex; align-items:center; gap:10px; background:#f1f5f9; border-radius:8px; padding:4px;">
+                                        <button onclick="changeWalkinItemQty('${item.id}', -1)" style="width:28px; height:28px; border:none; border-radius:6px; background:white; color:#1b5e20; font-weight:800; cursor:pointer;">-</button>
+                                        <span style="font-weight:700; min-width:20px; text-align:center;">${qty}</span>
+                                        <button onclick="changeWalkinItemQty('${item.id}', 1)" style="width:28px; height:28px; border:none; border-radius:6px; background:white; color:#1b5e20; font-weight:800; cursor:pointer;">+</button>
+                                    </div>
+                                    `}
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+            }).join('');
+
+            if (!hasResults) {
+                container.innerHTML = `<div style="text-align:center; padding:40px; color:#64748b;">No items found matching "${filter}"</div>`;
+            }
+        }
+
+        window.changeWalkinItemQty = function(id, delta) {
+            const currentQty = tempWalkinOrder[id] || 0;
+            const newQty = Math.max(0, currentQty + delta);
+            if (newQty === 0) {
+                delete tempWalkinOrder[id];
+            } else {
+                tempWalkinOrder[id] = newQty;
+            }
+            renderWalkinFoodPicker(document.getElementById('walkin-food-search').value.toLowerCase());
+            updateWalkinModalTotal();
+        };
+
+        function updateWalkinModalTotal() {
+            const items = getInventory();
+            let total = 0;
+            for (const id in tempWalkinOrder) {
+                const item = items.find(i => i.id === id);
+                if (item) total += item.price * tempWalkinOrder[id];
+            }
+            document.getElementById('walkin-modal-total').textContent = total.toLocaleString();
+        }
+
+        window.confirmWalkinFoodSelection = function() {
+            currentSelection = JSON.parse(JSON.stringify(tempWalkinOrder));
+            const items = getInventory();
+            const summaryEl = document.getElementById('walkin-order-summary');
+            const paymentInput = document.getElementById('walkin-payment');
+            
+            let total = 0;
+            let summaryText = [];
+            
+            for (const id in currentSelection) {
+                const item = items.find(i => i.id === id);
+                if (item) {
+                    const qty = currentSelection[id];
+                    total += item.price * qty;
+                    summaryText.push(`<span style="font-weight:700; color:#1b5e20;">${qty}x</span> ${item.title}`);
+                }
+            }
+
+            if (summaryText.length > 0) {
+                summaryEl.innerHTML = summaryText.join(", ");
+                paymentInput.value = total;
+            } else {
+                summaryEl.innerHTML = "No items selected yet.";
+                paymentInput.value = "";
+            }
+
+            closeWalkinFoodPicker();
+        };
+
+        window.submitWalkinReservation = function() {
+            const errorEl = document.getElementById('walkin-error');
+            errorEl.style.display = 'none';
+
+            const name    = (document.getElementById('walkin-name').value || '').trim();
+            const contact = (document.getElementById('walkin-contact').value || '').trim();
+            const date    = document.getElementById('walkin-date').value;
+            const time    = document.getElementById('walkin-time').value;
+            const table   = document.getElementById('walkin-table').value;
+            const guests  = document.getElementById('walkin-guests').value;
+            const payment = parseFloat(document.getElementById('walkin-payment').value) || 0;
+            const notes   = (document.getElementById('walkin-notes').value || '').trim();
+
+            if (!name)  { errorEl.textContent = 'Customer name is required.'; errorEl.style.display = 'block'; return; }
+            if (!date)  { errorEl.textContent = 'Arrival date is required.';  errorEl.style.display = 'block'; return; }
+            if (!time)  { errorEl.textContent = 'Arrival time is required.';  errorEl.style.display = 'block'; return; }
+            if (!table) { errorEl.textContent = 'Please select a table.';     errorEl.style.display = 'block'; return; }
+
+            const d = new Date(date + 'T' + time);
+            const displayDt = isNaN(d) ? date + ' ' + time : d.toLocaleString(undefined, {
+                weekday: 'short', month: 'short', day: 'numeric',
+                hour: 'numeric', minute: '2-digit', hour12: true
+            });
+
+            const resNo = 'WI-' + Math.floor(100000 + Math.random() * 900000);
+            
+            // Reconstruct foodArray from currentSelection
+            const invItems = getInventory();
+            const foodArray = [];
+            let orderSummary = "";
+            
+            for (const id in currentSelection) {
+                const item = invItems.find(i => i.id === id);
+                if (item) {
+                    const qty = currentSelection[id];
+                    foodArray.push(`${qty}x ${item.title}`);
+                }
+            }
+            orderSummary = foodArray.join(', ');
+
+            const reservation = {
+                reservationNumber:      resNo,
+                reservationType:        walkinType,
+                arrivalDate:            date,
+                arrivalTime:            time,
+                arrivalDateTimeDisplay: displayDt,
+                customerName:           name,
+                contactNumber:          contact,
+                bookedTable:            table,
+                guestCount:             guests,
+                foods:                  foodArray,
+                orderSummary:           orderSummary,
+                beefNote:               notes,
+                paymentAmount:          walkinType === 'priority' ? payment : 500,
+                paymentStatus:          'walk-in',
+                bookedBy:               'staff',
+                completedAt:            new Date().toISOString(),
+                cartItems:              currentSelection // Keep structured data too
+            };
+
+            const history = JSON.parse(localStorage.getItem('reservationHistory') || '[]');
+            history.push(reservation);
+            localStorage.setItem('reservationHistory', JSON.stringify(history));
+
+            // Deduct inventory if priority? Or just for all walkins?
+            // Usually walk-ins should deduct stock immediately.
+            try {
+                const invStr = localStorage.getItem('inventoryItems');
+                if (invStr) {
+                    let items = JSON.parse(invStr);
+                    for (const id in currentSelection) {
+                        const idx = items.findIndex(i => i.id === id);
+                        if (idx > -1) {
+                            items[idx].stock = Math.max(0, items[idx].stock - currentSelection[id]);
+                        }
+                    }
+                    localStorage.setItem('inventoryItems', JSON.stringify(items));
+                    renderMenuManagement(); // Refresh inventory tab
+                }
+            } catch(e) { console.error("Stock deduction failed", e); }
+
+            // Show success toast
+            const toast = document.getElementById('walkin-toast');
+            toast.textContent = `✅ Reservation ${resNo} saved for ${name} — ${table} on ${displayDt}`;
+            toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 5000);
+
+            // Reset form
+            document.getElementById('walkin-name').value    = '';
+            document.getElementById('walkin-contact').value = '';
+            document.getElementById('walkin-date').value    = '';
+            document.getElementById('walkin-time').value    = '';
+            document.getElementById('walkin-table').value   = '';
+            document.getElementById('walkin-guests').value  = '';
+            document.getElementById('walkin-payment').value = '';
+            document.getElementById('walkin-notes').value   = '';
+            document.getElementById('walkin-food-search').value = '';
+            document.getElementById('walkin-order-summary').innerHTML = "No items selected yet.";
+            currentSelection = {};
+            tempWalkinOrder = {};
+
+            renderRecentWalkins();
+        };
+
+        function renderRecentWalkins() {
+            const container = document.getElementById('walkin-recent-list');
+            if (!container) return;
+            const history = JSON.parse(localStorage.getItem('reservationHistory') || '[]');
+            const walkins = history.filter(r => r.bookedBy === 'staff').reverse().slice(0, 10);
+
+            if (!walkins.length) {
+                container.innerHTML = '<div style="color:#aaa; font-style:italic; text-align:center; padding:20px;">No walk-in reservations yet.</div>';
+                return;
+            }
+
+            container.innerHTML = walkins.map(r => `
+                <div class="card" style="margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; padding:14px 18px;">
+                    <div>
+                        <div style="font-weight:700; font-size:15px; color:#1e293b;">
+                            ${r.customerName}
+                            <span style="font-size:11px; padding:2px 8px; border-radius:12px; margin-left:6px; font-weight:bold;
+                                background:${r.reservationType === 'priority' ? '#fef3c7' : '#dbeafe'};
+                                color:${r.reservationType === 'priority' ? '#92400e' : '#1e3a8a'};">
+                                ${r.reservationType === 'priority' ? '⭐ Priority' : '🪑 Standard'}
+                            </span>
+                        </div>
+                        <div class="muted" style="margin-top:4px; font-size:13px;">${r.bookedTable} &nbsp;·&nbsp; ${r.arrivalDateTimeDisplay}</div>
+                        ${r.foods && r.foods.length ? `<div style="font-size:12px; color:#64748b; margin-top:3px;">🍽️ ${r.foods.join(', ')}</div>` : ''}
+                    </div>
+                    <div style="font-weight:800; font-size:16px; color:#1b5e20;">₱${Number(r.paymentAmount).toLocaleString()}</div>
+                </div>
+            `).join('');
+        }
+
+        // Update existing switchAdminTab
+        window.switchAdminTab = function(tab, btn) {
+            document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.add('hidden'));
+            document.getElementById('tab-' + tab)?.classList.remove('hidden');
+            document.querySelectorAll('.tab-link').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            if (tab === 'walkin') renderRecentWalkins();
+            if (tab === 'menu' && typeof renderMenuManagement === 'function') renderMenuManagement();
+            if (tab === 'promotions' && typeof renderPromotions === 'function') renderPromotions();
+            if (tab === 'payments' && typeof renderPaymentHistory === 'function') renderPaymentHistory();
+        };
+
+        // Auto-render recent walk-ins when tab loads
+        document.querySelector('[onclick="switchAdminTab(\'walkin\', this)"]')?.addEventListener('click', renderRecentWalkins);
     </script>
 </body>
 </html>

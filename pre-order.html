@@ -15,7 +15,7 @@
         <nav>
             <ul>
                 <li><a href="index.html#home" class="nav-link">Home</a></li>
-                <li><a href="seat-selection.html" class="nav-link">← Back to Tables</a></li>
+                <li><a href="#" onclick="handleBack(event)" class="nav-link">← Back to Tables</a></li>
             </ul>
         </nav>
     </header>
@@ -108,67 +108,127 @@
         </div>
     </div>
 
+    <!-- CUSTOM MODAL ROOT -->
+    <div id="super-modal-root"></div>
+
     <script>
         // ─────────────────────────────────────────────────────────
         // MENU DATA
         // ─────────────────────────────────────────────────────────
-        const menuData = [
-            // B E E F
-            { id:'m5', title:'Fillet Mignon',              category:'Beef', price:935 },
-            { id:'m6', title:'Tenderloin Steak (200g)',     category:'Beef', price:740 },
-            { id:'m7', title:'Tenderloin Tips (200g)',      category:'Beef', price:740 },
-            { id:'m8', title:'Rib Eye Steak (200-350g)',    category:'Beef', price:675 },
-            { id:'m9', title:'Hamburger Steak (204g)',      category:'Beef', price:505 },
-            // T-BONE & SIRLOIN
-            { id:'t1', title:'T-Bone Medium (250-400g)',      category:'T-Bone & Sirloin', price:715 },
-            { id:'t2', title:'T-Bone Large (450-500g)',       category:'T-Bone & Sirloin', price:790 },
-            { id:'t3', title:'T-Bone Extra Large (551-500g)', category:'T-Bone & Sirloin', price:865 },
-            { id:'t4', title:'T-Bone XX Large (551-500g)',    category:'T-Bone & Sirloin', price:940 },
-            { id:'t5', title:'Porter House (551-600g)',        category:'T-Bone & Sirloin', price:1015 },
-            { id:'s1', title:'Sirloin Mini (250-300g)',        category:'T-Bone & Sirloin', price:485 },
-            { id:'s2', title:'Sirloin Small (251-350g)',       category:'T-Bone & Sirloin', price:545 },
-            { id:'s3', title:'Sirloin Mid Size (351-450g)',    category:'T-Bone & Sirloin', price:605 },
-            { id:'s4', title:'Sirloin Big Size (401-450g)',    category:'T-Bone & Sirloin', price:670 },
+        let defaultMenuData = [
+            // BEEF (Pure Beef Steaks)
+            { id:'m5', title:'Fillet Mignon',                category:'Beef', price:935, stock: 50 },
+            { id:'m6', title:'Tenderloin Steak (200g)',       category:'Beef', price:740, stock: 50 },
+            { id:'m7', title:'Tenderloin Tips (200g)',        category:'Beef', price:740, stock: 50 },
+            { id:'m8', title:'Rib Eye Steak (200-350g)',      category:'Beef', price:675, stock: 50 },
+            { id:'m9', title:'Hamburger Steak (204g)',        category:'Beef', price:505, stock: 50 },
+            // T-BONE
+            { id:'t1', title:'T-Bone Medium (250-400g)',      category:'T-Bone', price:715, stock: 50 },
+            { id:'t2', title:'T-Bone Large (450-500g)',       category:'T-Bone', price:790, stock: 50 },
+            { id:'t3', title:'T-Bone Extra Large (551-500g)', category:'T-Bone', price:865, stock: 50 },
+            { id:'t4', title:'T-Bone XX Large (551-500g)',    category:'T-Bone', price:940, stock: 50 },
+            { id:'t5', title:'Porter House (551-600g)',       category:'T-Bone', price:1015, stock: 50 },
+            // SIRLOIN STEAK
+            { id:'s1', title:'Sirloin Mini (250-300g)',        category:'Sirloin Steak', price:485, stock: 50 },
+            { id:'s2', title:'Sirloin Small (251-350g)',       category:'Sirloin Steak', price:545, stock: 50 },
+            { id:'s3', title:'Sirloin Mid Size (351-450g)',    category:'Sirloin Steak', price:605, stock: 50 },
+            { id:'s4', title:'Sirloin Big Size (401-450g)',    category:'Sirloin Steak', price:670, stock: 50 },
             // CHICKEN & FISH
-            { id:'m1', title:'Whole Chicken',             category:'Chicken & Fish', price:660 },
-            { id:'m2', title:'Half Chicken',              category:'Chicken & Fish', price:335 },
-            { id:'m3', title:'Fish Steak (Tanigue)',      category:'Chicken & Fish', price:495 },
-            { id:'m4', title:'Bangus Steak',              category:'Chicken & Fish', price:510 },
-            // SIDES & SANDWICHES
-            { id:'sw1', title:'Big Sunny Burger with Fries', category:'Sandwich & Sides', price:430 },
-            { id:'sw2', title:'Big Sunny Steak Sandwich',    category:'Sandwich & Sides', price:400 },
-            { id:'sw3', title:'Steak Sandwich',              category:'Sandwich & Sides', price:165 },
-            { id:'sw4', title:'Cheeseburger',                category:'Sandwich & Sides', price:170 },
-            { id:'sd1', title:'Cream of Mushroom Soup',      category:'Sandwich & Sides', price:80 },
-            { id:'sd2', title:'Cream of Chicken Soup',       category:'Sandwich & Sides', price:80 },
-            { id:'sd3', title:'Potato Salad',                category:'Sandwich & Sides', price:155 },
-            { id:'sd4', title:'French Fries',                category:'Sandwich & Sides', price:155 },
-            { id:'sd5', title:'Mashed Potato',               category:'Sandwich & Sides', price:90 },
-            { id:'sd6', title:'Garlic Rice',                 category:'Sandwich & Sides', price:55 },
-            { id:'sd7', title:'Plain Rice',                  category:'Sandwich & Sides', price:40 },
+            { id:'m1', title:'Whole Chicken',                 category:'Chicken & Fish', price:660, stock: 50 },
+            { id:'m2', title:'Half Chicken',                  category:'Chicken & Fish', price:335, stock: 50 },
+            { id:'m3', title:'Fish Steak (Tanigue)',          category:'Chicken & Fish', price:495, stock: 50 },
+            { id:'m4', title:'Bangus Steak',                  category:'Chicken & Fish', price:510, stock: 50 },
+            // SANDWICH
+            { id:'sw1', title:'Big Sunny Burger with Fries',  category:'Sandwich', price:430, stock: 50 },
+            { id:'sw2', title:'Big Sunny Steak Sandwich with Fries', category:'Sandwich', price:400, stock: 50 },
+            { id:'sw3', title:'Steak Sandwich',               category:'Sandwich', price:165, stock: 50 },
+            { id:'sw4', title:'Cheeseburger',                 category:'Sandwich', price:170, stock: 50 },
+            { id:'sw5', title:'Hamburger',                    category:'Sandwich', price:160, stock: 50 },
+            // SIDE ORDERS
+            { id:'sd1', title:'Cream of Mushroom Soup',       category:'Side Orders', price:80, stock: 50 },
+            { id:'sd2', title:'Cream of Chicken Soup',        category:'Side Orders', price:80, stock: 50 },
+            { id:'sd3', title:'Potato Salad',                 category:'Side Orders', price:155, stock: 50 },
+            { id:'sd4', title:'French Fries',                  category:'Side Orders', price:155, stock: 50 },
+            { id:'sd5', title:'Mashed Potato',                category:'Side Orders', price:90, stock: 50 },
+            { id:'sd6', title:'Garlic Rice',                  category:'Side Orders', price:55, stock: 50 },
+            { id:'sd7', title:'Plain Rice',                   category:'Side Orders', price:40, stock: 50 },
+            { id:'sd8', title:'Garlic Bread',                 category:'Side Orders', price:45, stock: 50 },
             // DRINKS
-            { id:'d1', title:'Mango Juice',            category:'Drinks', price:135 },
-            { id:'d2', title:'Pineapple Juice',        category:'Drinks', price:95 },
-            { id:'d3', title:'Four Seasons',           category:'Drinks', price:95 },
-            { id:'d4', title:'Iced Tea',               category:'Drinks', price:85 },
-            { id:'d5', title:'Blue Lemonade',          category:'Drinks', price:95 },
-            { id:'d6', title:'Coke in Can',            category:'Drinks', price:95 },
-            { id:'d7', title:'San Mig Light',          category:'Drinks', price:95 },
-            { id:'d8', title:'Drip Coffee',            category:'Drinks', price:85 },
-            { id:'d9', title:'Bottled Water (500ml)',  category:'Drinks', price:35 },
-            { id:'w1', title:'Carlo Rossi (Red)',      category:'Drinks', price:700 },
-            { id:'w2', title:'Adega De Pegões',        category:'Drinks', price:600 }
+            { id:'d1', title:'Mango Juice',                   category:'Drinks', price:135, stock: 50 },
+            { id:'d2', title:'Pineapple Juice',               category:'Drinks', price:95, stock: 50 },
+            { id:'d3', title:'Four Seasons',                   category:'Drinks', price:95, stock: 50 },
+            { id:'d4', title:'Iced Tea',                       category:'Drinks', price:85, stock: 50 },
+            { id:'d5', title:'Blue Lemonade',                  category:'Drinks', price:95, stock: 50 },
+            { id:'d6', title:'Cucumber Juice',                 category:'Drinks', price:90, stock: 50 },
+            { id:'d7', title:'Pine-Orange Juice',              category:'Drinks', price:90, stock: 50 },
+            { id:'d8', title:'Calamansi Juice (Hot/Cold)',     category:'Drinks', price:70, stock: 50 },
+            { id:'d9', title:'Coke in Can',                    category:'Drinks', price:95, stock: 50 },
+            { id:'d10', title:'Sprite / Royal in Can',        category:'Drinks', price:95, stock: 50 },
+            { id:'d11', title:'San Mig Pale Pilsen',           category:'Drinks', price:85, stock: 50 },
+            { id:'d12', title:'San Mig Light',                 category:'Drinks', price:95, stock: 50 },
+            { id:'d13', title:'Hot Tea',                       category:'Drinks', price:70, stock: 50 },
+            { id:'d14', title:'Drip Coffee',                   category:'Drinks', price:85, stock: 50 },
+            { id:'d15', title:'Coffee with Cream',             category:'Drinks', price:55, stock: 50 },
+            { id:'d16', title:'Bottled Water (500ml)',         category:'Drinks', price:35, stock: 50 },
+            // WINES
+            { id:'w1', title:'Carlo Rossi (Red)',             category:'Wines', price:700, stock: 50 },
+            { id:'w2', title:'Carlo Rossi (White)',           category:'Wines', price:700, stock: 50 },
+            { id:'w3', title:'Adega De Pegões',               category:'Wines', price:600, stock: 50 }
         ];
+
+        function getMenuData() {
+            let inv = localStorage.getItem('inventoryItems');
+            if (inv) {
+                let items = JSON.parse(inv);
+                return items.map(i => {
+                    // [SELF-HEALING] Re-map internal categories back to customer-facing ones if needed
+                    const name = (i.title || i.name || "").toLowerCase();
+                    if (i.category === 'Food Ingredients' || i.category === 'Others' || i.category === 'Supplies') {
+                        if (name.match(/fillet mignon|tenderloin|rib eye|hamburger steak|beef|ribeye/)) i.category = 'Beef';
+                        else if (name.match(/t-bone|porterhouse|porter house/)) i.category = 'T-Bone';
+                        else if (name.match(/sirloin/)) i.category = 'Sirloin Steak';
+                        else if (name.match(/chicken|fish|bangus|salmon/)) i.category = 'Chicken & Fish';
+                        else if (name.match(/burger|sandwich|hamburger|cheeseburger/)) i.category = 'Sandwich';
+                        else if (name.match(/rice|fries|salad|soup|bread|garlic|potato|mash/)) i.category = 'Side Orders';
+                        else if (name.match(/wine|carlo rossi|adega/)) i.category = 'Wines';
+                        else if (name.match(/juice|tea|coffee|coke|sprite|water|royal|pilsen|lemonade|calamansi/)) i.category = 'Drinks';
+                    }
+                    if (i.category === 'Drinks' && name.match(/wine|carlo rossi|adega/)) i.category = 'Wines';
+                    if (i.category === 'Sandwich & Sides') {
+                        if (name.match(/burger|sandwich/)) i.category = 'Sandwich';
+                        else i.category = 'Side Orders';
+                    }
+                    if (i.category === 'T-Bone & Sirloin') {
+                        if (name.match(/sirloin/)) i.category = 'Sirloin Steak';
+                        else i.category = 'T-Bone';
+                    }
+
+                    // [VIRTUAL STOCK] Sync with new schema if present
+                    const virtualStock = (i.total_stock !== undefined) 
+                        ? (i.total_stock + (i.added_stock || 0) - (i.sold_stock || 0))
+                        : (i.stock || 0);
+                    
+                    i.stock = Math.max(0, virtualStock);
+                    return i;
+                });
+            }
+            return defaultMenuData;
+        }
+
+        let menuData = getMenuData();
 
         // ─────────────────────────────────────────────────────────
         // CATEGORY DEFINITIONS  (single source of truth)
         // ─────────────────────────────────────────────────────────
         const CATEGORIES = [
             { key: 'Beef',              label: '🥩 Pure Beef Steaks' },
-            { key: 'T-Bone & Sirloin',  label: '🦴 T-Bone & Sirloin' },
+            { key: 'T-Bone',            label: '🦴 T-Bone' },
+            { key: 'Sirloin Steak',     label: '🥩 Sirloin Steak' },
             { key: 'Chicken & Fish',    label: '🍗 Chicken & Fish' },
-            { key: 'Sandwich & Sides',  label: '🍟 Sandwiches & Sides' },
-            { key: 'Drinks',            label: '🍹 Drinks & Wine' }
+            { key: 'Sandwich',          label: '🍔 Sandwich' },
+            { key: 'Side Orders',       label: '🍟 Side Orders' },
+            { key: 'Drinks',            label: '🍹 Drinks' },
+            { key: 'Wines',             label: '🍷 Wines' }
         ];
 
         let cart = {};
@@ -195,22 +255,23 @@
 
         function renderMenu() {
             menuGrid.innerHTML = '';
-            const soldOut = JSON.parse(localStorage.getItem('soldOutItems') || '[]');
 
             menuData.filter(i => i.category === currentCategory).forEach(item => {
-                const isSoldOut = soldOut.includes(item.id);
+                const isSoldOut = item.stock <= 0;
+                const isLow = item.stock > 0 && item.stock <= (item.threshold || 5);
                 const qty = cart[item.id]?.qty || 0;
+                
                 const card = document.createElement('div');
                 card.className = 'menu-card' + (isSoldOut ? ' sold-out' : '');
+                
                 if(isSoldOut) {
                     card.style.opacity = '0.5';
                     card.style.filter = 'grayscale(100%)';
-                    card.style.position = 'relative';
                 }
                 
                 let controlsHtml = '';
                 if(isSoldOut) {
-                    controlsHtml = `<div style="font-weight: 800; color: #d32f2f; padding: 10px 0;">SOLD OUT</div>`;
+                    controlsHtml = `<div style="font-weight: 800; color: #d32f2f; padding: 10px 0; text-align:center;">SOLD OUT</div>`;
                 } else {
                     controlsHtml = `
                         <div class="qty-controls">
@@ -221,8 +282,13 @@
                     `;
                 }
 
+                const badgeHtml = isLow ? `<div style="position:absolute; top:8px; left:8px; background:#ef4444; color:white; padding:2px 8px; border-radius:12px; font-size:10px; font-weight:800; z-index:10; box-shadow:0 2px 5px rgba(0,0,0,0.2);">Only ${item.stock} left!</div>` : '';
+
                 card.innerHTML = `
-                    <img class="menu-img" src="https://placehold.co/400x300/f0fdf4/2e7d32?text=${encodeURIComponent(item.title.split(' ')[0])}" alt="${item.title}">
+                    <div style="position:relative; overflow:hidden;">
+                        ${badgeHtml}
+                        <img class="menu-img" src="${item.image ? item.image : `https://placehold.co/400x300/f0fdf4/2e7d32?text=${encodeURIComponent(item.title.split(' ')[0])}`}" alt="${item.title}" style="object-fit:cover; width:100%; height:150px;">
+                    </div>
                     <div class="menu-info">
                         <div class="menu-title">${item.title}</div>
                         <div class="menu-price">${fmt(item.price)}</div>
@@ -296,9 +362,22 @@
         // CART ACTIONS
         // ─────────────────────────────────────────────────────────
         window.updateQty = function(id, delta) {
+            const item = menuData.find(i => i.id === id);
+            if(!item) return;
+
             if (!cart[id]) cart[id] = { qty: 0 };
-            cart[id].qty += delta;
+            
+            let newQty = cart[id].qty + delta;
+            
+            // Validate Stock Maximum limit before assigning
+            if (newQty > item.stock) {
+                alert(`There are only ${item.stock} of ${item.title} available.`);
+                newQty = item.stock; 
+            }
+
+            cart[id].qty = newQty;
             if (cart[id].qty <= 0) delete cart[id];
+            
             renderMenu();
             renderCart();
         };
@@ -356,7 +435,11 @@
         // ─────────────────────────────────────────────────────────
         // CHECKOUT
         // ─────────────────────────────────────────────────────────
-        window.handleCheckout = function() { window.location.href = 'payment.html'; };
+        window.handleCheckout = function() { 
+            // Exact JSON object to deduct correct stock in payment.html
+            localStorage.setItem('currentCartObj', JSON.stringify(cart));
+            window.location.href = 'payment.html'; 
+        };
         document.getElementById('go-to-pay-btn').addEventListener('click', handleCheckout);
 
         // ─────────────────────────────────────────────────────────
@@ -394,24 +477,31 @@
         });
 
         // ─────────────────────────────────────────────────────────
-        // REAL-TIME SYNC FOR SOLD OUT ITEMS
+        // REAL-TIME SYNC FOR INVENTORY ITEMS
         // ─────────────────────────────────────────────────────────
         window.addEventListener('storage', (e) => {
-            if (e.key === 'soldOutItems') {
-                const soldOut = JSON.parse(e.newValue || '[]');
+            if (e.key === 'inventoryItems') {
+                menuData = getMenuData();
                 let cartChanged = false;
+                let alertMsg = "";
                 
                 for (let id in cart) {
-                    if (soldOut.includes(id)) {
+                    const latestItemInfo = menuData.find(i => i.id === id);
+                    if (!latestItemInfo || latestItemInfo.stock <= 0) {
                         delete cart[id];
                         cartChanged = true;
+                        alertMsg += `- An item was removed (no longer available)\n`;
+                    } else if (cart[id].qty > latestItemInfo.stock) {
+                        cart[id].qty = latestItemInfo.stock;
+                        cartChanged = true;
+                        alertMsg += `- ${latestItemInfo.title} quantity reduced to ${latestItemInfo.stock} (stock went down)\n`;
                     }
                 }
                 
                 renderMenu();
                 if (cartChanged) {
                     renderCart();
-                    alert("Notice: An item in your cart has just sold out and was removed.");
+                    alert("Stock Levels Updated:\n" + alertMsg);
                 }
             }
         });
@@ -424,6 +514,85 @@
 
         renderMenu();
         renderCart();
+
+        // ─────────────────────────────────────────────────────────
+        // MODAL HELPER & BACK NAVIGATION
+        // ─────────────────────────────────────────────────────────
+        const modalOverlay = document.getElementById('super-modal-root');
+
+        window.superModal = function ({ title = 'Notice', message = '', type = 'alert', confirmText = 'Confirm', cancelText = 'Cancel' }) {
+            return new Promise((resolve) => {
+                const html = `
+                    <div class="super-modal-overlay">
+                        <div class="super-modal-box">
+                            <div class="super-modal-header">
+                                <h3>${title}</h3>
+                            </div>
+                            <div class="super-modal-body">
+                                <p>${message}</p>
+                            </div>
+                            <div class="super-modal-footer">
+                                ${type === 'confirm' ? `<button class="super-modal-btn cancel" id="modal-cancel-btn">${cancelText}</button>` : ''}
+                                <button class="super-modal-btn confirm" id="modal-confirm-btn">${confirmText}</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                modalOverlay.innerHTML = html;
+
+                const confirmBtn = document.getElementById('modal-confirm-btn');
+                const cancelBtn = document.getElementById('modal-cancel-btn');
+
+                confirmBtn.onclick = () => {
+                    modalOverlay.innerHTML = '';
+                    resolve(true);
+                };
+                if (cancelBtn) {
+                    cancelBtn.onclick = () => {
+                        modalOverlay.innerHTML = '';
+                        resolve(false);
+                    };
+                }
+            });
+        };
+
+        window.handleBack = async function(e) {
+            if (e) e.preventDefault();
+            const itemCount = Object.keys(cart).length;
+            
+            let title = 'Going Back?';
+            let msg = 'Are you sure you want to go back?';
+            
+            if (itemCount === 0) {
+                title = 'Wait! ⚠️';
+                msg = 'You haven\'t ordered anything yet! Are you sure you want to leave the pre-order area?';
+            } else {
+                title = 'Cancel Order? ⚠️';
+                msg = 'Are you sure? Your current food selection will be cleared if you leave now.';
+            }
+
+            const confirmed = await superModal({
+                title: title,
+                message: msg,
+                type: 'confirm',
+                confirmText: 'Yes, Go Back',
+                cancelText: 'Stay Here'
+            });
+
+            if (confirmed) {
+                window.location.href = 'seat-selection.html';
+            } else {
+                // If they cancel, push the state back to keep the "back button" trapped
+                history.pushState(null, null, location.href);
+            }
+        };
+
+        // BROWSER BACK BUTTON TRAP
+        // Push an extra entry so when they click back, we catch the popstate event
+        history.pushState(null, null, location.href);
+        window.onpopstate = function() {
+            handleBack();
+        };
     </script>
 </body>
 </html>

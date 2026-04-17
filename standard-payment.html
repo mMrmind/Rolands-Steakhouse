@@ -7,11 +7,41 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/gcash.css">
+    <style>
+        @keyframes modalFadeIn  { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes modalSlideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    </style>
 </head>
 <body>
     <header id="main-header">
         <div class="logo"><img src="images/rolandsLOGO.jpg" alt="Logo"></div>
     </header>
+
+    <!-- ── Custom Glass Modal ── -->
+    <div id="custom-modal" style="
+        display: none; position: fixed; inset: 0; z-index: 9999;
+        background: rgba(0,0,0,0.50);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        align-items: center; justify-content: center;">
+        <div id="modal-box" style="
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.30);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-radius: 22px;
+            padding: 38px 32px 30px;
+            max-width: 360px;
+            width: 90%;
+            box-shadow: 0 28px 60px rgba(0,0,0,0.35);
+            text-align: center;
+            animation: modalSlideUp 0.28s cubic-bezier(0.34,1.56,0.64,1);">
+            <div id="modal-icon" style="font-size: 44px; margin-bottom: 14px;"></div>
+            <h3 id="modal-title" style="margin: 0 0 10px; font-family: 'Playfair Display', serif; color: #fff; font-size: 22px;"></h3>
+            <p id="modal-message" style="margin: 0 0 26px; color: rgba(255,255,255,0.85); font-size: 14px; line-height: 1.65;"></p>
+            <div id="modal-actions" style="display: flex; gap: 10px; justify-content: center;"></div>
+        </div>
+    </div>
 
     <section id="payment-section">
         <div class="payment-card" style="position: relative;">
@@ -85,6 +115,18 @@
             <button id="confirm-payment-btn" style="width:100%; margin-top:22px; padding:16px; font-size:16px; border-radius:12px;">
                 ✅ Confirm &amp; Submit Payment
             </button>
+
+            <button type="button" onclick="cancelBooking()"
+                style="width:100%; margin-top:12px; padding:14px; font-size:15px; border-radius:12px;
+                       background: transparent; color: #ef4444; border: 2px solid #fca5a5;
+                       font-weight: 700; cursor: pointer; font-family:'Roboto',sans-serif; transition: all 0.2s ease;"
+                onmouseover="this.style.background='#fef2f2'; this.style.borderColor='#ef4444';"
+                onmouseout="this.style.background='transparent'; this.style.borderColor='#fca5a5';">
+                ✕ Cancel Booking
+            </button>
+            <p style="text-align:center; font-size:12px; color:#aaa; margin: 8px 0 0;">
+                Cancellation will remove your reservation and return you to the homepage.
+            </p>
         </div>
     </section>
 
@@ -98,6 +140,20 @@
             document.getElementById('pay-badge-amount').textContent = '₱1,000.00';
             document.querySelector('.payment-card').style.borderTopColor = '#ffd700';
         }
+
+        /* ────────────────────────────────────────
+           Back Button Protection
+        ──────────────────────────────────────── */
+        (function initBackProtection() {
+            history.pushState(null, null, window.location.href);
+            window.addEventListener('popstate', function () {
+                history.pushState(null, null, window.location.href);
+                cancelBooking();
+            });
+            window.onbeforeunload = function() {
+                return "Are you sure you want to cancel your booking? Progress will be lost.";
+            };
+        })();
 
         function switchQR(type) {
             const slider = document.getElementById('toggleSlider');
@@ -144,7 +200,12 @@
             const hasFile = fileInput && fileInput.files && fileInput.files.length > 0;
 
             if (!ref && !hasFile) {
-                return alert("Please upload your payment screenshot or enter the reference number.");
+                showModal({
+                    icon: '📋',
+                    title: 'Missing Info',
+                    message: 'Please upload your payment screenshot or enter the reference number.'
+                });
+                return;
             }
 
             document.getElementById('confirm-payment-btn').textContent = "Processing...";
@@ -176,7 +237,7 @@
                     arrivalDateTimeDisplay: displayDt,
                     customerName: localStorage.getItem('customerName'),
                     bookedTable: localStorage.getItem('bookedTable'),
-                    orderSummary: '',
+                    orderSummary: isVip ? 'VIP Room Down Payment' : 'Standard Reservation Deposit',
                     foods: [],
                     paymentAmount: isVip ? 1000 : 200,
                     paymentRef: ref,
@@ -188,10 +249,82 @@
                 localStorage.removeItem('tempPaymentUpload');
                 localStorage.setItem('reservationHistory', JSON.stringify(history));
                 
-                alert('Payment submitted! Please wait for staff to verify it. Your receipt will be sent directly to the live chat support once approved.');
-                window.location.href = "index.html";
+                // Disable back/unload protection before final redirect
+                window.onbeforeunload = null;
+
+                showModal({
+                    icon: '🎉',
+                    title: 'Payment Submitted!',
+                    message: 'Please wait for staff to verify it. Your receipt will be sent directly to the live chat support once approved.',
+                    onConfirm: () => { window.location.href = "index.html"; }
+                });
             }, 1000);
         });
+
+        /* ────────────────────────────────────────
+           Modal & Cancel Logic
+        ──────────────────────────────────────── */
+        function showModal({ icon = '', title = '', message = '', type = 'alert', onConfirm = null }) {
+            const overlay = document.getElementById('custom-modal');
+            document.getElementById('modal-icon').textContent    = icon;
+            document.getElementById('modal-title').textContent   = title;
+            document.getElementById('modal-message').textContent = message;
+
+            const actions = document.getElementById('modal-actions');
+            actions.innerHTML = '';
+
+            const base = 'border:none; border-radius:50px; padding:12px 28px; font-weight:700; font-size:14px; cursor:pointer; transition:all 0.2s ease; font-family:Roboto,sans-serif;';
+
+            if (type === 'confirm') {
+                const noBtn = document.createElement('button');
+                noBtn.textContent = 'No, keep it';
+                noBtn.style.cssText = base + 'background:rgba(255,255,255,0.15); color:#fff; border:1px solid rgba(255,255,255,0.30);';
+                noBtn.onmouseenter = () => noBtn.style.background = 'rgba(255,255,255,0.28)';
+                noBtn.onmouseleave = () => noBtn.style.background = 'rgba(255,255,255,0.15)';
+                noBtn.onclick = () => { overlay.style.display = 'none'; };
+
+                const yesBtn = document.createElement('button');
+                yesBtn.textContent = 'Yes, cancel';
+                yesBtn.style.cssText = base + 'background:#ef4444; color:#fff;';
+                yesBtn.onmouseenter = () => yesBtn.style.background = '#dc2626';
+                yesBtn.onmouseleave = () => yesBtn.style.background = '#ef4444';
+                yesBtn.onclick = () => { overlay.style.display = 'none'; if (onConfirm) onConfirm(); };
+
+                actions.appendChild(noBtn);
+                actions.appendChild(yesBtn);
+            } else {
+                const okBtn = document.createElement('button');
+                okBtn.textContent = 'Got it';
+                okBtn.style.cssText = base + 'background:rgba(255,255,255,0.92); color:#1b5e20; width:100%;';
+                okBtn.onmouseenter = () => okBtn.style.background = '#fff';
+                okBtn.onmouseleave = () => okBtn.style.background = 'rgba(255,255,255,0.92)';
+                okBtn.onclick = () => { overlay.style.display = 'none'; if (onConfirm) onConfirm(); };
+                actions.appendChild(okBtn);
+            }
+
+            overlay.style.display = 'flex';
+            overlay.onclick = (e) => { if (e.target === overlay) overlay.style.display = 'none'; };
+        }
+
+        function cancelBooking() {
+            showModal({
+                icon: '⚠️',
+                title: 'Cancel Booking?',
+                message: 'Your reservation will be removed and you will be returned to the homepage.',
+                type: 'confirm',
+                onConfirm: () => {
+                    localStorage.removeItem('totalBill');
+                    localStorage.removeItem('cartItems');
+                    localStorage.removeItem('reservationData');
+                    localStorage.removeItem('tempPaymentUpload');
+                    localStorage.removeItem('pendingReservation');
+                    
+                    // Disable the unload warning so we can navigate away
+                    window.onbeforeunload = null;
+                    window.location.href = 'index.html';
+                }
+            });
+        }
     </script>
 </body>
 </html>

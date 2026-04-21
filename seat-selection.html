@@ -6,6 +6,8 @@
     <title>Select Table | Roland's Steak House</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/design-system.css">
+    <script src="js/design-system.js"></script>
 </head>
 <body class="seat-selection-page">
 
@@ -38,11 +40,11 @@
     </header>
 
     <!-- ═══ MAIN SECTION ═══ -->
-    <section id="seat-selection-section">
+    <section id="seat-selection-section" style="padding-top: 50px;">
 
-        <h2 id="page-heading" style="font-family:'Playfair Display'; font-size:clamp(22px,5vw,40px); margin-bottom:10px;">
+        <h1 id="page-heading" style="font-family:'Playfair Display'; font-size:clamp(28px,6vw,48px); margin-bottom:30px; font-weight: 700; color: #1e293b;">
             Choose Your Reservation
-        </h2>
+        </h1>
 
         <!-- Reservation type tabs -->
         <div class="reservation-filter">
@@ -72,6 +74,12 @@
                 </div>
 
                 <button class="vip-reserve-btn" id="vip-book-btn">Reserve VIP Room Now</button>
+                <button type="button" onclick="window.location.href='index.html#reservations'" 
+                        style="width: 100%; border: 1px solid #e2e8f0; background: white; color: #64748b; padding: 14px; border-radius: 12px; font-weight: bold; margin-top: 12px; cursor: pointer; transition: all 0.2s;"
+                        onmouseover="this.style.background='#f8fafc'; this.style.color='#ef4444'; this.style.borderColor='#fee2e2'"
+                        onmouseout="this.style.background='white'; this.style.color='#64748b'; this.style.borderColor='#e2e8f0'">
+                    Cancel & Go Back
+                </button>
             </div>
         </div>
 
@@ -98,6 +106,12 @@
                 Selection: <strong id="selected-seat-display" style="color:#2e7d32;">None</strong>
             </p>
             <button id="confirm-final-btn" disabled>Confirm Booking</button>
+            <button type="button" onclick="window.location.href='index.html#reservations'" 
+                    style="width: 100%; border: 1px solid #e2e8f0; background: white; color: #64748b; padding: 14px; border-radius: 12px; font-weight: bold; margin-top: 12px; cursor: pointer; transition: all 0.2s;"
+                    onmouseover="this.style.background='#f8fafc'; this.style.color='#ef4444'; this.style.borderColor='#fee2e2'"
+                    onmouseout="this.style.background='white'; this.style.color='#64748b'; this.style.borderColor='#e2e8f0'">
+                Cancel & Go Back
+            </button>
         </div>
 
     </section>

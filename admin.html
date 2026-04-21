@@ -7,15 +7,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/admin.css">
     <script src="https://unpkg.com/html5-qrcode"></script>
+    <link rel="stylesheet" href="css/design-system.css">
+    <script src="js/design-system.js"></script>
 </head>
 <body>
     <header>
         <div class="brand">Roland's Staff Admin</div>
         <div class="actions">
             <div id="admin-status" class="muted"></div>
-            <button class="secondary hidden" id="logout-admin-btn" type="button">Logout</button>
+            <button class="logout-btn hidden" id="logout-admin-btn" onclick="logoutAdmin()">Logout</button>
         </div>
     </header>
+
+    <div id="notification-container"></div>
 
     <div class="container">
         <div id="auth-section" class="auth-wrap">
@@ -72,7 +76,7 @@
         <div id="dashboard-section" class="hidden">
             <div class="admin-tabs">
                 <button class="tab-link active" onclick="switchAdminTab('overview', this)">Dashboard Overview</button>
-                <button class="tab-link" onclick="switchAdminTab('walkin', this)">📋 Walk-in Reservation</button>
+                <button class="tab-link" onclick="switchAdminTab('walkin', this)">📋 Manual Reservation</button>
                 <button class="tab-link" onclick="switchAdminTab('floorplan', this)">Floor Plan</button>
                 <button class="tab-link" onclick="switchAdminTab('menu', this)">Live Inventory</button>
                 <button class="tab-link" onclick="switchAdminTab('chat', this)">Live Chat</button>
@@ -83,7 +87,7 @@
             <!-- WALK-IN RESERVATION TAB -->
             <div id="tab-walkin" class="admin-tab-content hidden">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
-                    <h2 style="margin:0; font-family:'Playfair Display',serif; color:#2e7d32; font-size:26px;">📋 Walk-in Reservation</h2>
+                    <h2 style="margin:0; font-family:'Playfair Display',serif; color:#2e7d32; font-size:26px;">📋 Manual Reservation</h2>
                     <span class="muted" style="font-weight:700;">Book a table directly for a walk-in or phone customer</span>
                 </div>
 
@@ -170,10 +174,10 @@
                     </button>
                 </div>
 
-                <!-- Recent walk-in log -->
-                <h3 style="margin: 28px 0 14px; color:#1b5e20; font-size:16px; text-transform:uppercase; letter-spacing:.5px;">Recent Walk-in Reservations</h3>
+                <!-- Recent manual log -->
+                <h3 style="margin: 28px 0 14px; color:#1b5e20; font-size:16px; text-transform:uppercase; letter-spacing:.5px;">Recent Manual Reservations</h3>
                 <div id="walkin-recent-list">
-                    <div style="color:#aaa; font-style:italic; text-align:center; padding:20px;">No walk-in reservations yet.</div>
+                    <div style="color:#aaa; font-style:italic; text-align:center; padding:20px;">No manual reservations yet.</div>
                 </div>
             </div>
 
@@ -449,79 +453,172 @@
 
         const defaultMenuData = [
             // BEEF (Pure Beef Steaks)
-            { id:'m5', title:'Fillet Mignon',                category:'Beef', price:935, stock: 50 },
-            { id:'m6', title:'Tenderloin Steak (200g)',       category:'Beef', price:740, stock: 50 },
-            { id:'m7', title:'Tenderloin Tips (200g)',        category:'Beef', price:740, stock: 50 },
-            { id:'m8', title:'Rib Eye Steak (200-350g)',      category:'Beef', price:675, stock: 50 },
-            { id:'m9', title:'Hamburger Steak (204g)',        category:'Beef', price:505, stock: 50 },
+            { id: 'INV-B1', title: 'Fillet Mignon',                category: 'Beef', price: 935, stock: 50 },
+            { id: 'INV-B2', title: 'Tenderloin Steak (200g)',       category: 'Beef', price: 740, stock: 50 },
+            { id: 'INV-B3', title: 'Tenderloin Tips (200g)',        category: 'Beef', price: 740, stock: 50 },
+            { id: 'INV-B4', title: 'Rib Eye Steak (200-350g)',      category: 'Beef', price: 675, stock: 50 },
+            { id: 'INV-B5', title: 'Hamburger Steak (204g)',        category: 'Beef', price: 505, stock: 50 },
             // T-BONE
-            { id:'t1', title:'T-Bone Medium (250-400g)',      category:'T-Bone', price:715, stock: 50 },
-            { id:'t2', title:'T-Bone Large (450-500g)',       category:'T-Bone', price:790, stock: 50 },
-            { id:'t3', title:'T-Bone Extra Large (551-500g)', category:'T-Bone', price:865, stock: 50 },
-            { id:'t4', title:'T-Bone XX Large (551-500g)',    category:'T-Bone', price:940, stock: 50 },
-            { id:'t5', title:'Porter House (551-600g)',       category:'T-Bone', price:1015, stock: 50 },
+            { id: 'INV-T1', title: 'T-Bone Medium (250-400g)',      category: 'T-Bone', price: 715, stock: 50 },
+            { id: 'INV-T2', title: 'T-Bone Large (450-500g)',       category: 'T-Bone', price: 790, stock: 50 },
+            { id: 'INV-T3', title: 'T-Bone Extra Large (551-500g)', category: 'T-Bone', price: 865, stock: 50 },
+            { id: 'INV-T4', title: 'T-Bone XX Large (551-500g)',    category: 'T-Bone', price: 940, stock: 50 },
+            { id: 'INV-T5', title: 'Porter House (551-600g)',       category: 'T-Bone', price: 1015, stock: 50 },
             // SIRLOIN STEAK
-            { id:'s1', title:'Sirloin Mini (250-300g)',        category:'Sirloin Steak', price:485, stock: 50 },
-            { id:'s2', title:'Sirloin Small (251-350g)',       category:'Sirloin Steak', price:545, stock: 50 },
-            { id:'s3', title:'Sirloin Mid Size (351-450g)',    category:'Sirloin Steak', price:605, stock: 50 },
-            { id:'s4', title:'Sirloin Big Size (401-450g)',    category:'Sirloin Steak', price:670, stock: 50 },
+            { id: 'INV-S1', title: 'Sirloin Mini (250-300g)',        category: 'Sirloin Steak', price: 485, stock: 50 },
+            { id: 'INV-S2', title: 'Sirloin Small (251-350g)',       category: 'Sirloin Steak', price: 545, stock: 50 },
+            { id: 'INV-S3', title: 'Sirloin Mid Size (351-450g)',    category: 'Sirloin Steak', price: 605, stock: 50 },
+            { id: 'INV-S4', title: 'Sirloin Big Size (401-450g)',    category: 'Sirloin Steak', price: 670, stock: 50 },
             // CHICKEN & FISH
-            { id:'m1', title:'Whole Chicken',                 category:'Chicken & Fish', price:660, stock: 50 },
-            { id:'m2', title:'Half Chicken',                  category:'Chicken & Fish', price:335, stock: 50 },
-            { id:'m3', title:'Fish Steak (Tanigue)',          category:'Chicken & Fish', price:495, stock: 50 },
-            { id:'m4', title:'Bangus Steak',                  category:'Chicken & Fish', price:510, stock: 50 },
+            { id: 'INV-CF1', title: 'Whole Chicken',                 category: 'Chicken & Fish', price: 660, stock: 50 },
+            { id: 'INV-CF2', title: 'Half Chicken',                  category: 'Chicken & Fish', price: 335, stock: 50 },
+            { id: 'INV-CF3', title: 'Fish Steak (Tanigue)',          category: 'Chicken & Fish', price: 495, stock: 50 },
+            { id: 'INV-CF4', title: 'Bangus Steak',                  category: 'Chicken & Fish', price: 510, stock: 50 },
             // SANDWICH
-            { id:'sw1', title:'Big Sunny Burger with Fries',  category:'Sandwich', price:430, stock: 50 },
-            { id:'sw2', title:'Big Sunny Steak Sandwich with Fries', category:'Sandwich', price:400, stock: 50 },
-            { id:'sw3', title:'Steak Sandwich',               category:'Sandwich', price:165, stock: 50 },
-            { id:'sw4', title:'Cheeseburger',                 category:'Sandwich', price:170, stock: 50 },
-            { id:'sw5', title:'Hamburger',                    category:'Sandwich', price:160, stock: 50 },
+            { id: 'INV-SW1', title: 'Big Sunny Burger with Fries',  category: 'Sandwich', price: 430, stock: 50 },
+            { id: 'INV-SW2', title: 'Big Sunny Steak Sandwich with Fries', category: 'Sandwich', price: 400, stock: 50 },
+            { id: 'INV-SW3', title: 'Steak Sandwich',               category: 'Sandwich', price: 165, stock: 50 },
+            { id: 'INV-SW4', title: 'Cheeseburger',                 category: 'Sandwich', price: 170, stock: 50 },
+            { id: 'INV-SW5', title: 'Hamburger',                    category: 'Sandwich', price: 160, stock: 50 },
             // SIDE ORDERS
-            { id:'sd1', title:'Cream of Mushroom Soup',       category:'Side Orders', price:80, stock: 50 },
-            { id:'sd2', title:'Cream of Chicken Soup',        category:'Side Orders', price:80, stock: 50 },
-            { id:'sd3', title:'Potato Salad',                 category:'Side Orders', price:155, stock: 50 },
-            { id:'sd4', title:'French Fries',                  category:'Side Orders', price:155, stock: 50 },
-            { id:'sd5', title:'Mashed Potato',                category:'Side Orders', price:90, stock: 50 },
-            { id:'sd6', title:'Garlic Rice',                  category:'Side Orders', price:55, stock: 50 },
-            { id:'sd7', title:'Plain Rice',                   category:'Side Orders', price:40, stock: 50 },
-            { id:'sd8', title:'Garlic Bread',                 category:'Side Orders', price:45, stock: 50 },
+            { id: 'INV-SO1', title: 'Cream of Mushroom Soup',       category: 'Side Orders', price: 80, stock: 50 },
+            { id: 'INV-SO2', title: 'Cream of Chicken Soup',        category: 'Side Orders', price: 80, stock: 50 },
+            { id: 'INV-SO3', title: 'Potato Salad',                 category: 'Side Orders', price: 155, stock: 50 },
+            { id: 'INV-SO4', title: 'French Fries',                  category: 'Side Orders', price: 155, stock: 50 },
+            { id: 'INV-SO5', title: 'Mashed Potato',                category: 'Side Orders', price: 90, stock: 50 },
+            { id: 'INV-SO6', title: 'Garlic Rice',                  category: 'Side Orders', price: 55, stock: 50 },
+            { id: 'INV-SO7', title: 'Plain Rice',                   category: 'Side Orders', price: 40, stock: 50 },
+            { id: 'INV-SO8', title: 'Garlic Bread',                 category: 'Side Orders', price: 45, stock: 50 },
             // DRINKS
-            { id:'d1', title:'Mango Juice',                   category:'Drinks', price:135, stock: 50 },
-            { id:'d2', title:'Pineapple Juice',               category:'Drinks', price:95, stock: 50 },
-            { id:'d3', title:'Four Seasons',                   category:'Drinks', price:95, stock: 50 },
-            { id:'d4', title:'Iced Tea',                       category:'Drinks', price:85, stock: 50 },
-            { id:'d5', title:'Blue Lemonade',                  category:'Drinks', price:95, stock: 50 },
-            { id:'d6', title:'Cucumber Juice',                 category:'Drinks', price:90, stock: 50 },
-            { id:'d7', title:'Pine-Orange Juice',              category:'Drinks', price:90, stock: 50 },
-            { id:'d8', title:'Calamansi Juice (Hot/Cold)',     category:'Drinks', price:70, stock: 50 },
-            { id:'d9', title:'Coke in Can',                    category:'Drinks', price:95, stock: 50 },
-            { id:'d10', title:'Sprite / Royal in Can',        category:'Drinks', price:95, stock: 50 },
-            { id:'d11', title:'San Mig Pale Pilsen',           category:'Drinks', price:85, stock: 50 },
-            { id:'d12', title:'San Mig Light',                 category:'Drinks', price:95, stock: 50 },
-            { id:'d13', title:'Hot Tea',                       category:'Drinks', price:70, stock: 50 },
-            { id:'d14', title:'Drip Coffee',                   category:'Drinks', price:85, stock: 50 },
-            { id:'d15', title:'Coffee with Cream',             category:'Drinks', price:55, stock: 50 },
-            { id:'d16', title:'Bottled Water (500ml)',         category:'Drinks', price:35, stock: 50 },
+            { id: 'INV-D1', title: 'Mango Juice',                   category: 'Drinks', price: 135, stock: 50 },
+            { id: 'INV-D2', title: 'Pineapple Juice',               category: 'Drinks', price: 95, stock: 50 },
+            { id: 'INV-D3', title: 'Four Seasons',                   category: 'Drinks', price: 95, stock: 50 },
+            { id: 'INV-D4', title: 'Iced Tea',                       category: 'Drinks', price: 85, stock: 50 },
+            { id: 'INV-D5', title: 'Blue Lemonade',                  category: 'Drinks', price: 95, stock: 50 },
+            { id: 'INV-D6', title: 'Cucumber Juice',                 category: 'Drinks', price: 90, stock: 50 },
+            { id: 'INV-D7', title: 'Pine-Orange Juice',              category: 'Drinks', price: 90, stock: 50 },
+            { id: 'INV-D8', title: 'Calamansi Juice (Hot/Cold)',     category: 'Drinks', price: 70, stock: 50 },
+            { id: 'INV-D9', title: 'Coke in Can',                    category: 'Drinks', price: 95, stock: 50 },
+            { id: 'INV-D10', title: 'Sprite | Royal in Can',        category: 'Drinks', price: 95, stock: 50 },
+            { id: 'INV-D11', title: 'San Miguel Pale Pilsen',           category: 'Drinks', price: 85, stock: 50 },
+            { id: 'INV-D12', title: 'San Mig Light',                 category: 'Drinks', price: 95, stock: 50 },
+            { id: 'INV-D13', title: 'Hot Tea',                       category: 'Drinks', price: 70, stock: 50 },
+            { id: 'INV-D14', title: 'Drip Coffee',                   category: 'Drinks', price: 85, stock: 50 },
+            { id: 'INV-D15', title: 'Coffee with Cream',             category: 'Drinks', price: 55, stock: 50 },
+            { id: 'INV-D16', title: 'Bottled Water (500ml)',         category: 'Drinks', price: 35, stock: 50 },
             // WINES
-            { id:'w1', title:'Carlo Rossi (Red)',             category:'Wines', price:700, stock: 50 },
-            { id:'w2', title:'Carlo Rossi (White)',           category:'Wines', price:700, stock: 50 },
-            { id:'w3', title:'Adega De Pegões',               category:'Wines', price:600, stock: 50 }
+            { id: 'INV-W1', title: 'Carlo Rossi (Red)',             category: 'Wines', price: 700, stock: 50 },
+            { id: 'INV-W2', title: 'Carlo Rossi (White)',           category: 'Wines', price: 700, stock: 50 },
+            { id: 'INV-W3', title: 'Adega De Pegões',               category: 'Wines', price: 600, stock: 50 }
         ];
 
         const CATEGORIES = [
             { key: 'Beef',              label: '🥩 Beef Steaks' },
-            { key: 'T-Bone',            label: '🦴 T-Bone' },
+            { id:  'T-Bone', key: 'T-Bone', label: '🦴 T-Bone' },
             { key: 'Sirloin Steak',     label: '🥩 Sirloin Steak' },
             { key: 'Chicken & Fish',    label: '🍗 Chicken & Fish' },
             { key: 'Sandwich',          label: '🍔 Sandwich' },
             { key: 'Side Orders',       label: '🍟 Side Orders' },
             { key: 'Drinks',            label: '🍹 Drinks' },
-            { key: 'Wines',             label: '🍷 Wines' }
+            { key: 'Wines',             label: '🍷 Wines' },
+            { key: 'Supplies',          label: '🧺 Supplies' },
+            { key: 'Others',            label: '📦 Others' }
         ];
 
         function getInventory() {
-            let inv = localStorage.getItem('inventoryItems');
-            return inv ? JSON.parse(inv) : defaultMenuData;
+            try {
+                const inv = localStorage.getItem('inventoryItems');
+                let savedItems = inv ? JSON.parse(inv) : [];
+
+                // Legacy ID Migration
+                const legacyMap = {
+                    'm5':'INV-B1','m6':'INV-B2','m7':'INV-B3','m8':'INV-B4','m9':'INV-B5',
+                    't1':'INV-T1','t2':'INV-T2','t3':'INV-T3','t4':'INV-T4','t5':'INV-T5',
+                    's1':'INV-S1','s2':'INV-S2','s3':'INV-S3','s4':'INV-S4',
+                    'm1':'INV-CF1','m2':'INV-CF2','m3':'INV-CF3','m4':'INV-CF4',
+                    'sw1':'INV-SW1','sw2':'INV-SW2','sw3':'INV-SW3','sw4':'INV-SW4','sw5':'INV-SW5',
+                    'sd1':'INV-SO1','sd2':'INV-SO2','sd3':'INV-SO3','sd4':'INV-SO4','sd5':'INV-SO5','sd6':'INV-SO6','sd7':'INV-SO7','sd8':'INV-SO8',
+                    'd1':'INV-D1','d2':'INV-D2','d3':'INV-D3','d4':'INV-D4','d5':'INV-D5','d6':'INV-D6','d7':'INV-D7','d8':'INV-D8','d9':'INV-D9','d10':'INV-D10','d11':'INV-D11','d12':'INV-D12','d13':'INV-D13','d14':'INV-D14','d15':'INV-D15','d16':'INV-D16',
+                    'w1':'INV-W1','w2':'INV-W2','w3':'INV-W3'
+                };
+                let migrated = false;
+                savedItems.forEach(i => {
+                    if (legacyMap[i.id]) {
+                        i.id = legacyMap[i.id];
+                        migrated = true;
+                    }
+                });
+                if (migrated) {
+                    const unique = [];
+                    const seen = new Set();
+                    savedItems.forEach(i => {
+                        if (!seen.has(i.id)) {
+                            seen.add(i.id);
+                            unique.push(i);
+                        } else {
+                            const existing = unique.find(u => u.id === i.id);
+                            if (i.image && !existing.image) existing.image = i.image;
+                        }
+                    });
+                    savedItems = unique;
+                }
+
+                const savedMap = {};
+                savedItems.forEach(i => { if(i.id) savedMap[i.id] = i; });
+
+                const mainCats = CATEGORIES.map(c => c.key);
+                let mutated = false;
+
+                // Merge: defaults as base, saved values override matching IDs
+                const merged = defaultMenuData.map(def => {
+                    const saved = savedMap[def.id] || {};
+                    const combined = { ...def, ...saved };
+                    
+                    // Category normalization - FORCE update if it's 'Others', 'Supplies', or unknown
+                    if (!mainCats.includes(combined.category) || combined.category === 'Others' || combined.category === 'Supplies') {
+                        const n = (combined.title || combined.name || '').toLowerCase();
+                        let foundCat = 'Others';
+
+                        if (n.match(/fillet mignon|tenderloin|rib eye|hamburger steak|beef|ribeye/)) foundCat = 'Beef';
+                        else if (n.match(/t-bone|porterhouse|porter house/)) foundCat = 'T-Bone';
+                        else if (n.match(/sirloin/)) foundCat = 'Sirloin Steak';
+                        else if (n.match(/chicken|fish|bangus|tanigue|salmon|seafood/)) foundCat = 'Chicken & Fish';
+                        else if (n.match(/burger|sandwich|hamburger|cheeseburger/)) foundCat = 'Sandwich';
+                        else if (n.match(/rice|fries|salad|soup|bread|garlic|potato|mash/)) foundCat = 'Side Orders';
+                        else if (n.match(/wine|carlo rossi|adega|pegoes|rossi/)) foundCat = 'Wines';
+                        else if (n.match(/juice|tea|coffee|coke|sprite|water|royal|pilsen|lemonade|calamansi|beer|san mig|light|drip|cucumber|four seasons/)) foundCat = 'Drinks';
+                        
+                        if (combined.category !== foundCat) {
+                            combined.category = foundCat;
+                            mutated = true;
+                        }
+                    }
+
+                    // Stock normalization
+                    if (combined.total_stock === undefined && combined.stock !== undefined) {
+                        combined.total_stock = combined.stock;
+                        mutated = true;
+                    }
+                    // Virtual stock for legacy UI display
+                    combined.stock = (combined.total_stock || 0) + (combined.added_stock || 0) - (combined.sold_stock || 0);
+                    return combined;
+                });
+
+                // Append custom items
+                savedItems.forEach(i => {
+                    if (i.id && !merged.find(m => m.id === i.id)) {
+                        const copy = { ...i };
+                        copy.stock = (copy.total_stock || 0) + (copy.added_stock || 0) - (copy.sold_stock || 0);
+                        merged.push(copy);
+                    }
+                });
+
+                if (mutated) localStorage.setItem('inventoryItems', JSON.stringify(merged));
+                return merged;
+            } catch (err) {
+                console.error("Inventory error:", err);
+                return defaultMenuData;
+            }
         }
 
         function getUsers() {
@@ -547,17 +644,17 @@
         }
 
         function setAdminSession(username) {
-            localStorage.setItem('adminLoggedInUser', username);
+            sessionStorage.setItem('adminLoggedInUser', username);
         }
 
         function logoutAdmin() {
-            const username = localStorage.getItem('adminLoggedInUser');
+            const username = sessionStorage.getItem('adminLoggedInUser');
             if (username) {
                 const online = safeJsonParse(localStorage.getItem('onlineAdmins'), {});
                 delete online[username];
                 localStorage.setItem('onlineAdmins', JSON.stringify(online));
             }
-            localStorage.removeItem('adminLoggedInUser');
+            sessionStorage.removeItem('adminLoggedInUser');
             window.location.reload();
         }
 
@@ -810,7 +907,7 @@
             };
 
             // Hostess Logic
-            const ALL_TABLES = ["Table 1", "Table 2", "Table 3", "Table 4", "Table 5", "Table 6", "Table 7", "Table 8", "Table 9", "Table 10"];
+            const ALL_TABLES = ["Table 1", "Table 2", "Table 3", "Table 4", "Table 5", "Table 6", "Table 7", "Table 8", "Table 9", "Table 10", "VIP Room"];
             const cycleStatus = { 'available': 'reserved', 'reserved': 'seated', 'seated': 'cleaning', 'cleaning': 'available' };
 
             function renderFloorPlan() {
@@ -945,7 +1042,7 @@
                     const newTime = document.getElementById(`toast-time-${idx}`)?.value || hist[idx].arrivalTime;
 
                     if (newTime < '10:30' || newTime > '21:00') {
-                        alert('Time must be between 10:30 AM and 9:00 PM.');
+                        superModal({ title: 'Invalid Time 🕒', message: 'Reservations must be between 10:30 AM and 9:00 PM.' });
                         return;
                     }
 
@@ -1078,8 +1175,13 @@
                 listEl.innerHTML = html;
             }
 
-            window.verifyPayment = function(idx) {
-                if(!confirm("Verify and approve this payment?")) return;
+            window.verifyPayment = async function(idx) {
+                const confirmed = await superModal({
+                    title: 'Approve Payment? ✅',
+                    message: 'Are you sure you want to verify and approve this payment?',
+                    type: 'confirm'
+                });
+                if(!confirmed) return;
                 const hist = getReservationHistory();
                 if(hist[idx]) {
                     hist[idx].paymentStatus = 'verified';
@@ -1132,8 +1234,13 @@
                 }
             };
 
-            window.rejectPayment = function(idx) {
-                if(!confirm("Reject this payment? The reservation will be kept but moved back to the pre-order area.")) return;
+            window.rejectPayment = async function(idx) {
+                const confirmed = await superModal({
+                    title: 'Reject Payment? ❌',
+                    message: 'Are you sure you want to reject this payment? The reservation will be kept but moved back to pending status.',
+                    type: 'confirm'
+                });
+                if(!confirmed) return;
                 const hist = getReservationHistory();
                 if(hist[idx]) {
                     // Reset payment fields so it effectively goes back to "Unpaid/Pre-order" status
@@ -1191,10 +1298,6 @@
                 
                 const listEl = document.getElementById('adminChatList');
                 if (listEl) {
-                    Array.from(listEl.children).forEach(child => {
-                        child.classList.remove('active');
-                        if(child.getAttribute('onclick') && child.getAttribute('onclick').includes(sId)) {
-                            child.classList.add('active');
                         }
                     });
                 }
@@ -1246,6 +1349,36 @@
                 reader.readAsDataURL(file);
             };
 
+            window.showNotification = function(text, type = 'success', title = 'System Update') {
+                const container = document.getElementById('notification-container');
+                if (!container) return;
+
+                const id = 'notif_' + Date.now();
+                const div = document.createElement('div');
+                div.className = `custom-notification ${type === 'error' ? 'error-mode' : 'success-mode'}`;
+                div.id = id;
+                
+                div.innerHTML = `
+                    <div class="notification-content">
+                        <div class="notification-title">${title}</div>
+                        <div class="notification-text">${text}</div>
+                    </div>
+                    <button class="notification-close" onclick="this.parentElement.remove()">✕</button>
+                `;
+                
+                container.appendChild(div);
+                
+                // Auto remove after 5 seconds
+                setTimeout(() => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        el.style.transform = 'translateX(100%)';
+                        el.style.opacity = '0';
+                        setTimeout(() => el.remove(), 300);
+                    }
+                }, 5000);
+            };
+
             // Promotions logic
             window.promoBase64 = '';
             
@@ -1267,7 +1400,7 @@
                 const desc = document.getElementById('promo-desc').value.trim();
                 
                 if (!title || !desc || !window.promoBase64) {
-                    alert('Please provide a title, description, and upload an image.');
+                    showNotification('Please provide a title, description, and upload an image.', 'error', 'Action Required');
                     return;
                 }
 
@@ -1290,17 +1423,24 @@
                 window.promoBase64 = '';
                 document.getElementById('promo-upload-input').value = '';
                 
-                alert('Promotion published to homepage!');
+                showNotification('Your promotion is now live on the homepage!', 'success', 'Promo Published');
                 renderPromosAdmin();
             };
 
             window.deletePromo = function(id) {
-                if(confirm('Are you sure you want to remove this promotion?')) {
-                    let promos = safeJsonParse(localStorage.getItem('activePromos'), []);
-                    promos = promos.filter(p => p.id !== id);
-                    localStorage.setItem('activePromos', JSON.stringify(promos));
-                    renderPromosAdmin();
-                }
+                superModal({
+                    title: 'Delete Promotion? 🗑️',
+                    message: 'Are you sure you want to remove this promotion?',
+                    type: 'confirm'
+                }).then(confirmed => {
+                    if(confirmed) {
+                        let promos = safeJsonParse(localStorage.getItem('activePromos'), []);
+                        promos = promos.filter(p => p.id !== id);
+                        localStorage.setItem('activePromos', JSON.stringify(promos));
+                        showNotification('Promotion successfully removed.', 'success', 'Promo Deleted');
+                        renderPromosAdmin();
+                    }
+                });
             };
 
             window.renderPromosAdmin = function() {
@@ -1402,8 +1542,26 @@
                 }, 5000);
             }
 
-            window.deleteItem = function(resObjNum) {
-                if(confirm("Are you sure you want to delete this reservation? This cannot be undone.")) {
+            window.deleteReservation = async function(idx) {
+                const confirmed = await superModal({
+                    title: 'Delete Reservation? 🗑️',
+                    message: 'Are you sure you want to delete this reservation? This action cannot be undone.',
+                    type: 'confirm'
+                });
+                if(!confirmed) return;
+                const hist = getReservationHistory();
+                hist.splice(idx, 1);
+                localStorage.setItem('reservationHistory', JSON.stringify(hist));
+                renderDashboard();
+            };
+
+            window.deleteItem = async function(resObjNum) {
+                const confirmed = await superModal({
+                    title: 'Delete Reservation? 🗑️',
+                    message: 'Are you sure you want to delete this reservation? This action cannot be undone.',
+                    type: 'confirm'
+                });
+                if(confirmed) {
                     const hist = getReservationHistory();
                     const filtered = hist.filter(h => h.reservationNumber !== resObjNum);
                     localStorage.setItem('reservationHistory', JSON.stringify(filtered));
@@ -1428,47 +1586,7 @@
             summaryLine.textContent = `Showing ${history.length} of ${history.length} reservations.`;
             searchInput.addEventListener('input', applySearch);
 
-            const CATEGORIES = [
-                { key: 'Drinks', label: '🍹 Drinks' },
-                { key: 'Food Ingredients', label: '🥩 Food Ingredients' },
-                { key: 'Supplies', label: '🧺 Supplies' },
-                { key: 'Others', label: '📦 Others' },
-                // Legacy support for menu display if needed
-                { key: 'Beef', label: '🥩 Pure Beef Steaks' },
-                { key: 'T-Bone & Sirloin', label: '🦴 T-Bone & Sirloin' },
-                { key: 'Chicken & Fish', label: '🍗 Chicken & Fish' },
-                { key: 'Sandwich & Sides', label: '🍟 Sandwiches & Sides' }
-            ];
-
-            function getAutoCategory(name) {
-                const n = name.toLowerCase();
-                if (n.match(/coke|juice|tea|mango|pineapple|orange|water|pilsen|light|coffee|sugar|creamer|wine|tea/)) return 'Drinks';
-                if (n.match(/rice|meat|fish|sauce|beef|chicken|bangus|mayo|soup|mustard|knorr|lea|tabasco|steak|ribeye|sirloin|t-bone|fillet|mignon|pork|chop|tenderloin/)) return 'Food Ingredients';
-                if (n.match(/tissue|soap|cleaner|cups|towel|napkin|toothpick|placemat|pen|paper|clip|rubber|alcohol|dishwashing|bleach|glade|spoon|fork|knife/)) return 'Supplies';
-                return 'Others';
-            }
-
-            function getInventory() {
-                let inv = localStorage.getItem('inventoryItems');
-                if (!inv) return [];
-                let items = JSON.parse(inv);
-                let mutated = false;
-                items = items.map(i => {
-                    if (i.total_stock === undefined && i.stock !== undefined) {
-                        i.total_stock = i.stock;
-                        mutated = true;
-                    }
-                    if (!i.category) {
-                        i.category = getAutoCategory(i.title || i.name || '');
-                        mutated = true;
-                    }
-                    // Virtual stock for legacy UI
-                    i.stock = (i.total_stock||0) + (i.added_stock||0) - (i.sold_stock||0);
-                    return i;
-                });
-                if (mutated) localStorage.setItem('inventoryItems', JSON.stringify(items));
-                return items;
-            }
+            // Utility removed (consolidated at top)
 
             // Live Inventory View using global helpers
             function renderMenuManagement() {
@@ -1528,8 +1646,13 @@
 
             renderMenuManagement();
 
-            window.deleteInventoryPhoto = function(id) {
-                if(!confirm("Delete this item's photo? It will revert to the default placeholder.")) return;
+            window.deleteInventoryPhoto = async function(id) {
+                const confirmed = await superModal({
+                    title: 'Delete Photo? 🖼️',
+                    message: "Are you sure you want to delete this item's photo? It will revert to the default placeholder.",
+                    type: 'confirm'
+                });
+                if(!confirmed) return;
                 
                 let items = getInventory();
                 const idx = items.findIndex(i => i.id === id);
@@ -1610,7 +1733,7 @@
             auth.classList.add('hidden');
             dashboard.classList.remove('hidden');
 
-            const username = localStorage.getItem('adminLoggedInUser') || '';
+            const username = sessionStorage.getItem('adminLoggedInUser') || '';
             adminStatus.textContent = username ? `Signed in as ${username}` : '';
             logoutBtn.classList.remove('hidden');
 
@@ -1656,7 +1779,7 @@
             
             // Staff heartbeat
             setInterval(() => {
-                const me = localStorage.getItem('adminLoggedInUser');
+                const me = sessionStorage.getItem('adminLoggedInUser');
                 if (me) {
                     const onlineAdmins = safeJsonParse(localStorage.getItem('onlineAdmins'), {});
                     onlineAdmins[me] = Date.now();
@@ -1686,7 +1809,7 @@
             const authMsg2 = document.getElementById('auth-message-2');
 
             const users = getUsers();
-            const sessionUser = localStorage.getItem('adminLoggedInUser');
+            const sessionUser = sessionStorage.getItem('adminLoggedInUser');
 
             const logoutBtn = document.getElementById('logout-admin-btn');
             logoutBtn.onclick = logoutAdmin;
@@ -1695,31 +1818,58 @@
                 return renderDashboard();
             }
 
+            // Admin login (Attach unconditionally)
+            document.getElementById('admin-login-btn').addEventListener('click', async () => {
+                try {
+                    const username = (document.getElementById('admin-username').value || '').trim();
+                    const password = document.getElementById('admin-password').value || '';
+                    authMsg2.textContent = '';
+                    authMsg2.style.color = '#ef4444';
+
+                    if (!username) { authMsg2.textContent = 'Please enter your username.'; return; }
+                    if (!password) { authMsg2.textContent = 'Please enter your password.'; return; }
+
+                    const usersNow = getUsers();
+                    const user = usersNow.find(u => u.username === username);
+                    if (!user) { authMsg2.textContent = 'Account not found. Ensure you created this staff account in the Super Admin dashboard first.'; return; }
+
+                    const passwordHash = await sha256Hex(password);
+                    const isLegacyMatch = !!(user.password && user.password === password);
+                    const isHashMatch = !!(user.passwordHash && user.passwordHash === passwordHash);
+                    
+                    if (!isLegacyMatch && !isHashMatch) { 
+                        authMsg2.textContent = 'Wrong password. Please try again.'; 
+                        return; 
+                    }
+
+                    // Auto-migrate legacy user to hashed password to upgrade security on the fly
+                    if (isLegacyMatch && !user.passwordHash) {
+                        user.passwordHash = passwordHash;
+                        delete user.password;
+                        localStorage.setItem('adminUsers', JSON.stringify(usersNow));
+                    }
+
+                    setAdminSession(username);
+                    renderDashboard();
+                } catch (err) {
+                    authMsg2.textContent = 'CRITICAL LOGIN ERROR: ' + err.message;
+                }
+            });
+
+            // Allow ENTER key to submit
+            const handleEnter = function(e) {
+                if (e.key === 'Enter') {
+                    document.getElementById('admin-login-btn').click();
+                }
+            };
+            document.getElementById('admin-username').addEventListener('keypress', handleEnter);
+            document.getElementById('admin-password').addEventListener('keypress', handleEnter);
+
             if (!users.length) {
                 noAdminUsers.classList.remove('hidden');
                 adminLoginPanel.classList.add('hidden');
                 return;
             }
-
-            // Admin login
-            document.getElementById('admin-login-btn').addEventListener('click', async () => {
-                authMsg2.textContent = '';
-                const username = (document.getElementById('admin-username').value || '').trim();
-                const password = document.getElementById('admin-password').value || '';
-
-                if (!username) return authMsg2.textContent = 'Enter username.';
-                if (!password) return authMsg2.textContent = 'Enter password.';
-
-                const usersNow = getUsers();
-                const user = usersNow.find(u => u.username === username);
-                if (!user) return authMsg2.textContent = 'Account not found.';
-
-                const passwordHash = await sha256Hex(password);
-                if (passwordHash !== user.passwordHash) return authMsg2.textContent = 'Wrong password.';
-
-                setAdminSession(username);
-                renderDashboard();
-            });
 
         }
 
@@ -1954,8 +2104,9 @@
             // Reset form
             document.getElementById('walkin-name').value    = '';
             document.getElementById('walkin-contact').value = '';
-            document.getElementById('walkin-date').value    = '';
-            document.getElementById('walkin-time').value    = '';
+            const now = new Date();
+            document.getElementById('walkin-date').value    = now.toISOString().split('T')[0];
+            document.getElementById('walkin-time').value    = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
             document.getElementById('walkin-table').value   = '';
             document.getElementById('walkin-guests').value  = '';
             document.getElementById('walkin-payment').value = '';
@@ -1975,7 +2126,7 @@
             const walkins = history.filter(r => r.bookedBy === 'staff').reverse().slice(0, 10);
 
             if (!walkins.length) {
-                container.innerHTML = '<div style="color:#aaa; font-style:italic; text-align:center; padding:20px;">No walk-in reservations yet.</div>';
+                container.innerHTML = '<div style="color:#aaa; font-style:italic; text-align:center; padding:20px;">No manual reservations yet.</div>';
                 return;
             }
 
@@ -2005,7 +2156,20 @@
             document.querySelectorAll('.tab-link').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             
-            if (tab === 'walkin') renderRecentWalkins();
+            if (tab === 'walkin') {
+                const dateInput = document.getElementById('walkin-date');
+                const timeInput = document.getElementById('walkin-time');
+                // Auto-set date to today if empty
+                if (dateInput && !dateInput.value) {
+                    dateInput.value = new Date().toISOString().split('T')[0];
+                }
+                // Auto-set time to now if empty
+                if (timeInput && !timeInput.value) {
+                    const now = new Date();
+                    timeInput.value = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+                }
+                renderRecentWalkins();
+            }
             if (tab === 'menu' && typeof renderMenuManagement === 'function') renderMenuManagement();
             if (tab === 'promotions' && typeof renderPromotions === 'function') renderPromotions();
             if (tab === 'payments' && typeof renderPaymentHistory === 'function') renderPaymentHistory();

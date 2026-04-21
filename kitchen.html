@@ -6,6 +6,8 @@
     <title>Cook Area | Roland's Steak House</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/kitchen.css">
+    <link rel="stylesheet" href="css/design-system.css">
+    <script src="js/design-system.js"></script>
     <style>
         /* Auth Gate Style */
         #auth-gate {
@@ -144,14 +146,15 @@
         }
 
         function initKitchen() {
-            if (sessionStorage.getItem('kitchenAuthenticated') === 'true') {
-                document.getElementById('auth-gate').style.display = 'none';
-            }
             renderKitchenQueue(true); // silent initial load
             setInterval(renderKitchenQueue, 5000);
         }
 
-        initKitchen();
+        // On page load: if already authenticated this session, skip the PIN gate
+        if (sessionStorage.getItem('kitchenAuthenticated') === 'true') {
+            document.getElementById('auth-gate').style.display = 'none';
+            initKitchen();
+        }
 
         // QUEUE LOGIC
         let lastHistoryCount = -1;
@@ -311,8 +314,15 @@
             }
         }
 
-        function cancelOrder(idx) {
-            if(!confirm("Are you sure you want to CANCEL this order? It will be removed from the kitchen queue.")) return;
+        async function cancelOrder(idx) {
+            const confirmed = await superModal({
+                title: 'Cancel Order? 🚫',
+                message: 'Are you sure you want to CANCEL this order? It will be removed from the kitchen queue.',
+                type: 'confirm',
+                confirmText: 'Yes, Cancel It',
+                cancelText: 'Keep Cooking'
+            });
+            if(!confirmed) return;
             const hist = getReservationHistory();
             if(hist[idx]) {
                 hist[idx].kdsStatus = 'cancelled';

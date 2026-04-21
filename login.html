@@ -6,6 +6,8 @@
     <title>Authentication - Roland's Steak House</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="css/design-system.css">
+    <script src="js/design-system.js"></script>
 </head>
 <body>
 
@@ -137,7 +139,7 @@
                     localStorage.setItem('loggedInUserName', data.name);
                     window.location.href = 'index.html';
                 } else {
-                    alert('Invalid email or password. Please try again.');
+                    superModal({ title: 'Login Failed ❌', message: 'Invalid email or password. Please try again.' });
                     btn.textContent = 'Sign In';
                     btn.disabled    = false;
                 }
@@ -167,7 +169,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body:    JSON.stringify({ name, email, password })
                 });
-                alert('Account created! Please sign in.');
+                superModal({ title: 'Welcome! 🎉', message: 'Account created! Please sign in with your new credentials.' });
                 switchForm('login-form');
             } catch (err) {
                 // Server offline — log in locally
@@ -184,7 +186,7 @@
         function handleForgot(e) {
             e.preventDefault();
             const email = document.getElementById('forgot-email').value;
-            alert('A password recovery link has been safely sent to ' + email + '.');
+            superModal({ title: 'Email Sent 📧', message: 'A password recovery link has been safely sent to ' + email + '.' });
             document.getElementById('forgot-email').value = '';
             switchForm('login-form');
         }

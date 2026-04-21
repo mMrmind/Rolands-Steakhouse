@@ -7,99 +7,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/gcash.css">
+    <link rel="stylesheet" href="css/design-system.css">
+    <script src="js/design-system.js"></script>
     <style>
-        @keyframes modalFadeIn  { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes modalSlideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-        /* ══════════════════════════════════════════════════════════
-           CUSTOM MODAL SYSTEM (Green & White Style)
-        ══════════════════════════════════════════════════════════ */
-        .super-modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.5);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 99999;
-            padding: 20px;
-            animation: fadeInModal 0.25s ease-out;
-        }
-
-        .super-modal-box {
-            background: white;
-            width: 100%;
-            max-width: 420px;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            border: 1px solid rgba(27, 94, 32, 0.1);
-        }
-
-        .super-modal-header {
-            background: #1b5e20;
-            padding: 18px 25px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .super-modal-header h3 {
-            margin: 0;
-            color: white;
-            font-size: 18px;
-            font-family: 'Playfair Display', serif;
-        }
-
-        .super-modal-body {
-            padding: 25px;
-            text-align: left;
-        }
-
-        .super-modal-body p {
-            margin: 0 0 15px 0;
-            color: #475569;
-            font-size: 15px;
-            line-height: 1.6;
-        }
-
-        .super-modal-footer {
-            padding: 0 25px 25px 25px;
-            display: flex;
-            gap: 12px;
-        }
-
-        .super-modal-btn {
-            flex: 1;
-            padding: 14px;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: none;
-            font-family: 'Roboto', sans-serif;
-        }
-
-        .super-modal-btn.confirm {
-            background: #1b5e20;
-            color: white;
-        }
-
-        .super-modal-btn.confirm:hover {
-            background: #2e7d32;
-            transform: translateY(-2px);
-        }
-
-        .super-modal-btn.cancel {
-            background: #f1f5f9;
-            color: #475569;
-            border: 1px solid #e2e8f0;
-        }
-
-        .super-modal-btn.cancel:hover {
+        .pay-toggle-btn:hover {
             background: #e2e8f0;
         }
 
@@ -213,46 +124,7 @@
         const total = localStorage.getItem('totalBill') || '0';
         document.getElementById('display-amt').textContent = Number(total).toLocaleString();
 
-        // ─────────────────────────────────────────────────────────
-        // MODAL HELPER
-        // ─────────────────────────────────────────────────────────
-        const modalOverlay = document.getElementById('super-modal-root');
 
-        window.superModal = function ({ title = 'Notice', message = '', type = 'alert', confirmText = 'Confirm', cancelText = 'Cancel' }) {
-            return new Promise((resolve) => {
-                const html = `
-                    <div class="super-modal-overlay">
-                        <div class="super-modal-box">
-                            <div class="super-modal-header">
-                                <h3>${title}</h3>
-                            </div>
-                            <div class="super-modal-body">
-                                <p>${message}</p>
-                            </div>
-                            <div class="super-modal-footer">
-                                ${type === 'confirm' ? `<button class="super-modal-btn cancel" id="modal-cancel-btn">${cancelText}</button>` : ''}
-                                <button class="super-modal-btn confirm" id="modal-confirm-btn">${confirmText}</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                modalOverlay.innerHTML = html;
-
-                const confirmBtn = document.getElementById('modal-confirm-btn');
-                const cancelBtn = document.getElementById('modal-cancel-btn');
-
-                confirmBtn.onclick = () => {
-                    modalOverlay.innerHTML = '';
-                    resolve(true);
-                };
-                if (cancelBtn) {
-                    cancelBtn.onclick = () => {
-                        modalOverlay.innerHTML = '';
-                        resolve(false);
-                    };
-                }
-            });
-        };
 
         /* ────────────────────────────────────────
            Back Button Protection
@@ -377,7 +249,7 @@
             const resNo = 'RES-' + Math.floor(100000 + Math.random() * 900000);
             localStorage.setItem('reservationNumber', resNo);
 
-            const history = JSON.parse(localStorage.getItem('reservationHistory') || '[]');
+            const reservationHistory = JSON.parse(localStorage.getItem('reservationHistory') || '[]');
 
             // Inventory stock deduction
             const currentCartStr = localStorage.getItem('currentCartObj');
@@ -431,7 +303,7 @@
                 console.warn('Server offline — saved to localStorage only:', err);
             }
 
-            history.push({
+            reservationHistory.push({
                 reservationNumber:      resNo,
                 reservationType:        'priority',
                 arrivalDate:            dateKey,
@@ -450,7 +322,7 @@
             });
 
             localStorage.removeItem('tempPaymentUpload');
-            localStorage.setItem('reservationHistory', JSON.stringify(history));
+            localStorage.setItem('reservationHistory', JSON.stringify(reservationHistory));
 
             window.onbeforeunload = null;
 

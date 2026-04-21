@@ -6,6 +6,8 @@
     <title>POS Terminal | Roland's Steakhouse</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/html5-qrcode"></script>
+    <link rel="stylesheet" href="css/design-system.css">
+    <script src="js/design-system.js"></script>
     <style>
         :root {
             --primary: #1b5e20;
@@ -516,7 +518,8 @@
             <div style="font-size:60px; margin-bottom:20px;">✅</div>
             <h2 style="font-family:'Playfair Display'; margin:0 0 10px;">Transaction Success</h2>
             <p id="success-msg" style="color:var(--text-muted); font-size:14px; line-height:1.5;">Order saved and inventory updated.</p>
-            <button onclick="closeModals()" class="checkout-btn" style="width:100%; margin-top:20px;">Done</button>
+            <button id="pos-receipt-btn" onclick="openPOSReceipt()" class="checkout-btn" style="width:100%; margin-top:20px; background: #0f172a;">🖨️ Print Receipt</button>
+            <button onclick="closeModals()" class="checkout-btn" style="width:100%; margin-top:10px; background: var(--text-muted);">Done</button>
         </div>
     </div>
 
@@ -532,22 +535,23 @@
 
     <script>
         const CATEGORIES = [
-            { key: 'All',           label: 'All Items' },
-            { key: 'Beef',          label: '🥩 Beef Steaks' },
+            { key: 'All',           label: '🏠 All Items' },
+            { key: 'Beef',          label: '🥩 Beef' },
             { key: 'T-Bone',        label: '🦴 T-Bone' },
-            { key: 'Sirloin Steak', label: '🥩 Sirloin' },
-            { key: 'Chicken & Fish',label: '🍗 Chicken/Fish' },
+            { key: 'Sirloin Steak', label: '🥩 Sirloin Steak' },
+            { key: 'Chicken & Fish',label: '🍗 Chicken & Fish' },
             { key: 'Sandwich',      label: '🍔 Sandwich' },
-            { key: 'Side Orders',   label: '🍟 Sides' },
+            { key: 'Side Orders',   label: '🍟 Side Orders' },
             { key: 'Drinks',        label: '🍹 Drinks' },
-            { key: 'Wines',         label: '🍷 Wines' },
-            { key: 'Supplies',      label: '🧺 Supplies/Other' }
+            { key: 'Wines',         label: '🍷 Wines' }
         ];
 
         let currentCat = "All";
         let cart = {};
         let scanner = null;
         let currentPin = "";
+        let lastTransactionId = null;
+
         function appendPin(num) {
             if(currentPin.length >= 4) return;
             currentPin += num;
@@ -606,39 +610,170 @@
         }
 
         function getInventory() {
-            const inv = localStorage.getItem('inventoryItems');
-            if(!inv) return [];
-            let items = JSON.parse(inv);
-            return items.map(i => {
-                const name = (i.title || i.name || "").toLowerCase();
-                // [SELF-HEALING] Match POS categories to official menu logic
-                if (i.category === 'Food Ingredients' || i.category === 'Others' || i.category === 'Supplies') {
-                    if (name.match(/fillet mignon|tenderloin|rib eye|hamburger steak|beef|ribeye/)) i.category = 'Beef';
-                    else if (name.match(/t-bone|porterhouse|porter house/)) i.category = 'T-Bone';
-                    else if (name.match(/sirloin/)) i.category = 'Sirloin Steak';
-                    else if (name.match(/chicken|fish|bangus|salmon/)) i.category = 'Chicken & Fish';
-                    else if (name.match(/burger|sandwich|hamburger|cheeseburger/)) i.category = 'Sandwich';
-                    else if (name.match(/rice|fries|salad|soup|bread|garlic|potato|mash/)) i.category = 'Side Orders';
-                    else if (name.match(/wine|carlo rossi|adega/)) i.category = 'Wines';
-                    else if (name.match(/juice|tea|coffee|coke|sprite|water|royal|pilsen|lemonade|calamansi/)) i.category = 'Drinks';
-                }
-                
-                // Keep Wine separate from generic drinks
-                if (i.category === 'Drinks' && name.match(/wine|carlo rossi|adega/)) i.category = 'Wines';
-                if (i.category === 'T-Bone & Sirloin') {
-                    if (name.match(/sirloin/)) i.category = 'Sirloin Steak';
-                    else i.category = 'T-Bone';
-                }
-                if (i.category === 'Sandwich & Sides') {
-                    if (name.match(/burger|sandwich/)) i.category = 'Sandwich';
-                    else i.category = 'Side Orders';
+            try {
+                const inv = localStorage.getItem('inventoryItems');
+                let invItems = [];
+
+                if (inv) {
+                    try {
+                        const parsed = JSON.parse(inv);
+                        if (Array.isArray(parsed)) invItems = parsed;
+                    } catch (e) {
+                        console.error("POS Inventory Parse Error:", e);
+                    }
                 }
 
-                // Support both schemas for stock display
-                i.stock_val = (i.total_stock||0) + (i.added_stock||0) - (i.sold_stock||0);
-                if (i.total_stock === undefined && i.stock !== undefined) i.stock_val = i.stock;
-                return i;
-            });
+                // Legacy ID Migration
+                if (invItems.length > 0) {
+                    const legacyMap = {
+                        'm5':'INV-B1','m6':'INV-B2','m7':'INV-B3','m8':'INV-B4','m9':'INV-B5',
+                        't1':'INV-T1','t2':'INV-T2','t3':'INV-T3','t4':'INV-T4','t5':'INV-T5',
+                        's1':'INV-S1','s2':'INV-S2','s3':'INV-S3','s4':'INV-S4',
+                        'm1':'INV-CF1','m2':'INV-CF2','m3':'INV-CF3','m4':'INV-CF4',
+                        'sw1':'INV-SW1','sw2':'INV-SW2','sw3':'INV-SW3','sw4':'INV-SW4','sw5':'INV-SW5',
+                        'sd1':'INV-SO1','sd2':'INV-SO2','sd3':'INV-SO3','sd4':'INV-SO4','sd5':'INV-SO5','sd6':'INV-SO6','sd7':'INV-SO7','sd8':'INV-SO8',
+                        'd1':'INV-D1', 'd2':'INV-D2', 'd3':'INV-D3', 'd4':'INV-D4', 'd5':'INV-D5', 'd6':'INV-D6', 'd7':'INV-D7', 'd8':'INV-D8', 'd9':'INV-D9', 'd10':'INV-D10', 
+                        'd11':'INV-D11', 'd12':'INV-D12', 'd13':'INV-D13', 'd14':'INV-D14', 'd15':'INV-D15', 'd16':'INV-D16',
+                        'w1':'INV-W1', 'w2':'INV-W2', 'w3':'INV-W3'
+                    };
+                    let migrated = false;
+                    invItems.forEach(i => {
+                        if (legacyMap[i.id]) {
+                            i.id = legacyMap[i.id];
+                            migrated = true;
+                        }
+                    });
+                    if (migrated) {
+                        const unique = [];
+                        const seen = new Set();
+                        invItems.forEach(i => {
+                            if (!seen.has(i.id)) {
+                                seen.add(i.id);
+                                unique.push(i);
+                            } else {
+                                const existing = unique.find(u => u.id === i.id);
+                                if (i.image && !existing.image) existing.image = i.image;
+                            }
+                        });
+                        invItems = unique;
+                    }
+                }
+
+                // Full default menu — always used as the base
+                const defaultItems = [
+                    // Beef
+                    { id:'INV-B1', title:'Fillet Mignon', category:'Beef', price:935, stock: 100 },
+                    { id:'INV-B2', title:'Tenderloin Steak (200g)', category:'Beef', price:740, stock: 100 },
+                    { id:'INV-B3', title:'Tenderloin Tips (200g)', category:'Beef', price:740, stock: 100 },
+                    { id:'INV-B4', title:'Rib Eye Steak (200g-350g)', category:'Beef', price:675, stock: 100 },
+                    { id:'INV-B5', title:'Hamburger Steak (204g)', category:'Beef', price:505, stock: 100 },
+                    // T-Bone
+                    { id:'INV-T1', title:'T-Bone Medium (250g-400g)', category:'T-Bone', price:715, stock: 100 },
+                    { id:'INV-T2', title:'T-Bone Large (550g-650g)', category:'T-Bone', price:790, stock: 100 },
+                    { id:'INV-T3', title:'T-Bone Extra Large', category:'T-Bone', price:865, stock: 100 },
+                    { id:'INV-T4', title:'T-Bone XX Large', category:'T-Bone', price:940, stock: 100 },
+                    { id:'INV-T5', title:'Porter House (551g-600g)', category:'T-Bone', price:1015, stock: 100 },
+                    // Sirloin
+                    { id:'INV-S1', title:'Sirloin Mini (250g-300g)', category:'Sirloin Steak', price:485, stock: 100 },
+                    { id:'INV-S2', title:'Sirloin Small (251g-350g)', category:'Sirloin Steak', price:545, stock: 100 },
+                    { id:'INV-S3', title:'Sirloin Mid Size (351g-450g)', category:'Sirloin Steak', price:605, stock: 100 },
+                    { id:'INV-S4', title:'Sirloin Big Size (401g-450g)', category:'Sirloin Steak', price:670, stock: 100 },
+                    // Chicken & Fish
+                    { id:'INV-CF1', title:'Whole Chicken', category:'Chicken & Fish', price:660, stock: 100 },
+                    { id:'INV-CF2', title:'Half Chicken', category:'Chicken & Fish', price:335, stock: 100 },
+                    { id:'INV-CF3', title:'Fish Steak (Tanigue)', category:'Chicken & Fish', price:495, stock: 100 },
+                    { id:'INV-CF4', title:'Bangus Steak', category:'Chicken & Fish', price:510, stock: 100 },
+                    // Sandwich
+                    { id:'INV-SW1', title:'Big Sunny Burger with Fries', category:'Sandwich', price:430, stock: 100 },
+                    { id:'INV-SW2', title:'Big Sunny Steak Sandwich with Fries', category:'Sandwich', price:400, stock: 100 },
+                    { id:'INV-SW3', title:'Steak Sandwich', category:'Sandwich', price:165, stock: 100 },
+                    { id:'INV-SW4', title:'Cheeseburger', category:'Sandwich', price:170, stock: 100 },
+                    { id:'INV-SW5', title:'Hamburger', category:'Sandwich', price:160, stock: 100 },
+                    // Drinks
+                    { id:'INV-D1', title:'Mango Juice', category:'Drinks', price:135, stock: 100 },
+                    { id:'INV-D2', title:'Four Seasons', category:'Drinks', price:95, stock: 100 },
+                    { id:'INV-D3', title:'Pineapple Juice', category:'Drinks', price:95, stock: 100 },
+                    { id:'INV-D4', title:'Pine-Orange Juice', category:'Drinks', price:90, stock: 100 },
+                    { id:'INV-D5', title:'Iced Tea', category:'Drinks', price:85, stock: 100 },
+                    { id:'INV-D6', title:'Cucumber Juice', category:'Drinks', price:90, stock: 100 },
+                    { id:'INV-D7', title:'Blue Lemonade', category:'Drinks', price:95, stock: 100 },
+                    { id:'INV-D8', title:'Calamansi Juice (Hot/Cold)', category:'Drinks', price:70, stock: 100 },
+                    { id:'INV-D9', title:'Coke in Can', category:'Drinks', price:95, stock: 100 },
+                    { id:'INV-D10', title:'Sprite | Royal in Can', category:'Drinks', price:95, stock: 100 },
+                    { id:'INV-D11', title:'San Miguel Pale Pilsen', category:'Drinks', price:85, stock: 100 },
+                    { id:'INV-D12', title:'San Mig Light', category:'Drinks', price:95, stock: 100 },
+                    { id:'INV-D13', title:'Hot Tea', category:'Drinks', price:70, stock: 100 },
+                    { id:'INV-D14', title:'Drip Coffee', category:'Drinks', price:85, stock: 100 },
+                    { id:'INV-D15', title:'Coffee with Cream', category:'Drinks', price:55, stock: 100 },
+                    { id:'INV-D16', title:'Bottled Water (500ml)', category:'Drinks', price:35, stock: 100 },
+                    // Wines
+                    { id:'INV-W1', title:'Carlo Rossi (Red Wine)', category:'Wines', price:700, stock: 100 },
+                    { id:'INV-W2', title:'Carlo Rossi (White Wine)', category:'Wines', price:700, stock: 100 },
+                    { id:'INV-W3', title:'Adega De Pegoos', category:'Wines', price:600, stock: 100 },
+                    // Sides
+                    { id:'INV-SO1', title:'Cream of Mushroom Soup', category:'Side Orders', price:80, stock: 100 },
+                    { id:'INV-SO2', title:'Cream of Chicken Soup', category:'Side Orders', price:80, stock: 100 },
+                    { id:'INV-SO3', title:'Mashed Potato', category:'Side Orders', price:90, stock: 100 },
+                    { id:'INV-SO4', title:'Potato Salad', category:'Side Orders', price:155, stock: 100 },
+                    { id:'INV-SO5', title:'French Fries', category:'Side Orders', price:155, stock: 100 },
+                    { id:'INV-SO6', title:'Garlic Bread', category:'Side Orders', price:45, stock: 100 },
+                    { id:'INV-SO7', title:'Garlic Rice', category:'Side Orders', price:55, stock: 100 },
+                    { id:'INV-SO8', title:'Plain Rice', category:'Side Orders', price:40, stock: 100 }
+                ];
+
+                const validCats = ['Beef', 'T-Bone', 'Sirloin Steak', 'Chicken & Fish', 'Sandwich', 'Side Orders', 'Drinks', 'Wines', 'Supplies', 'Others'];
+
+                // Normalize category and compute stock_val for a single item
+                function normalizeItem(i) {
+                    const name = (i.title || i.name || "").toLowerCase();
+
+                    if (!validCats.includes(i.category) || i.category === 'Food Ingredients') {
+                        if (name.match(/fillet mignon|tenderloin|rib eye|hamburger steak|beef|ribeye/)) i.category = 'Beef';
+                        else if (name.match(/t-bone|porterhouse|porter house/)) i.category = 'T-Bone';
+                        else if (name.match(/sirloin/)) i.category = 'Sirloin Steak';
+                        else if (name.match(/chicken|fish|bangus|tanigue|salmon|seafood/)) i.category = 'Chicken & Fish';
+                        else if (name.match(/burger|sandwich|hamburger|cheeseburger/)) i.category = 'Sandwich';
+                        else if (name.match(/rice|fries|salad|soup|bread|garlic|potato|mash/)) i.category = 'Side Orders';
+                        else if (name.match(/wine|carlo rossi|adega|pegoes|rossi/)) i.category = 'Wines';
+                        else if (name.match(/juice|tea|coffee|coke|sprite|water|royal|pilsen|lemonade|calamansi|beer|san mig|light|drip|cucumber|four seasons/)) i.category = 'Drinks';
+                        else i.category = 'Others';
+                    }
+
+                    // Keep Wine separate from generic drinks
+                    if (i.category === 'Drinks' && name.match(/wine|carlo rossi|adega/)) i.category = 'Wines';
+
+                    // Support both stock schemas
+                    i.stock_val = (i.total_stock !== undefined)
+                        ? (i.total_stock || 0) + (i.added_stock || 0) - (i.sold_stock || 0)
+                        : (i.stock || 0);
+                    if (i.stock_val < 0) i.stock_val = 0;
+                    return i;
+                }
+
+                // Build a map of inventory items keyed by ID
+                const invMap = {};
+                invItems.forEach(i => { if (i.id) invMap[i.id] = normalizeItem(i); });
+
+                // Merge: defaults as base, inventory values override matching IDs property-by-property
+                const merged = defaultItems.map(def => {
+                    const saved = invMap[def.id] || {};
+                    // Merge property by property to ensure image is kept
+                    return { ...normalizeItem(def), ...saved };
+                });
+
+                // Append any inventory-only items that aren't in the defaults (custom items)
+                invItems.forEach(i => {
+                    if (i.id && !merged.find(m => m.id === i.id)) {
+                        merged.push(normalizeItem(i));
+                    }
+                });
+
+                return merged;
+
+            } catch (err) {
+                console.error("Critical POS Inventory Crash:", err);
+                return [];
+            }
         }
 
         function renderProducts() {
@@ -666,8 +801,7 @@
             const items = getInventory();
             const item = items.find(i => i.id === id);
             if (!item || item.stock_val <= 0) {
-                alert("Out of stock!");
-                return;
+                return superModal({ title: 'Out of Stock 🥩', message: 'This item is currently unavailable.' });
             }
 
             if (cart[id]) {
@@ -728,13 +862,13 @@
 
         /* --- CHECKOUT --- */
         function processCheckout() {
-            if (Object.keys(cart).length === 0) return alert("Add items to finalize.");
+            if (Object.keys(cart).length === 0) return superModal({ title: 'Empty Cart 🛒', message: 'Please add items to the order before finalizing.' });
             
             const table = document.getElementById('order-table').value;
             const guests = document.getElementById('order-guests').value;
             const name = document.getElementById('order-name').value || 'Walk-in Guest';
 
-            if (!table) return alert("Select a table first.");
+            if (!table) return superModal({ title: 'Table Required 📍', message: 'Please select a table to complete the transaction.' });
 
             // 1. Deduct Stock
             const items = JSON.parse(localStorage.getItem('inventoryItems') || '[]');
@@ -788,8 +922,14 @@
             
             renderProducts();
             
+            lastTransactionId = resNo;
             document.getElementById('success-msg').innerHTML = `Transaction <b>${resNo}</b> saved successfully! Stock updated in real-time.`;
             document.getElementById('modal-success').style.display = 'flex';
+        }
+
+        function openPOSReceipt() {
+            if (!lastTransactionId) return;
+            window.open(`receipt.html?res=${lastTransactionId}`, '_blank');
         }
 
         /* --- SCANNER LOGIC --- */
@@ -813,7 +953,7 @@
                     onScanSuccess
                 );
             } catch (err) {
-                alert("Camera error: " + err);
+                superModal({ title: 'Camera Error 📸', message: 'Could not access camera: ' + err });
                 stopScanner();
             }
         }

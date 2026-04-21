@@ -13,6 +13,8 @@
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link rel="stylesheet" href="css/superadmin.css">
+    <link rel="stylesheet" href="css/design-system.css">
+    <script src="js/design-system.js"></script>
 </head>
 
 <body>
@@ -52,8 +54,6 @@
                 <button class="tab-link" onclick="switchTab('staff', this)">Staff Accounts</button>
                 <button class="tab-link" onclick="switchTab('inventory', this)">Inventory</button>
                 <button class="tab-link" onclick="switchTab('kitchen', this)">🍳 Kitchen Settings</button>
-                <button class="tab-link" style="color: #ef4444;" onclick="switchTab('danger', this)">Danger
-                    Zone</button>
             </div>
 
             <!-- OVERVIEW TAB -->
@@ -85,7 +85,7 @@
                         <div class="value" id="stat-admins">0</div>
                     </div>
                     <div class="card">
-                        <h3>Walk-in Reservations</h3>
+                        <h3>Manual Reservations</h3>
                         <div class="value" id="stat-walkins">0</div>
                     </div>
                     <div class="card" style="border: 1px solid #4ade80; background: rgba(74, 222, 128, 0.05);">
@@ -174,17 +174,30 @@
             <div id="tab-inventory" class="superadmin-tab-content">
                 <div class="stat-filter-row">
                     <h2 class="section-title" style="margin: 0; border: none; padding: 0;">Inventory Intelligence</h2>
-                    <div style="display: flex; gap: 12px; align-items: center;">
-                        <button type="button" class="filter-btn" onclick="openOCRModal()"
-                            style="background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%); color: white; box-shadow: 0 4px 10px rgba(27,94,32,0.2); border: none;">📂
-                            Scan Handwritten Sheet</button>
+                    <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
                         <button type="button" class="filter-btn secondary" onclick="exportInventoryReport()"
                             style="border: 1px solid #e2e8f0; background: white;">📊 Export Report</button>
+                        <button type="button" class="filter-btn" id="bulk-edit-btn" onclick="toggleBulkEdit()"
+                            style="background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0;">✏️ Bulk
+                            Restock</button>
                         <button type="button" class="filter-btn" onclick="openInventoryModal()"
                             style="background: linear-gradient(135deg, #2e7d32 0%, #388e3c 100%); color: white; box-shadow: 0 4px 10px rgba(46,125,50,0.2); border: none;">+
                             Add Item</button>
                     </div>
                 </div>
+
+                <div class="inv-top-bar">
+                    <div class="inv-search-wrap">
+                        <input type="text" id="inv-search-input" placeholder="Search inventory items..."
+                            oninput="renderInventory()">
+                    </div>
+                    <div id="bulk-controls" class="hidden">
+                        <button type="button" onclick="saveBulkInventory()"
+                            style="background: #1b5e20; color: white; padding: 10px 20px;">Save Bulk Changes</button>
+                        <button type="button" class="secondary" onclick="toggleBulkEdit()">Cancel</button>
+                    </div>
+                </div>
+
 
                 <!-- INVENTORY DASHBOARD -->
                 <div class="grid" style="margin-bottom: 24px;">
@@ -230,7 +243,6 @@
                             <tr>
                                 <th>Item Name</th>
                                 <th>Total Stock</th>
-                                <th>In Chiller</th>
                                 <th>Added</th>
                                 <th>Sold</th>
                                 <th>End of Day</th>
@@ -253,6 +265,24 @@
                         </div>
                         <div class="super-modal-body">
                             <input type="hidden" id="inv-id">
+
+                            <!-- Item Image Upload -->
+                            <div style="margin-bottom: 20px; text-align: center;">
+                                <div id="inv-img-preview-container"
+                                    style="width: 100px; height: 100px; margin: 0 auto 10px; border: 2px dashed #e2e8f0; border-radius: 50%; overflow: hidden; background: #f8fafc; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;"
+                                    onclick="document.getElementById('inv-image-input').click()">
+                                    <img id="inv-img-preview" src=""
+                                        style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                                    <div id="inv-img-placeholder" style="color: #94a3b8; font-size: 24px;">📸</div>
+                                </div>
+                                <input type="file" id="inv-image-input" accept="image/*" style="display: none;"
+                                    onchange="handleInvImageUpload(this)">
+                                <button type="button" class="secondary" style="font-size: 11px; padding: 4px 10px;"
+                                    onclick="document.getElementById('inv-image-input').click()">Upload Photo</button>
+                                <button id="remove-inv-img-btn" type="button" class="danger"
+                                    style="font-size: 11px; padding: 4px 10px; display: none; margin-left: 5px;"
+                                    onclick="removeInvImage()">Remove</button>
+                            </div>
 
                             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
                                 <div>
@@ -283,23 +313,13 @@
                                 </div>
                             </div>
 
-                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-top:20px;">
-                                <div>
-                                    <label
-                                        style="display:block; margin-bottom:8px; font-weight:700; font-size:13px; color:#64748b;">Initial
-                                        Stock</label>
-                                    <input type="number" id="inv-stock"
-                                        style="width: 100%; padding:12px; border:1px solid #e2e8f0; border-radius:10px; background:#f8fafc;"
-                                        value="0">
-                                </div>
-                                <div>
-                                    <label
-                                        style="display:block; margin-bottom:8px; font-weight:700; font-size:13px; color:#64748b;">In
-                                        Chiller</label>
-                                    <input type="number" id="inv-chiller"
-                                        style="width: 100%; padding:12px; border:1px solid #e2e8f0; border-radius:10px; background:#f8fafc;"
-                                        value="0">
-                                </div>
+                            <div style="margin-top:20px;">
+                                <label
+                                    style="display:block; margin-bottom:8px; font-weight:700; font-size:13px; color:#64748b;">Initial
+                                    Stock</label>
+                                <input type="number" id="inv-stock"
+                                    style="width: 100%; padding:12px; border:1px solid #e2e8f0; border-radius:10px; background:#f8fafc;"
+                                    value="0">
                             </div>
 
                             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-top:20px;">
@@ -378,7 +398,6 @@
                                             <tr>
                                                 <th style="padding: 12px 16px;">Match Item</th>
                                                 <th>Total</th>
-                                                <th>Chiller</th>
                                                 <th>Add</th>
                                                 <th>Sold</th>
                                             </tr>
@@ -402,68 +421,74 @@
     </div>
 
     <!-- KITCHEN & POS TAB -->
-    <div id="tab-kitchen" class="superadmin-tab-content">
-        <h2 class="section-title" style="margin-top: 0;">Operations Security Control</h2>
+    <div id="tab-kitchen" class="superadmin-tab-content" style="padding-bottom: 50px;">
+        <h2 class="section-title"
+            style="margin-top: 20px; margin-bottom: 30px; text-align: center; border-bottom: none;">Operations Security
+            Control</h2>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+        <div
+            style="max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 30px;">
             <!-- Kitchen Access -->
-            <div class="card">
-                <div style="font-size: 32px; margin-bottom: 15px;">🍳</div>
-                <h3 style="margin: 0 0 10px; color: #1b5e20;">Kitchen Area Security</h3>
-                <p style="color:#64748b; font-size:13px; margin-bottom: 20px; min-height: 40px;">Set the 4-digit access
-                    code for the independent Cook Area. Kitchen staff will need this code to view the live queue.</p>
+            <div class="card"
+                style="display: flex; flex-direction: column; justify-content: space-between; border-radius: 16px; transition: transform 0.2s; background: white; padding: 25px;">
+                <div>
+                    <div style="font-size: 32px; margin-bottom: 15px;">🍳</div>
+                    <h3 style="margin: 0 0 10px; color: #1b5e20; font-size: 18px;">Kitchen Area Security</h3>
+                    <p style="color:#64748b; font-size:14px; margin-bottom: 25px; line-height: 1.5;">Set the 4-digit
+                        access
+                        code for the independent Cook Area. Kitchen staff will need this code to view the live queue.
+                    </p>
+                </div>
 
-                <label
-                    style="display:block; margin-bottom:8px; font-weight:700; color:#444; font-size: 12px; text-transform: uppercase;">Kitchen
-                    Access Code</label>
-                <div style="display:flex; gap:10px;">
-                    <input id="kitchen-password-input" type="password" placeholder="••••" maxlength="4"
-                        style="flex:1; padding:12px; border:1px solid #cbd5e1; border-radius:8px; font-size:16px; letter-spacing:8px; text-align: center; background: #f8fafc;">
-                    <button type="button" onclick="window.saveKitchenPassword()"
-                        style="background:#2e7d32; color:white; border:none; padding:0 20px; border-radius:8px; font-weight:bold; cursor:pointer; transition: 0.2s;"
-                        onmouseover="this.style.background='#1b5e20'" onmouseout="this.style.background='#2e7d32'">
-                        Update
-                    </button>
+                <div>
+                    <label
+                        style="display:block; margin-bottom:12px; font-weight:700; color:#475569; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Kitchen
+                        Access Code</label>
+                    <div style="display:flex; gap:12px;">
+                        <input id="kitchen-password-input" type="password" placeholder="••••" maxlength="4"
+                            style="flex:1; padding:14px; border:1px solid #e2e8f0; border-radius:10px; font-size:18px; letter-spacing:8px; text-align: center; background: #f8fafc; font-weight: 700;">
+                        <button type="button" onclick="window.saveKitchenPassword()"
+                            style="background:#1b5e20; color:white; border:none; padding:0 24px; border-radius:10px; font-weight:bold; cursor:pointer; transition: all 0.2s; font-size: 14px;"
+                            onmouseover="this.style.background='#2e7d32'; this.style.transform='translateY(-1px)'"
+                            onmouseout="this.style.background='#1b5e20'; this.style.transform='translateY(0)'">
+                            Update
+                        </button>
+                    </div>
                 </div>
             </div>
 
             <!-- POS Access -->
-            <div class="card">
-                <div style="font-size: 32px; margin-bottom: 15px;">🏛️</div>
-                <h3 style="margin: 0 0 10px; color: #1b5e20;">POS Terminal Security</h3>
-                <p style="color:#64748b; font-size:13px; margin-bottom: 20px; min-height: 40px;">Set the 4-digit access
-                    code for the POS Terminal. Cashiers will need this code to process payments and verify receipts.</p>
+            <div class="card"
+                style="display: flex; flex-direction: column; justify-content: space-between; border-radius: 16px; transition: transform 0.2s; background: white; padding: 25px;">
+                <div>
+                    <div style="font-size: 32px; margin-bottom: 15px;">🏛️</div>
+                    <h3 style="margin: 0 0 10px; color: #1b5e20; font-size: 18px;">POS Terminal Security</h3>
+                    <p style="color:#64748b; font-size:14px; margin-bottom: 25px; line-height: 1.5;">Set the 4-digit
+                        access
+                        code for the POS Terminal. Cashiers will need this code to process payments and verify receipts.
+                    </p>
+                </div>
 
-                <label
-                    style="display:block; margin-bottom:8px; font-weight:700; color:#444; font-size: 12px; text-transform: uppercase;">POS
-                    Access Code</label>
-                <div style="display:flex; gap:10px;">
-                    <input id="pos-password-input" type="password" placeholder="••••" maxlength="4"
-                        style="flex:1; padding:12px; border:1px solid #cbd5e1; border-radius:8px; font-size:16px; letter-spacing:8px; text-align: center; background: #f8fafc;">
-                    <button type="button" onclick="window.savePosPassword()"
-                        style="background:#2e7d32; color:white; border:none; padding:0 20px; border-radius:8px; font-weight:bold; cursor:pointer; transition: 0.2s;"
-                        onmouseover="this.style.background='#1b5e20'" onmouseout="this.style.background='#2e7d32'">
-                        Update
-                    </button>
+                <div>
+                    <label
+                        style="display:block; margin-bottom:12px; font-weight:700; color:#475569; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">POS
+                        Access Code</label>
+                    <div style="display:flex; gap:12px;">
+                        <input id="pos-password-input" type="password" placeholder="••••" maxlength="4"
+                            style="flex:1; padding:14px; border:1px solid #e2e8f0; border-radius:10px; font-size:18px; letter-spacing:8px; text-align: center; background: #f8fafc; font-weight: 700;">
+                        <button type="button" onclick="window.savePosPassword()"
+                            style="background:#1b5e20; color:white; border:none; padding:0 24px; border-radius:10px; font-weight:bold; cursor:pointer; transition: all 0.2s; font-size: 14px;"
+                            onmouseover="this.style.background='#2e7d32'; this.style.transform='translateY(-1px)'"
+                            onmouseout="this.style.background='#1b5e20'; this.style.transform='translateY(0)'">
+                            Update
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- DANGER TAB -->
-    <div id="tab-danger" class="superadmin-tab-content">
-        <h2 class="section-title" style="margin-top: 0;">Danger Zone</h2>
-        <div class="settings-panel">
-            <h3>System Overrides (Irreversible Actions)</h3>
-            <p class="muted" style="margin-bottom: 15px;">Use extreme caution. These actions apply to all local
-                browser storage for this application.</p>
-            <div class="danger-actions">
-                <button type="button" id="clear-history-btn" class="danger">Purge All Reservations</button>
-                <button type="button" id="clear-admins-btn" class="danger">Revoke All Staff Admin
-                    Accounts</button>
-            </div>
-        </div>
-    </div>
+    <div style="height: 40px;"></div>
 
     <div style="height: 40px;"></div>
     </div>
@@ -892,49 +917,272 @@
             renderStaffManagement();
 
             // --- INVENTORY MANAGEMENT LOGIC ---
-            // --- INVENTORY MANAGEMENT LOGIC ---
             function getInventory() {
-                let inv = localStorage.getItem('inventoryItems');
-                if (!inv) {
-                    const defaultMenu = [
-                        { id: 'm5', title: 'Fillet Mignon', category: 'Beef', total_stock: 50 },
-                        { id: 't1', title: 'T-Bone Medium', category: 'T-Bone', total_stock: 50 },
-                        { id: 's1', title: 'Sirloin Mini', category: 'Sirloin Steak', total_stock: 50 },
-                        { id: 'm1', title: 'Whole Chicken', category: 'Chicken & Fish', total_stock: 50 },
-                        { id: 'sw1', title: 'Big Sunny Burger', category: 'Sandwich', total_stock: 50 },
-                        { id: 'sd1', title: 'Cream of Mushroom Soup', category: 'Side Orders', total_stock: 50 },
-                        { id: 'd1', title: 'Mango Juice', category: 'Drinks', total_stock: 50 },
-                        { id: 'w1', title: 'Carlo Rossi (Red)', category: 'Wines', total_stock: 50 }
+                try {
+                    let inv = localStorage.getItem('inventoryItems');
+                    let savedItems = [];
+
+                    if (inv) {
+                        try {
+                            const parsed = JSON.parse(inv);
+                            if (Array.isArray(parsed)) savedItems = parsed;
+                        } catch (e) {
+                            console.error("Inventory JSON corrupt:", e);
+                        }
+                    }
+
+                    // Migration for legacy IDs (e.g., m5 -> INV-B1)
+                    if (savedItems.length > 0) {
+                        const legacyMap = {
+                            'm5': 'INV-B1', 'm6': 'INV-B2', 'm7': 'INV-B3', 'm8': 'INV-B4', 'm9': 'INV-B5',
+                            't1': 'INV-T1', 't2': 'INV-T2', 't3': 'INV-T3', 't4': 'INV-T4', 't5': 'INV-T5',
+                            's1': 'INV-S1', 's2': 'INV-S2', 's3': 'INV-S3', 's4': 'INV-S4',
+                            'm1': 'INV-CF1', 'm2': 'INV-CF2', 'm3': 'INV-CF3', 'm4': 'INV-CF4',
+                            'sw1': 'INV-SW1', 'sw2': 'INV-SW2', 'sw3': 'INV-SW3', 'sw4': 'INV-SW4', 'sw5': 'INV-SW5',
+                            'sd1': 'INV-SO1', 'sd2': 'INV-SO2', 'sd3': 'INV-SO3', 'sd4': 'INV-SO4', 'sd5': 'INV-SO5', 'sd6': 'INV-SO6', 'sd7': 'INV-SO7', 'sd8': 'INV-SO8',
+                            'd1': 'INV-D1', 'd2': 'INV-D2', 'd3': 'INV-D3', 'd4': 'INV-D4', 'd5': 'INV-D5', 'd6': 'INV-D6', 'd7': 'INV-D7', 'd8': 'INV-D8', 'd9': 'INV-D9', 'd10': 'INV-D10', 'd11': 'INV-D11', 'd12': 'INV-D12', 'd13': 'INV-D13', 'd14': 'INV-D14', 'd15': 'INV-D15', 'd16': 'INV-D16',
+                            'w1': 'INV-W1', 'w2': 'INV-W2', 'w3': 'INV-W3'
+                        };
+                        let migrated = false;
+                        savedItems.forEach(i => {
+                            if (legacyMap[i.id]) {
+                                i.id = legacyMap[i.id];
+                                migrated = true;
+                            }
+                        });
+                        if (migrated) {
+                            const unique = [];
+                            const seen = new Set();
+                            savedItems.forEach(i => {
+                                if (!seen.has(i.id)) {
+                                    seen.add(i.id);
+                                    unique.push(i);
+                                } else {
+                                    const existing = unique.find(u => u.id === i.id);
+                                    if (i.image && !existing.image) existing.image = i.image;
+                                }
+                            });
+                            savedItems = unique;
+                        }
+                    }
+
+                    // Full canonical menu — always the base so no category ever goes missing
+                    const menuDefaults = [
+                        { id: 'INV-B1', title: 'Fillet Mignon', category: 'Beef', price: 935 },
+                        { id: 'INV-B2', title: 'Tenderloin Steak (200g)', category: 'Beef', price: 740 },
+                        { id: 'INV-B3', title: 'Tenderloin Tips (200g)', category: 'Beef', price: 740 },
+                        { id: 'INV-B4', title: 'Rib Eye Steak (200g-350g)', category: 'Beef', price: 675 },
+                        { id: 'INV-B5', title: 'Hamburger Steak (204g)', category: 'Beef', price: 505 },
+                        { id: 'INV-T1', title: 'T-Bone Medium (250g-400g)', category: 'T-Bone', price: 715 },
+                        { id: 'INV-T2', title: 'T-Bone Large (550g-650g)', category: 'T-Bone', price: 790 },
+                        { id: 'INV-T3', title: 'T-Bone Extra Large', category: 'T-Bone', price: 865 },
+                        { id: 'INV-T4', title: 'T-Bone XX Large', category: 'T-Bone', price: 940 },
+                        { id: 'INV-T5', title: 'Porter House (551g-600g)', category: 'T-Bone', price: 1015 },
+                        { id: 'INV-S1', title: 'Sirloin Mini (250g-300g)', category: 'Sirloin Steak', price: 485 },
+                        { id: 'INV-S2', title: 'Sirloin Small (251g-350g)', category: 'Sirloin Steak', price: 545 },
+                        { id: 'INV-S3', title: 'Sirloin Mid Size (351g-450g)', category: 'Sirloin Steak', price: 605 },
+                        { id: 'INV-S4', title: 'Sirloin Big Size (401g-450g)', category: 'Sirloin Steak', price: 670 },
+                        { id: 'INV-CF1', title: 'Whole Chicken', category: 'Chicken & Fish', price: 660 },
+                        { id: 'INV-CF2', title: 'Half Chicken', category: 'Chicken & Fish', price: 335 },
+                        { id: 'INV-CF3', title: 'Fish Steak (Tanigue)', category: 'Chicken & Fish', price: 495 },
+                        { id: 'INV-CF4', title: 'Bangus Steak', category: 'Chicken & Fish', price: 510 },
+                        { id: 'INV-SW1', title: 'Big Sunny Burger with Fries', category: 'Sandwich', price: 430 },
+                        { id: 'INV-SW2', title: 'Big Sunny Steak Sandwich with Fries', category: 'Sandwich', price: 400 },
+                        { id: 'INV-SW3', title: 'Steak Sandwich', category: 'Sandwich', price: 165 },
+                        { id: 'INV-SW4', title: 'Cheeseburger', category: 'Sandwich', price: 170 },
+                        { id: 'INV-SW5', title: 'Hamburger', category: 'Sandwich', price: 160 },
+                        { id: 'INV-D1', title: 'Mango Juice', category: 'Drinks', price: 135 },
+                        { id: 'INV-D2', title: 'Four Seasons', category: 'Drinks', price: 95 },
+                        { id: 'INV-D3', title: 'Pineapple Juice', category: 'Drinks', price: 95 },
+                        { id: 'INV-D4', title: 'Pine-Orange Juice', category: 'Drinks', price: 90 },
+                        { id: 'INV-D5', title: 'Iced Tea', category: 'Drinks', price: 85 },
+                        { id: 'INV-D6', title: 'Cucumber Juice', category: 'Drinks', price: 90 },
+                        { id: 'INV-D7', title: 'Blue Lemonade', category: 'Drinks', price: 95 },
+                        { id: 'INV-D8', title: 'Calamansi Juice (Hot/Cold)', category: 'Drinks', price: 70 },
+                        { id: 'INV-D9', title: 'Coke in Can', category: 'Drinks', price: 95 },
+                        { id: 'INV-D10', title: 'Sprite | Royal in Can', category: 'Drinks', price: 95 },
+                        { id: 'INV-D11', title: 'San Miguel Pale Pilsen', category: 'Drinks', price: 85 },
+                        { id: 'INV-D12', title: 'San Mig Light', category: 'Drinks', price: 95 },
+                        { id: 'INV-D13', title: 'Hot Tea', category: 'Drinks', price: 70 },
+                        { id: 'INV-D14', title: 'Drip Coffee', category: 'Drinks', price: 85 },
+                        { id: 'INV-D15', title: 'Coffee with Cream', category: 'Drinks', price: 55 },
+                        { id: 'INV-D16', title: 'Bottled Water (500ml)', category: 'Drinks', price: 35 },
+                        { id: 'INV-W1', title: 'Carlo Rossi (Red Wine)', category: 'Wines', price: 700 },
+                        { id: 'INV-W2', title: 'Carlo Rossi (White Wine)', category: 'Wines', price: 700 },
+                        { id: 'INV-W3', title: 'Adega De Pegoos', category: 'Wines', price: 600 },
+                        { id: 'INV-SO1', title: 'Cream of Mushroom Soup', category: 'Side Orders', price: 80 },
+                        { id: 'INV-SO2', title: 'Cream of Chicken Soup', category: 'Side Orders', price: 80 },
+                        { id: 'INV-SO3', title: 'Mashed Potato', category: 'Side Orders', price: 90 },
+                        { id: 'INV-SO4', title: 'Potato Salad', category: 'Side Orders', price: 155 },
+                        { id: 'INV-SO5', title: 'French Fries', category: 'Side Orders', price: 155 },
+                        { id: 'INV-SO6', title: 'Garlic Bread', category: 'Side Orders', price: 45 },
+                        { id: 'INV-SO7', title: 'Garlic Rice', category: 'Side Orders', price: 55 },
+                        { id: 'INV-SO8', title: 'Plain Rice', category: 'Side Orders', price: 40 }
                     ];
-                    inv = JSON.stringify(defaultMenu);
-                    localStorage.setItem('inventoryItems', inv);
+
+                    const mainCats = ['Beef', 'T-Bone', 'Sirloin Steak', 'Chicken & Fish', 'Sandwich', 'Side Orders', 'Drinks', 'Wines', 'Supplies', 'Others'];
+
+                    // Normalize and migrate an item's fields
+                    function migrateItem(i) {
+                        const migrated = { ...i };
+                        // Old 'stock' -> New 'total_stock' 
+                        if (migrated.total_stock === undefined && migrated.stock !== undefined) {
+                            migrated.total_stock = migrated.stock;
+                        }
+                        if (migrated.total_stock === undefined) migrated.total_stock = 100;
+                        if (migrated.added_stock === undefined) migrated.added_stock = 0;
+                        if (migrated.sold_stock === undefined) migrated.sold_stock = 0;
+                        
+                        // Fix category
+                        if (!mainCats.includes(migrated.category) || migrated.category === 'Food Ingredients') {
+                            migrated.category = getAutoCategory(migrated.title || migrated.name || migrated.id || '');
+                        }
+                        return migrated;
+                    }
+
+                    // Build map of saved items by ID for fast lookup
+                    const savedMap = {};
+                    savedItems.forEach(i => { if (i.id) savedMap[i.id] = migrateItem(i); });
+
+                    // Merge: defaults as base, saved values override matching IDs property-by-property
+                    const merged = menuDefaults.map(def => {
+                        if (savedMap[def.id]) {
+                            // Merge saved item over default to preserve image and status
+                            return { ...def, ...savedMap[def.id] };
+                        }
+                        // Default item not yet in storage — create with 100 stock
+                        return { ...def, total_stock: 100, added_stock: 0, sold_stock: 0 };
+                    });
+
+                    // Append any custom items added by admin that aren't in defaults
+                    savedItems.forEach(i => {
+                        if (i.id && !merged.find(m => m.id === i.id)) {
+                            merged.push(migrateItem(i));
+                        }
+                    });
+
+                    // Persist the merged result so future saves include all items
+                    localStorage.setItem('inventoryItems', JSON.stringify(merged));
+                    localStorage.setItem('menu_seeded_v1', 'true');
+                    return merged;
+
+                } catch (err) {
+                    console.error("Critical Inventory Crash:", err);
+                    return seedInventoryFromMenu(true);
+                }
+            }
+
+            // Proper function declaration for HOISTING reliability
+            async function seedInventoryFromMenu(isAuto = false) {
+                if (!isAuto) {
+                    const confirmed = await superModal({
+                        title: 'Sync Inventory? 🔄',
+                        message: 'This will synchronize your inventory with the official 52-item menu. Your current stock levels (Total/Added/Sold) will be PRESERVED for matching items. Proceed?',
+                        type: 'confirm'
+                    });
+                    if (!confirmed) return;
                 }
 
-                let items = JSON.parse(inv);
-                let mutated = false;
+                const menu = [
+                    // Beef
+                    { id: 'INV-B1', title: 'Fillet Mignon', category: 'Beef', price: 935 },
+                    { id: 'INV-B2', title: 'Tenderloin Steak (200g)', category: 'Beef', price: 740 },
+                    { id: 'INV-B3', title: 'Tenderloin Tips (200g)', category: 'Beef', price: 740 },
+                    { id: 'INV-B4', title: 'Rib Eye Steak (200g-350g)', category: 'Beef', price: 675 },
+                    { id: 'INV-B5', title: 'Hamburger Steak (204g)', category: 'Beef', price: 505 },
+                    // T-Bone
+                    { id: 'INV-T1', title: 'T-Bone Medium (250g-400g)', category: 'T-Bone', price: 715 },
+                    { id: 'INV-T2', title: 'T-Bone Large (550g-650g)', category: 'T-Bone', price: 790 },
+                    { id: 'INV-T3', title: 'T-Bone Extra Large', category: 'T-Bone', price: 865 },
+                    { id: 'INV-T4', title: 'T-Bone XX Large', category: 'T-Bone', price: 940 },
+                    { id: 'INV-T5', title: 'Porter House (551g-600g)', category: 'T-Bone', price: 1015 },
+                    // Sirloin
+                    { id: 'INV-S1', title: 'Sirloin Mini (250g-300g)', category: 'Sirloin Steak', price: 485 },
+                    { id: 'INV-S2', title: 'Sirloin Small (251g-350g)', category: 'Sirloin Steak', price: 545 },
+                    { id: 'INV-S3', title: 'Sirloin Mid Size (351g-450g)', category: 'Sirloin Steak', price: 605 },
+                    { id: 'INV-S4', title: 'Sirloin Big Size (401g-450g)', category: 'Sirloin Steak', price: 670 },
+                    // Chicken & Fish
+                    { id: 'INV-CF1', title: 'Whole Chicken', category: 'Chicken & Fish', price: 660 },
+                    { id: 'INV-CF2', title: 'Half Chicken', category: 'Chicken & Fish', price: 335 },
+                    { id: 'INV-CF3', title: 'Fish Steak (Tanigue)', category: 'Chicken & Fish', price: 495 },
+                    { id: 'INV-CF4', title: 'Bangus Steak', category: 'Chicken & Fish', price: 510 },
+                    // Sandwich
+                    { id: 'INV-SW1', title: 'Big Sunny Burger with Fries', category: 'Sandwich', price: 430 },
+                    { id: 'INV-SW2', title: 'Big Sunny Steak Sandwich with Fries', category: 'Sandwich', price: 400 },
+                    { id: 'INV-SW3', title: 'Steak Sandwich', category: 'Sandwich', price: 165 },
+                    { id: 'INV-SW4', title: 'Cheeseburger', category: 'Sandwich', price: 170 },
+                    { id: 'INV-SW5', title: 'Hamburger', category: 'Sandwich', price: 160 },
+                    // Drinks
+                    { id: 'INV-D1', title: 'Mango Juice', category: 'Drinks', price: 135 },
+                    { id: 'INV-D2', title: 'Four Seasons', category: 'Drinks', price: 95 },
+                    { id: 'INV-D3', title: 'Pineapple Juice', category: 'Drinks', price: 95 },
+                    { id: 'INV-D4', title: 'Pine-Orange Juice', category: 'Drinks', price: 90 },
+                    { id: 'INV-D5', title: 'Iced Tea', category: 'Drinks', price: 85 },
+                    { id: 'INV-D6', title: 'Cucumber Juice', category: 'Drinks', price: 90 },
+                    { id: 'INV-D7', title: 'Blue Lemonade', category: 'Drinks', price: 95 },
+                    { id: 'INV-D8', title: 'Calamansi Juice (Hot/Cold)', category: 'Drinks', price: 70 },
+                    { id: 'INV-D9', title: 'Coke in Can', category: 'Drinks', price: 95 },
+                    { id: 'INV-D10', title: 'Sprite | Royal in Can', category: 'Drinks', price: 95 },
+                    { id: 'INV-D11', title: 'San Miguel Pale Pilsen', category: 'Drinks', price: 85 },
+                    { id: 'INV-D12', title: 'San Mig Light', category: 'Drinks', price: 95 },
+                    { id: 'INV-D13', title: 'Hot Tea', category: 'Drinks', price: 70 },
+                    { id: 'INV-D14', title: 'Drip Coffee', category: 'Drinks', price: 85 },
+                    { id: 'INV-D15', title: 'Coffee with Cream', category: 'Drinks', price: 55 },
+                    { id: 'INV-D16', title: 'Bottled Water (500ml)', category: 'Drinks', price: 35 },
+                    // Wines
+                    { id: 'INV-W1', title: 'Carlo Rossi (Red Wine)', category: 'Wines', price: 700 },
+                    { id: 'INV-W2', title: 'Carlo Rossi (White Wine)', category: 'Wines', price: 700 },
+                    { id: 'INV-W3', title: 'Adega De Pegoos', category: 'Wines', price: 600 },
+                    // Sides
+                    { id: 'INV-SO1', title: 'Cream of Mushroom Soup', category: 'Side Orders', price: 80 },
+                    { id: 'INV-SO2', title: 'Cream of Chicken Soup', category: 'Side Orders', price: 80 },
+                    { id: 'INV-SO3', title: 'Mashed Potato', category: 'Side Orders', price: 90 },
+                    { id: 'INV-SO4', title: 'Potato Salad', category: 'Side Orders', price: 155 },
+                    { id: 'INV-SO5', title: 'French Fries', category: 'Side Orders', price: 155 },
+                    { id: 'INV-SO6', title: 'Garlic Bread', category: 'Side Orders', price: 45 },
+                    { id: 'INV-SO7', title: 'Garlic Rice', category: 'Side Orders', price: 55 },
+                    { id: 'INV-SO8', title: 'Plain Rice', category: 'Side Orders', price: 40 }
+                ];
 
-                // DATA MIGRATION: Old 'stock' -> New 'total_stock'
-                items = items.map(i => {
-                    if (i.total_stock === undefined && i.stock !== undefined) {
-                        i.total_stock = i.stock;
-                        mutated = true;
+                const existingItemStr = localStorage.getItem('inventoryItems');
+                const existing = JSON.parse(existingItemStr || '[]');
+                const merged = menu.map(m => {
+                    const found = existing.find(ex => (ex.title && ex.title.toLowerCase() === m.title.toLowerCase()) || ex.id === m.id);
+                    if (found) {
+                        return { ...found, ...m }; // Update title/price/category but keep stock
                     }
-                    const validCats = ['Drinks', 'Food Ingredients', 'Supplies', 'Others'];
-                    if (!validCats.includes(i.category)) {
-                        i.category = getAutoCategory(i.title || i.name || '');
-                        mutated = true;
-                    }
-                    return i;
+                    return { ...m, total_stock: 100, added_stock: 0, sold_stock: 0 }; // Default new
                 });
 
-                if (mutated) {
-                    localStorage.setItem('inventoryItems', JSON.stringify(items));
+                localStorage.setItem('inventoryItems', JSON.stringify(merged));
+                localStorage.setItem('menu_seeded_v1', 'true');
+                if (!isAuto) {
+                    location.reload();
                 }
-                return items;
+                return merged;
             }
+            window.seedInventoryFromMenu = seedInventoryFromMenu;
 
             // --- ADVANCED INVENTORY LOGIC ---
             let currentInvCat = 'All';
+            let isBulkEditMode = false;
+
+            window.toggleBulkEdit = function () {
+                isBulkEditMode = !isBulkEditMode;
+                const btn = document.getElementById('bulk-edit-btn');
+                const controls = document.getElementById('bulk-controls');
+
+                if (isBulkEditMode) {
+                    btn.classList.add('bulk-mode-active');
+                    btn.textContent = 'Editing Mode...';
+                    controls.classList.remove('hidden');
+                } else {
+                    btn.classList.remove('bulk-mode-active');
+                    btn.textContent = '✏️ Bulk Restock';
+                    controls.classList.add('hidden');
+                }
+                renderInventory();
+            };
 
             window.switchInvCat = function (cat, btn) {
                 currentInvCat = cat;
@@ -948,14 +1196,62 @@
                 if (n.match(/fillet mignon|tenderloin|rib eye|hamburger steak|beef|ribeye/)) return 'Beef';
                 if (n.match(/t-bone|porterhouse|porter house/)) return 'T-Bone';
                 if (n.match(/sirloin/)) return 'Sirloin Steak';
-                if (n.match(/chicken|fish|bangus|salmon/)) return 'Chicken & Fish';
+                if (n.match(/chicken|fish|bangus|tanigue|salmon|seafood/)) return 'Chicken & Fish';
                 if (n.match(/burger|sandwich|hamburger|cheeseburger/)) return 'Sandwich';
                 if (n.match(/rice|fries|salad|soup|bread|garlic|potato|mash/)) return 'Side Orders';
-                if (n.match(/wine|carlo rossi|adega/)) return 'Wines';
-                if (n.match(/juice|tea|coffee|coke|sprite|water|royal|pilsen|lemonade|calamansi/)) return 'Drinks';
+                if (n.match(/wine|carlo rossi|adega|pegoes|rossi/)) return 'Wines';
+                if (n.match(/juice|tea|coffee|coke|sprite|water|royal|pilsen|lemonade|calamansi|beer|san mig|light|drip|cucumber|four seasons/)) return 'Drinks';
                 if (n.match(/tissue|soap|cleaner|cups|towel|napkin|toothpick|placemat|pen|paper|clip|rubber|alcohol|dishwashing|bleach|glade|spoon|fork|knife/)) return 'Supplies';
                 return 'Others';
             }
+
+            window.adjustStock = function (id, field, delta, event) {
+                const items = getInventory();
+                const item = items.find(i => i.id === id);
+                if (!item) return;
+
+                item[field] = (parseInt(item[field] || 0)) + delta;
+                item.last_updated = new Date().toISOString();
+                localStorage.setItem('inventoryItems', JSON.stringify(items));
+
+                // Visual feedback
+                const target = event.currentTarget.parentElement;
+                target.classList.add('stock-val-pop');
+                setTimeout(() => target.classList.remove('stock-val-pop'), 400);
+
+                renderInventory();
+                window.dispatchEvent(new Event('storage'));
+            };
+
+            window.saveBulkInventory = async function () {
+                const items = getInventory();
+                const inputs = document.querySelectorAll('.inv-bulk-input');
+                let mutated = false;
+
+                inputs.forEach(input => {
+                    const id = input.dataset.id;
+                    const field = input.dataset.field;
+                    const val = parseInt(input.value) || 0;
+
+                    const item = items.find(i => i.id === id);
+                    if (item && item[field] !== val) {
+                        item[field] = val;
+                        item.last_updated = new Date().toISOString();
+                        mutated = true;
+                    }
+                });
+
+                if (mutated) {
+                    localStorage.setItem('inventoryItems', JSON.stringify(items));
+                    window.dispatchEvent(new Event('storage'));
+                    await superModal({
+                        title: 'Bulk Update Success! 🚀',
+                        message: 'All inventory changes have been saved across the system.'
+                    });
+                }
+
+                toggleBulkEdit(); // Exit mode
+            };
 
             function refreshInvStats() {
                 const items = getInventory();
@@ -980,7 +1276,12 @@
                 if (!tbody) return;
                 tbody.innerHTML = '';
 
-                const filtered = currentInvCat === 'All' ? items : items.filter(i => i.category === currentInvCat);
+                const q = (document.getElementById('inv-search-input')?.value || '').trim().toLowerCase();
+                let filtered = currentInvCat === 'All' ? items : items.filter(i => i.category === currentInvCat);
+
+                if (q) {
+                    filtered = filtered.filter(i => i.title.toLowerCase().includes(q));
+                }
 
                 if (filtered.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="8" class="muted" style="text-align:center; padding:40px;">No items found in this category.</td></tr>`;
@@ -998,23 +1299,45 @@
                     const statusColor = isOut ? '#ef4444' : (isLow ? '#f59e0b' : '#16a34a');
 
                     const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td style="font-weight:700; color:#1e293b;">${item.title}</td>
-                        <td>${total}</td>
-                        <td>${item.in_chiller || 0}</td>
-                        <td style="color:#16a34a;">+${add}</td>
-                        <td style="color:#ef4444;">-${sold}</td>
-                        <td style="font-weight:800; background:#f8fafc;">${eod}</td>
-                        <td><span style="color:${statusColor}; font-weight:bold; font-size:11px; padding:4px 8px; background:${statusColor}15; border-radius:12px;">${statusLabel}</span></td>
-                        <td>
-                            <button type="button" class="secondary" style="padding: 4px 8px; font-size: 11px;" onclick="openInventoryModal('${item.id}')">Edit</button>
-                            <button type="button" class="danger" style="padding: 4px 8px; font-size: 11px;" onclick="deleteInventoryItem('${item.id}')">Delete</button>
-                        </td>
-                    `;
+
+                    const imgHtml = item.image
+                        ? `<img src="${item.image}" style="width:32px; height:32px; border-radius:50%; object-fit:cover; vertical-align:middle; margin-right:10px; border:1px solid #e2e8f0;">`
+                        : `<div style="width:32px; height:32px; border-radius:50%; background:#f1f5f9; display:inline-flex; align-items:center; justify-content:center; vertical-align:middle; margin-right:10px; border:1px solid #e2e8f0; font-size:12px; color:#94a3b8;">🍴</div>`;
+
+                    if (isBulkEditMode) {
+                        tr.innerHTML = `
+                            <td style="font-weight:700; color:#1e293b;">${imgHtml}${item.title}</td>
+                            <td><input type="number" class="inv-bulk-input" data-id="${item.id}" data-field="total_stock" value="${total}"></td>
+                            <td><input type="number" class="inv-bulk-input" data-id="${item.id}" data-field="added_stock" value="${add}"></td>
+                            <td><input type="number" class="inv-bulk-input" data-id="${item.id}" data-field="sold_stock" value="${sold}"></td>
+                            <td style="font-weight:800; background:#f8fafc;">${eod}</td>
+                            <td><span style="color:${statusColor}; font-weight:bold; font-size:11px; padding:4px 8px; background:${statusColor}15; border-radius:12px;">${statusLabel}</span></td>
+                            <td>
+                                <button type="button" class="secondary" style="padding: 4px 8px; font-size: 11px;" onclick="openInventoryModal('${item.id}')">Details</button>
+                            </td>
+                        `;
+                    } else {
+                        tr.innerHTML = `
+                            <td style="font-weight:700; color:#1e293b;">${imgHtml}${item.title}</td>
+                            <td>${total}</td>
+                            <td style="color:#16a34a;">
+                                +${add}
+                                <button class="stock-adjust-btn" onclick="adjustStock('${item.id}', 'added_stock', 1, event)">+</button>
+                            </td>
+                            <td style="color:#ef4444;">-${sold}</td>
+                            <td style="font-weight:800; background:#f8fafc;">${eod}</td>
+                            <td><span style="color:${statusColor}; font-weight:bold; font-size:11px; padding:4px 8px; background:${statusColor}15; border-radius:12px;">${statusLabel}</span></td>
+                            <td>
+                                <button type="button" class="secondary" style="padding: 4px 8px; font-size: 11px;" onclick="openInventoryModal('${item.id}')">Edit</button>
+                                <button type="button" class="danger" style="padding: 4px 8px; font-size: 11px;" onclick="deleteInventoryItem('${item.id}')">Delete</button>
+                            </td>
+                        `;
+                    }
                     tbody.appendChild(tr);
                 });
                 refreshInvStats();
             }
+
 
             window.openInventoryModal = function (id = null) {
                 document.getElementById('inv-modal').classList.remove('hidden');
@@ -1038,20 +1361,89 @@
                     document.getElementById('inv-title').value = item.title;
                     document.getElementById('inv-category').value = item.category || '';
                     document.getElementById('inv-stock').value = item.total_stock || 0;
-                    document.getElementById('inv-chiller').value = item.in_chiller || 0;
                     document.getElementById('inv-added').value = item.added_stock || 0;
                     document.getElementById('inv-sold').value = item.sold_stock || 0;
+
+                    // Handle Image Preview
+                    const preview = document.getElementById('inv-img-preview');
+                    const placeholder = document.getElementById('inv-img-placeholder');
+                    const removeBtn = document.getElementById('remove-inv-img-btn');
+                    if (item.image) {
+                        preview.src = item.image;
+                        preview.style.display = 'block';
+                        placeholder.style.display = 'none';
+                        removeBtn.style.display = 'inline-block';
+                    } else {
+                        preview.src = '';
+                        preview.style.display = 'none';
+                        placeholder.style.display = 'flex';
+                        removeBtn.style.display = 'none';
+                    }
                 } else {
                     document.getElementById('inv-modal-title').textContent = 'Add New Inventory Item';
                     document.getElementById('inv-id').value = '';
                     document.getElementById('inv-title').value = '';
                     document.getElementById('inv-category').value = '';
                     document.getElementById('inv-stock').value = 0;
-                    document.getElementById('inv-chiller').value = 0;
                     document.getElementById('inv-added').value = 0;
                     document.getElementById('inv-sold').value = 0;
+
+                    // Reset Image Preview
+                    document.getElementById('inv-img-preview').style.display = 'none';
+                    document.getElementById('inv-img-placeholder').style.display = 'flex';
+                    document.getElementById('remove-inv-img-btn').style.display = 'none';
                 }
                 updateEOD();
+            };
+
+            window.handleInvImageUpload = function (input) {
+                if (!input.files || !input.files[0]) return;
+
+                const file = input.files[0];
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    const img = new Image();
+                    img.onload = function () {
+                        // Resizing logic to keep base64 small
+                        const MAX_WIDTH = 300;
+                        const scale = MAX_WIDTH / img.width;
+                        const canvas = document.createElement('canvas');
+                        canvas.width = MAX_WIDTH;
+                        canvas.height = img.height * scale;
+
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                        const base64 = canvas.toDataURL('image/jpeg', 0.7);
+                        const preview = document.getElementById('inv-img-preview');
+                        const placeholder = document.getElementById('inv-img-placeholder');
+                        const removeBtn = document.getElementById('remove-inv-img-btn');
+
+                        preview.src = base64;
+                        preview.style.display = 'block';
+                        placeholder.style.display = 'none';
+                        removeBtn.style.display = 'inline-block';
+
+                        // Reset input value so the same file can be selected again
+                        input.value = '';
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            };
+
+            window.removeInvImage = function () {
+                const preview = document.getElementById('inv-img-preview');
+                const placeholder = document.getElementById('inv-img-placeholder');
+                const removeBtn = document.getElementById('remove-inv-img-btn');
+                const input = document.getElementById('inv-image-input');
+
+                preview.src = '';
+                preview.style.display = 'none';
+                placeholder.style.display = 'flex';
+                removeBtn.style.display = 'none';
+                input.value = '';
             };
 
             window.closeInventoryModal = () => {
@@ -1063,9 +1455,11 @@
                 const title = document.getElementById('inv-title').value.trim();
                 let category = document.getElementById('inv-category').value;
                 const total_stock = parseInt(document.getElementById('inv-stock').value) || 0;
-                const in_chiller = parseInt(document.getElementById('inv-chiller').value) || 0;
                 const added_stock = parseInt(document.getElementById('inv-added').value) || 0;
                 const sold_stock = parseInt(document.getElementById('inv-sold').value) || 0;
+                const image = document.getElementById('inv-img-preview').style.display === 'block'
+                    ? document.getElementById('inv-img-preview').src
+                    : '';
 
                 if (!title) {
                     return superModal({
@@ -1077,7 +1471,7 @@
 
                 const items = getInventory();
                 const itemData = {
-                    title, category, total_stock, in_chiller, added_stock, sold_stock,
+                    title, category, total_stock, added_stock, sold_stock, image,
                     last_updated: new Date().toISOString()
                 };
 
@@ -1160,7 +1554,7 @@
                     parseOCRResults(text);
                 } catch (e) {
                     console.error(e);
-                    alert("OCR Failed: " + e.message);
+                    superModal({ title: 'OCR Error 🤖', message: 'Failed to process image: ' + e.message });
                     closeOCRModal();
                 }
             };
@@ -1182,9 +1576,8 @@
                             const row = {
                                 name: name,
                                 total: nums[0] || 0,
-                                chiller: nums[1] || 0,
-                                add: nums[2] || 0,
-                                sold: nums[3] || 0
+                                add: nums[1] || 0,
+                                sold: nums[2] || 0
                             };
                             ocrData.push(row);
 
@@ -1192,7 +1585,6 @@
                             tr.innerHTML = `
                                 <td><input type="text" value="${row.name}" onchange="ocrData[${ocrData.length - 1}].name=this.value"></td>
                                 <td><input type="number" value="${row.total}" onchange="ocrData[${ocrData.length - 1}].total=parseInt(this.value)"></td>
-                                <td><input type="number" value="${row.chiller}" onchange="ocrData[${ocrData.length - 1}].chiller=parseInt(this.value)"></td>
                                 <td><input type="number" value="${row.add}" onchange="ocrData[${ocrData.length - 1}].add=parseInt(this.value)"></td>
                                 <td><input type="number" value="${row.sold}" onchange="ocrData[${ocrData.length - 1}].sold=parseInt(this.value)"></td>
                             `;
@@ -1214,7 +1606,6 @@
                         title: ocrRow.name,
                         category: getAutoCategory(ocrRow.name),
                         total_stock: ocrRow.total,
-                        in_chiller: ocrRow.chiller,
                         added_stock: ocrRow.add,
                         sold_stock: ocrRow.sold,
                         last_updated: new Date().toISOString()
@@ -1417,43 +1808,6 @@
                 URL.revokeObjectURL(url);
             };
 
-            // Danger Actions
-            document.getElementById('clear-history-btn').onclick = async () => {
-                const pin = await superModal({
-                    title: '☢️ Danger Zone',
-                    message: 'Enter Pincode to <b>PURGE ALL RESERVATIONS</b>. This cannot be undone!',
-                    showInput: true,
-                    placeholder: 'Enter 6-digit pin',
-                    confirmText: 'Purge Records'
-                });
-
-                if (pin === "789456") {
-                    localStorage.removeItem('reservationHistory');
-                    await superModal({ title: '✅ Success', message: 'All reservations have been cleared.', confirmText: 'OK' });
-                    window.location.reload();
-                } else if (pin !== null) {
-                    await superModal({ title: '❌ Error', message: 'Unauthorized. Action blocked.', confirmText: 'Close' });
-                }
-            };
-
-            document.getElementById('clear-admins-btn').onclick = async () => {
-                const pin = await superModal({
-                    title: 'Danger Zone',
-                    message: 'Enter Pincode to <b>REVOKE ALL STAFF ACCOUNTS</b>. All active staff will be logged out and deleted!',
-                    showInput: true,
-                    placeholder: 'Enter 6-digit pin',
-                    confirmText: 'Revoke All'
-                });
-
-                if (pin === "789456") {
-                    localStorage.removeItem('adminUsers');
-                    localStorage.removeItem('adminLoggedInUser');
-                    await superModal({ title: '✅ Success', message: 'All staff accounts have been deleted.', confirmText: 'OK' });
-                    window.location.reload();
-                } else if (pin !== null) {
-                    await superModal({ title: '❌ Error', message: 'Invalid pin code.', confirmText: 'Close' });
-                }
-            };
 
             // Start polling
             pollOnlineAdmins();
@@ -1499,93 +1853,7 @@
 
         initAuth();
 
-        // ── CUSTOM MODAL SYSTEM ──
-        const modalOverlay = document.createElement('div');
-        modalOverlay.id = 'super-modal-root';
-        document.body.appendChild(modalOverlay);
-
-        /**
-         * Generic Custom Modal Helper (Green & White Style)
-         */
-        window.superModal = function ({ title = 'Notice', message = '', type = 'alert', showInput = false, placeholder = '...', confirmText = 'Confirm', cancelText = 'Cancel' }) {
-            return new Promise((resolve) => {
-                const html = `
-                    <div class="super-modal-overlay">
-                        <div class="super-modal-box">
-                            <div class="super-modal-header">
-                                <h3>${title}</h3>
-                            </div>
-                            <div class="super-modal-body" style="padding-top: 30px;">
-                                <p style="margin-bottom: 25px; color: #64748b; font-size: 15px;">${message}</p>
-                                ${showInput ? `
-                                    <div class="premium-pin-wrap">
-                                        <div class="pin-display" id="pin-display-boxes">
-                                            <div class="pin-box"></div>
-                                            <div class="pin-box"></div>
-                                            <div class="pin-box"></div>
-                                            <div class="pin-box"></div>
-                                            <div class="pin-box"></div>
-                                            <div class="pin-box"></div>
-                                        </div>
-                                        <input type="password" id="modal-pincode" class="hidden-pin-input" maxlength="6" autofocus autocomplete="off">
-                                    </div>
-                                    <style>
-                                        .premium-pin-wrap { position: relative; display: flex; justify-content: center; margin-bottom: 30px; }
-                                        .pin-display { display: flex; gap: 12px; }
-                                        .pin-box { width: 45px; height: 55px; border: 2px solid #e2e8f0; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; transition: 0.2s; background: #f8fafc; }
-                                        .pin-box.active { border-color: #1b5e20; box-shadow: 0 0 10px rgba(27, 94, 32, 0.1); background: white; }
-                                        .pin-box.filled::after { content: "•"; color: #1b5e20; font-size: 32px; }
-                                        .hidden-pin-input { position: absolute; opacity: 0; width: 100%; height: 100%; cursor: default; }
-                                    </style>
-                                ` : ''}
-                            </div>
-                            <div class="super-modal-footer">
-                                ${type === 'confirm' || showInput ? `<button class="super-modal-btn cancel" id="modal-cancel-btn">${cancelText}</button>` : ''}
-                                <button class="super-modal-btn confirm" id="modal-confirm-btn">${confirmText}</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                modalOverlay.innerHTML = html;
-
-                const confirmBtn = document.getElementById('modal-confirm-btn');
-                const cancelBtn = document.getElementById('modal-cancel-btn');
-                const inputField = document.getElementById('modal-pincode');
-                const boxes = document.querySelectorAll('.pin-box');
-
-                if (inputField) {
-                    inputField.focus();
-
-                    // Sync boxes with input
-                    inputField.addEventListener('input', () => {
-                        const val = inputField.value;
-                        boxes.forEach((box, i) => {
-                            box.classList.toggle('filled', i < val.length);
-                            box.classList.toggle('active', i === val.length);
-                        });
-                        if (val.length === 6) {
-                            setTimeout(() => confirmBtn.click(), 300);
-                        }
-                    });
-
-                    // Clicking boxes focuses input
-                    document.querySelector('.premium-pin-wrap').addEventListener('click', () => inputField.focus());
-
-                }
-
-                confirmBtn.onclick = () => {
-                    const val = inputField ? inputField.value : true;
-                    modalOverlay.innerHTML = '';
-                    resolve(val);
-                };
-                if (cancelBtn) {
-                    cancelBtn.onclick = () => {
-                        modalOverlay.innerHTML = '';
-                        resolve(null);
-                    };
-                }
-            });
-        };
+        // ── DESIGN SYSTEM ASSETS LOADED ──
     </script>
 </body>
 

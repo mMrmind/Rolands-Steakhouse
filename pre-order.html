@@ -50,7 +50,10 @@
         <div class="cart-sidebar">
             <div class="cart-header">
                 Your Order
-                <span class="cart-clear-btn" onclick="clearCart()">Clear</span>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <span class="cart-clear-btn" style="color: #1b5e20; background: #f0fdf4;" onclick="refreshOrder()">Refresh</span>
+                    <span class="cart-clear-btn" onclick="clearCart()">Clear</span>
+                </div>
             </div>
             <div class="cart-items-container" id="cart-items"></div>
             <div class="cart-total-section">
@@ -60,7 +63,7 @@
             </div>
 
             <!-- Beef Preference Panel -->
-            <div class="beef-pref-panel">
+            <div class="beef-pref-panel" style="display: none;">
                 <div class="beef-pref-label">🥩 Beef Preference</div>
                 <div class="doneness-row" id="doneness-chips">
                     <button type="button" class="doneness-chip" data-val="Rare">Rare</button>
@@ -94,7 +97,10 @@
         <div class="sheet-inner">
             <div class="cart-header">
                 Your Order
-                <span class="cart-clear-btn" onclick="clearCart()">Clear</span>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <span class="cart-clear-btn" style="color: #1b5e20; background: #f0fdf4;" onclick="refreshOrder()">Refresh</span>
+                    <span class="cart-clear-btn" onclick="clearCart()">Clear</span>
+                </div>
             </div>
             <div class="cart-items-container" id="cart-items-sheet"></div>
             <div class="cart-total-section">
@@ -104,7 +110,7 @@
             </div>
 
             <!-- Beef Preference in sheet -->
-            <div class="beef-pref-panel">
+            <div class="beef-pref-panel" style="display: none;">
                 <div class="beef-pref-label">🥩 Beef Preference</div>
                 <div class="doneness-row" id="doneness-chips-sheet">
                     <button type="button" class="doneness-chip" data-val="Rare">Rare</button>
@@ -250,10 +256,13 @@
                 const invMap = {};
                 invItems.forEach(i => { if (i.id) invMap[i.id] = normalizeItem(i); });
 
-                // Merge: start with all defaults, then overlay any matching inventory entries.
-                // This guarantees every default category always has items, even if the admin
-                // inventory is incomplete. Inventory values take priority for stock/price/etc.
-                const merged = defaultMenuData.map(def => invMap[def.id] ? invMap[def.id] : def);
+                // Merge property by property to ensure image is kept
+                const merged = defaultMenuData.map(def => {
+                    const saved = invMap[def.id] || {};
+                    const mergedItem = { ...normalizeItem(def), ...saved };
+                    if (!mergedItem.image && saved.image) mergedItem.image = saved.image;
+                    return mergedItem;
+                });
 
                 // Append any inventory-only items that don't exist in the defaults (custom items)
                 invItems.forEach(i => {
@@ -390,6 +399,24 @@
             const html    = buildCartItemsHTML();
             const itemCount = Object.values(cart).reduce((s, v) => s + v.qty, 0);
 
+            // Check for beef items
+            const hasBeef = Object.keys(cart).some(id => {
+                const item = menuData.find(i => i.id === id);
+                return item && ['Beef', 'T-Bone', 'Sirloin Steak'].includes(item.category);
+            });
+
+            // Toggle beef preference panels
+            document.querySelectorAll('.beef-pref-panel').forEach(panel => {
+                panel.style.display = hasBeef ? 'block' : 'none';
+            });
+            if (!hasBeef) {
+                selectedDoneness = '';
+                document.querySelectorAll('.doneness-chip').forEach(c => c.classList.remove('active'));
+                document.getElementById('beef-note-textarea').value = '';
+                document.getElementById('beef-note-sheet').value = '';
+                localStorage.removeItem('beefNote');
+            }
+
             // Desktop sidebar
             document.getElementById('cart-items').innerHTML     = html;
             document.getElementById('cart-subtotal').textContent = fmtTotal;
@@ -446,8 +473,37 @@
             cart[id].qty = newQty;
             if (cart[id].qty <= 0) delete cart[id];
             
+            // Auto-scroll to preference if beef is added and no doneness is selected
+            if (delta > 0 && ['Beef', 'T-Bone', 'Sirloin Steak'].includes(item.category) && !selectedDoneness) {
+                const prefPanel = document.querySelector('.beef-pref-panel');
+                if (prefPanel) {
+                    prefPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    prefPanel.style.transition = 'all 0.3s ease';
+                    prefPanel.style.boxShadow = '0 0 20px rgba(27, 94, 32, 0.4)';
+                    prefPanel.style.transform = 'scale(1.02)';
+                    setTimeout(() => {
+                        prefPanel.style.boxShadow = '';
+                        prefPanel.style.transform = '';
+                    }, 1000);
+                }
+            }
+
             renderMenu();
             renderCart();
+        };
+
+        window.refreshOrder = function() {
+            // Visual feedback
+            const btns = document.querySelectorAll('.cart-clear-btn');
+            btns.forEach(b => { if(b.textContent === 'Refresh') b.textContent = '...'; });
+            
+            setTimeout(() => {
+                menuData = getMenuData();
+                renderMenu();
+                renderCart();
+                btns.forEach(b => { if(b.textContent === '...') b.textContent = 'Refresh'; });
+                superModal({ title: 'Synced 🔄', message: 'Menu and stock levels have been refreshed successfully.' });
+            }, 500);
         };
 
         window.clearCart = function() {

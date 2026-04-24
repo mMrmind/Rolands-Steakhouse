@@ -242,6 +242,7 @@
                         <thead style="background: #f8fafc;">
                             <tr>
                                 <th>Item Name</th>
+                                <th>Price</th>
                                 <th>Total Stock</th>
                                 <th>Added</th>
                                 <th>Sold</th>
@@ -311,6 +312,20 @@
                                         <option value="Others">Others</option>
                                     </select>
                                 </div>
+                            </div>
+
+                            <!-- Price field -->
+                            <div style="margin-top:20px;">
+                                <label style="display:block; margin-bottom:8px; font-weight:700; font-size:13px; color:#1b5e20;">
+                                    💰 Menu Price (₱)
+                                </label>
+                                <div style="position:relative;">
+                                    <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#64748b; font-weight:700;">₱</span>
+                                    <input type="number" id="inv-price" min="0" step="1"
+                                        style="width:100%; padding:12px 12px 12px 28px; border:2px solid #16a34a; border-radius:10px; background:#f0fdf4; font-size:16px; font-weight:700; color:#1b5e20;"
+                                        placeholder="e.g. 740">
+                                </div>
+                                <p style="font-size:11px; color:#64748b; margin:4px 0 0;">This overrides the default price on the Pre-Order menu immediately.</p>
                             </div>
 
                             <div style="margin-top:20px;">
@@ -797,8 +812,26 @@
             // Staff admin management
             const staffTbody = document.getElementById('staff-list-tbody');
 
-            function renderStaffManagement(isPolling = false) {
-                const users = getAdminUsers();
+            async function renderStaffManagement(isPolling = false) {
+                let users = getAdminUsers();
+                let usingCloud = true;
+                
+                try {
+                    const response = await fetch('/api/staff?nocache=' + new Date().getTime(), {
+                        headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache', 'Expires': '0' }
+                    });
+                    if (response.ok) {
+                        users = await response.json();
+                        if (users && users.length > 0) {
+                            localStorage.setItem('adminUsers', JSON.stringify(users)); // Sync cloud down
+                        }
+                    } else {
+                        usingCloud = false;
+                    }
+                } catch(e) {
+                    usingCloud = false; // Fallback silently
+                }
+
                 const onlineAdmins = safeJsonParse(localStorage.getItem('onlineAdmins'), {});
                 const now = Date.now();
 
@@ -816,34 +849,40 @@
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td><strong style="color: #0f172a;">${u.username}</strong> ${statusBadge}</td>
-                        <td><button type="button" class="danger" style="padding: 6px 12px; font-size: 12px; border-radius: 4px;" onclick="window.deleteStaffUser(${i})">Delete</button></td>
+                        <td><button type="button" class="danger" style="padding: 6px 12px; font-size: 12px; border-radius: 4px;" onclick="window.deleteStaffUser(${i}, '${u.username}')">Delete</button></td>
                     `;
                     staffTbody.appendChild(tr);
                 });
             }
 
-            window.deleteStaffUser = async function (index) {
+            window.deleteStaffUser = async function (index, usernameTarget) {
                 const users = getAdminUsers();
-                const targetUser = users[index];
+                let username = usernameTarget;
+                if (!username && users[index]) username = users[index].username;
 
                 const pin = await superModal({
                     title: '🔒 Security Authorization',
-                    message: `Enter Pincode to DELETE staff account: <b>${targetUser.username}</b>`,
+                    message: `Enter Pincode to DELETE staff account: <b>${username}</b>`,
                     showInput: true,
                     placeholder: 'Enter 6-digit pin',
                     confirmText: 'Delete Account'
                 });
 
                 if (pin === "789456") {
-                    users.splice(index, 1);
-                    localStorage.setItem('adminUsers', JSON.stringify(users));
+                    try {
+                        await fetch('/api/staff/' + username, { method: 'DELETE' });
+                    } catch(e) { } // Ignore server disconnects
+
+                    const updatedUsers = users.filter(u => u.username !== username);
+                    localStorage.setItem('adminUsers', JSON.stringify(updatedUsers));
+                    
                     // Update stats
                     const statCount = document.getElementById('stat-admins');
-                    if (statCount) statCount.textContent = users.length;
+                    if (statCount) statCount.textContent = updatedUsers.length;
 
                     await superModal({
                         title: '✅ Success',
-                        message: `Staff account <b>${targetUser.username}</b> has been permanently removed.`,
+                        message: `Staff account <b>${username}</b> has been removed.`,
                         confirmText: 'OK'
                     });
                     renderStaffManagement();
@@ -890,6 +929,17 @@
 
                 if (pin === "789456") {
                     const passwordHash = await sha256Hex(password);
+                    
+                    let savedToCloud = false;
+                    try {
+                        const res = await fetch('/api/staff', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ username, passwordHash })
+                        });
+                        if (res.ok) savedToCloud = true;
+                    } catch(e) { } // Ignore disconnect
+
                     users.push({ username, passwordHash });
                     localStorage.setItem('adminUsers', JSON.stringify(users));
 
@@ -899,9 +949,12 @@
                     const statCount = document.getElementById('stat-admins');
                     if (statCount) statCount.textContent = users.length;
 
+                    let msg = `Staff account for <b>${username}</b> has been created successfully!`;
+                    if (savedToCloud) msg += " (Synced to Cloud)";
+
                     await superModal({
                         title: '✅ Success',
-                        message: `Staff account for <b>${username}</b> has been created successfully!`,
+                        message: msg,
                         confirmText: 'Done'
                     });
                     renderStaffManagement();
@@ -1304,9 +1357,12 @@
                         ? `<img src="${item.image}" style="width:32px; height:32px; border-radius:50%; object-fit:cover; vertical-align:middle; margin-right:10px; border:1px solid #e2e8f0;">`
                         : `<div style="width:32px; height:32px; border-radius:50%; background:#f1f5f9; display:inline-flex; align-items:center; justify-content:center; vertical-align:middle; margin-right:10px; border:1px solid #e2e8f0; font-size:12px; color:#94a3b8;">🍴</div>`;
 
+                    const priceDisplay = item.price !== undefined && item.price !== null ? '₱' + item.price.toLocaleString() : '<span style="color:#94a3b8; font-size:11px;">Default</span>';
+
                     if (isBulkEditMode) {
                         tr.innerHTML = `
                             <td style="font-weight:700; color:#1e293b;">${imgHtml}${item.title}</td>
+                            <td style="font-weight:600; color:#1b5e20;">${priceDisplay}</td>
                             <td><input type="number" class="inv-bulk-input" data-id="${item.id}" data-field="total_stock" value="${total}"></td>
                             <td><input type="number" class="inv-bulk-input" data-id="${item.id}" data-field="added_stock" value="${add}"></td>
                             <td><input type="number" class="inv-bulk-input" data-id="${item.id}" data-field="sold_stock" value="${sold}"></td>
@@ -1319,6 +1375,7 @@
                     } else {
                         tr.innerHTML = `
                             <td style="font-weight:700; color:#1e293b;">${imgHtml}${item.title}</td>
+                            <td style="font-weight:600; color:#1b5e20;">${priceDisplay}</td>
                             <td>${total}</td>
                             <td style="color:#16a34a;">
                                 +${add}
@@ -1360,6 +1417,7 @@
                     document.getElementById('inv-id').value = item.id;
                     document.getElementById('inv-title').value = item.title;
                     document.getElementById('inv-category').value = item.category || '';
+                    document.getElementById('inv-price').value = item.price || '';
                     document.getElementById('inv-stock').value = item.total_stock || 0;
                     document.getElementById('inv-added').value = item.added_stock || 0;
                     document.getElementById('inv-sold').value = item.sold_stock || 0;
@@ -1384,6 +1442,7 @@
                     document.getElementById('inv-id').value = '';
                     document.getElementById('inv-title').value = '';
                     document.getElementById('inv-category').value = '';
+                    document.getElementById('inv-price').value = '';
                     document.getElementById('inv-stock').value = 0;
                     document.getElementById('inv-added').value = 0;
                     document.getElementById('inv-sold').value = 0;
@@ -1454,6 +1513,8 @@
                 const id = document.getElementById('inv-id').value;
                 const title = document.getElementById('inv-title').value.trim();
                 let category = document.getElementById('inv-category').value;
+                const priceRaw = document.getElementById('inv-price').value;
+                const price = priceRaw !== '' ? parseFloat(priceRaw) : null;
                 const total_stock = parseInt(document.getElementById('inv-stock').value) || 0;
                 const added_stock = parseInt(document.getElementById('inv-added').value) || 0;
                 const sold_stock = parseInt(document.getElementById('inv-sold').value) || 0;
@@ -1467,6 +1528,9 @@
                         message: 'Item name is required.'
                     });
                 }
+                if (price !== null && price < 0) {
+                    return superModal({ title: 'Invalid Price', message: 'Price cannot be negative.' });
+                }
                 if (!category) category = getAutoCategory(title);
 
                 const items = getInventory();
@@ -1474,6 +1538,8 @@
                     title, category, total_stock, added_stock, sold_stock, image,
                     last_updated: new Date().toISOString()
                 };
+                // Only set price if admin explicitly entered one
+                if (price !== null) itemData.price = price;
 
                 if (id) {
                     const idx = items.findIndex(i => i.id === id);

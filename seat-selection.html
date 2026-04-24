@@ -251,39 +251,75 @@
             const tId    = table.getAttribute('data-id');
             const locked = overrides[tId] === 'unavailable';
 
-            const bookings   = history.filter(r => r.bookedTable === tId && r.arrivalDate === chosenDate);
-            const timeTaken  = bookings.some(r => r.arrivalTime === chosenTime);
+            function parseTimeMins(t) {
+                if (!t) return -9999;
+                const [h, m] = t.split(':').map(Number);
+                return (h * 60) + (m || 0);
+            }
+
+            const chosenMins = parseTimeMins(chosenTime);
+
+            const bookings = history.filter(r => {
+                const isMatchingTable = r.bookedTable === tId && r.arrivalDate === chosenDate;
+                if (!isMatchingTable) return false;
+
+                // User Request: "unpaid will not reserve a table"
+                // Status check (case-insensitive)
+                const status = (r.paymentStatus || "").toLowerCase();
+                const isUnpaid = status.includes('unpaid') || status.includes('failed') || status.includes('pending_paymongo');
+                
+                return !isUnpaid;
+            });
+            
+            // Check if any booking is within 2.5 hours (150 mins) of the chosen time
+            const timeTaken  = bookings.some(r => {
+                const bMins = parseTimeMins(r.arrivalTime);
+                return Math.abs(bMins - chosenMins) < 150;
+            });
 
             // "Taken HH:MM" tags
+            let tableHasConflict = false;
             if (bookings.length > 0) {
                 const row = document.createElement('div');
                 row.style.cssText = 'margin-top:5px;display:flex;flex-wrap:wrap;gap:3px;justify-content:center;';
                 bookings.forEach(b => {
-                    const conflict = b.arrivalTime === chosenTime;
+                    const bMins = parseTimeMins(b.arrivalTime);
+                    const isConflict = Math.abs(bMins - chosenMins) < 150;
+                    if (isConflict) tableHasConflict = true;
+
                     const tag = document.createElement('span');
-                    tag.textContent = `Taken ${b.arrivalTime || 'today'}`;
+                    
+                    // Display in 24-hour (military) format per request
+                    const displayTime = b.arrivalTime || 'today';
+
+                    tag.textContent = `Taken ${displayTime}`;
                     tag.style.cssText = `display:inline-block;font-size:10px;font-weight:700;
                         padding:2px 6px;border-radius:20px;white-space:nowrap;
-                        background:${conflict ? '#fee2e2':'#fff3cd'};
-                        color:${conflict ? '#b91c1c':'#92400e'};
-                        border:1px solid ${conflict ? '#fca5a5':'#fde68a'};`;
+                        background:${isConflict ? '#fee2e2':'#f1f5f9'};
+                        color:${isConflict ? '#b91c1c':'#475569'};
+                        border:1px solid ${isConflict ? '#fca5a5':'#cbd5e1'};`;
                     row.appendChild(tag);
                 });
                 const lbl = table.querySelector('.table-label');
                 if (lbl) lbl.after(row);
             }
 
-            // Lock unavailable tables
-            if (locked || timeTaken) {
-                table.classList.replace('available', 'unavailable');
-                table.title = timeTaken
-                    ? `Already reserved for ${chosenDate} at ${chosenTime}`
-                    : 'Table unavailable for management reasons';
-            }
-
             // Click to select
             table.addEventListener('click', () => {
-                if (table.classList.contains('unavailable')) return;
+                if (locked) {
+                    superModal({ title: 'Table Locked 🔒', message: 'This table is currently unavailable for management reasons.' });
+                    return;
+                }
+
+                if (timeTaken) {
+                    // Still allow pressing, but show a warning
+                    superModal({ 
+                        title: 'Time Conflict ⚠️', 
+                        message: `This table is already reserved within 2.5 hours of your arrival (${chosenTime}). Please choose another table or a different time.` 
+                    });
+                    return;
+                }
+
                 document.querySelectorAll('.table-seat').forEach(t => t.classList.remove('selected'));
                 table.classList.add('selected');
                 chosenTableId = tId;

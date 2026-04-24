@@ -33,20 +33,25 @@
 
                 <div id="admin-login" class="">
                     <h2>Sign In</h2>
-                    <div class="half">
-                        <div>
-                            <label for="admin-username">Username</label>
-                            <input id="admin-username" type="text" placeholder="Your admin username">
+                    <form autocomplete="off" onsubmit="return false;" style="margin:0;padding:0;">
+                        <!-- Hidden dummy inputs to trick browser autofill -->
+                        <input type="text" style="display:none;" tabindex="-1" aria-hidden="true">
+                        <input type="password" style="display:none;" tabindex="-1" aria-hidden="true">
+                        <div class="half">
+                            <div>
+                                <label for="admin-username">Username</label>
+                                <input id="admin-username" type="text" placeholder="Your admin username" autocomplete="off">
+                            </div>
+                            <div>
+                                <label for="admin-password">Password</label>
+                                <input id="admin-password" type="password" placeholder="Your admin password" autocomplete="new-password">
+                            </div>
                         </div>
-                        <div>
-                            <label for="admin-password">Password</label>
-                            <input id="admin-password" type="password" placeholder="Your admin password">
+                        <div class="btnrow">
+                            <button type="button" id="admin-login-btn">Sign In</button>
                         </div>
-                    </div>
-                    <div class="btnrow">
-                        <button type="button" id="admin-login-btn">Sign In</button>
-                    </div>
-                    <div class="msg" id="auth-message-2"></div>
+                    </form>
+                    <div class="msg" id="auth-message-2" style="margin-top:10px; min-height:20px; font-size:14px; font-weight:600;"></div>
                 </div>
             </div>
 
@@ -311,8 +316,22 @@
                 </div>
             </div>
 
-            <div class="row">
-                <input id="search-input" type="text" placeholder="Search by Reservation # or Customer name...">
+            <style>
+                .status-filter { background: transparent; border: none; padding: 6px 14px; font-size: 13px; font-weight: 700; color: #64748b; cursor: pointer; border-radius: 6px; transition: all 0.2s; }
+                .status-filter.active { background: white; color: #1b5e20; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+                .status-filter:hover:not(.active) { background: rgba(0,0,0,0.05); color: #334155; }
+            </style>
+            
+            <div class="row" style="gap: 12px; align-items: center;">
+                <input id="search-input" type="text" placeholder="Search by Reservation # or Customer name..." style="flex: 1;">
+                
+                <div style="display:flex; background-color:#f1f5f9; border-radius:8px; padding:4px; gap: 4px;">
+                    <button id="filter-all" type="button" onclick="setResFilter('all')" class="status-filter active">All</button>
+                    <button id="filter-paid" type="button" onclick="setResFilter('paid')" class="status-filter">✅ Paid</button>
+                    <button id="filter-unpaid" type="button" onclick="setResFilter('unpaid')" class="status-filter">❌ Unpaid/Failed</button>
+                    <button id="filter-pending" type="button" onclick="setResFilter('pending')" class="status-filter">⏳ Pending</button>
+                </div>
+
                 <button type="button" id="export-csv-btn" class="secondary">Export CSV</button>
             </div>
 
@@ -329,7 +348,7 @@
                         <th>Table</th>
                         <th>Type</th>
                         <th>Foods / Notes</th>
-                        <th>Paid</th>
+                        <th>Payment</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -769,11 +788,32 @@
                     tdFoods.textContent = foods;
 
                     const tdPaid = document.createElement('td');
-                    tdPaid.innerHTML = `<div>₱${Number(r.paymentAmount || 0).toLocaleString()}</div>`;
+                    let methodBadge = '';
+                    if (r.paymentMethod === 'paymongo') {
+                        methodBadge = '<div style="font-size:10px; color:#166534; font-weight:800; background:#dcfce7; padding:2px 6px; border-radius:4px; display:inline-block; margin-top:4px;">💳 PAYMONGO</div>';
+                    } else if (r.paymentMethod === 'manual') {
+                        methodBadge = '<div style="font-size:10px; color:#9a3412; font-weight:800; background:#ffedd5; padding:2px 6px; border-radius:4px; display:inline-block; margin-top:4px;">🏦 MANUAL</div>';
+                    } else {
+                        methodBadge = '<div style="font-size:10px; color:#475569; font-weight:800; background:#f1f5f9; padding:2px 6px; border-radius:4px; display:inline-block; margin-top:4px;">💵 WALK-IN / COD</div>';
+                    }
+
+                    let statusBadge = '';
+                    if (r.paymentStatus === 'paid') {
+                        statusBadge = '<div style="font-size:10px; color:#15803d; font-weight:800; display:block; margin-top:2px;">✅ PAID</div>';
+                    } else if (r.paymentStatus === 'pending_paymongo') {
+                        statusBadge = '<div style="font-size:10px; color:#dc2626; font-weight:800; display:block; margin-top:2px;">❌ UNPAID/FAILED</div>';
+                    } else if (r.paymentStatus === 'pending') {
+                        statusBadge = '<div style="font-size:10px; color:#b45309; font-weight:800; display:block; margin-top:2px;">⏳ PENDING CHECK</div>';
+                    } else if (r.paymentStatus === 'none' || !r.paymentStatus) {
+                        statusBadge = '<div style="font-size:10px; color:#64748b; font-weight:800; display:block; margin-top:2px;">— NONE / COD —</div>';
+                    }
+
+                    tdPaid.innerHTML = `<div style="font-weight:800; color:#1e293b; font-size:14px;">₱${Number(r.paymentAmount || 0).toLocaleString()}</div>${methodBadge}${statusBadge}`;
+                    
                     if (r.paymentProof || r.paymentRef) {
                         const proofBtn = document.createElement('button');
                         proofBtn.textContent = '🧾 View Proof';
-                        proofBtn.style.cssText = 'font-size:11px; padding:3px 8px; margin-top:4px; background:#e0f2fe; border:1px solid #7ec8e3; color:#0369a1; border-radius:4px; cursor:pointer; display:block; width:100%;';
+                        proofBtn.style.cssText = 'font-size:11px; padding:3px 8px; margin-top:6px; background:#e0f2fe; border:1px solid #7ec8e3; color:#0369a1; border-radius:4px; cursor:pointer; display:block; width:100%; font-weight:600;';
                         proofBtn.onclick = () => window.openProofModal(r);
                         tdPaid.appendChild(proofBtn);
                     }
@@ -1298,8 +1338,7 @@
                 
                 const listEl = document.getElementById('adminChatList');
                 if (listEl) {
-                        }
-                    });
+                    // Chat list will be re-rendered on next poll
                 }
             };
 
@@ -1570,12 +1609,34 @@
             };
 
 
+            window.currentPaymentFilter = 'all';
+
+            window.setResFilter = function(filterValue) {
+                window.currentPaymentFilter = filterValue;
+                document.querySelectorAll('.status-filter').forEach(b => b.classList.remove('active'));
+                document.getElementById('filter-' + filterValue).classList.add('active');
+                applySearch();
+            };
+
             function applySearch() {
                 const q = normalizeText(searchInput.value);
-                const filtered = !q ? history : history.filter(r => {
+                const filtered = history.filter(r => {
+                    // Filter by Text
                     const rn = normalizeText(r.reservationNumber);
                     const cn = normalizeText(r.customerName);
-                    return rn.includes(q) || cn.includes(q);
+                    const matchesText = !q || rn.includes(q) || cn.includes(q);
+
+                    // Filter by Status
+                    let matchesStatus = true;
+                    if (window.currentPaymentFilter === 'paid') {
+                        matchesStatus = r.paymentStatus === 'paid';
+                    } else if (window.currentPaymentFilter === 'unpaid') {
+                        matchesStatus = r.paymentStatus === 'pending_paymongo';
+                    } else if (window.currentPaymentFilter === 'pending') {
+                        matchesStatus = r.paymentStatus === 'pending';
+                    } // 'all' requires no check
+
+                    return matchesText && matchesStatus;
                 });
                 renderRows(filtered);
                 summaryLine.textContent = `Showing ${filtered.length} of ${history.length} reservations.`;
@@ -1583,7 +1644,7 @@
             }
 
             renderRows(history);
-            summaryLine.textContent = `Showing ${history.length} of ${history.length} reservations.`;
+            applySearch(); // Force initial filter
             searchInput.addEventListener('input', applySearch);
 
             // Utility removed (consolidated at top)
@@ -1800,77 +1861,124 @@
             });
         }
 
-        function initAuth() {
-            const authSection = document.getElementById('auth-section');
-            const dashboardSection = document.getElementById('dashboard-section');
+        async function initAuth() {
             const noAdminUsers = document.getElementById('no-admin-users');
             const adminLoginPanel = document.getElementById('admin-login');
-            const authMsg = document.getElementById('auth-message');
             const authMsg2 = document.getElementById('auth-message-2');
-
-            const users = getUsers();
-            const sessionUser = sessionStorage.getItem('adminLoggedInUser');
-
             const logoutBtn = document.getElementById('logout-admin-btn');
             logoutBtn.onclick = logoutAdmin;
 
+            // --- Step 1: Check existing session ---
+            const sessionUser = sessionStorage.getItem('adminLoggedInUser');
             if (sessionUser) {
                 return renderDashboard();
             }
 
-            // Admin login (Attach unconditionally)
-            document.getElementById('admin-login-btn').addEventListener('click', async () => {
-                try {
-                    const username = (document.getElementById('admin-username').value || '').trim();
-                    const password = document.getElementById('admin-password').value || '';
-                    authMsg2.textContent = '';
-                    authMsg2.style.color = '#ef4444';
+            // --- Step 2: Load user list (local first, then try cloud sync) ---
+            let knownUsers = JSON.parse(localStorage.getItem('adminUsers') || '[]');
 
-                    if (!username) { authMsg2.textContent = 'Please enter your username.'; return; }
-                    if (!password) { authMsg2.textContent = 'Please enter your password.'; return; }
-
-                    const usersNow = getUsers();
-                    const user = usersNow.find(u => u.username === username);
-                    if (!user) { authMsg2.textContent = 'Account not found. Ensure you created this staff account in the Super Admin dashboard first.'; return; }
-
-                    const passwordHash = await sha256Hex(password);
-                    const isLegacyMatch = !!(user.password && user.password === password);
-                    const isHashMatch = !!(user.passwordHash && user.passwordHash === passwordHash);
-                    
-                    if (!isLegacyMatch && !isHashMatch) { 
-                        authMsg2.textContent = 'Wrong password. Please try again.'; 
-                        return; 
+            // Try to sync from Supabase in the background, non-blocking
+            try {
+                const res = await fetch('/api/staff?nocache=' + Date.now(), {
+                    headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' }
+                });
+                if (res.ok) {
+                    const cloudUsers = await res.json();
+                    if (Array.isArray(cloudUsers) && cloudUsers.length > 0) {
+                        knownUsers = cloudUsers;
+                        localStorage.setItem('adminUsers', JSON.stringify(cloudUsers)); // keep in sync
                     }
-
-                    // Auto-migrate legacy user to hashed password to upgrade security on the fly
-                    if (isLegacyMatch && !user.passwordHash) {
-                        user.passwordHash = passwordHash;
-                        delete user.password;
-                        localStorage.setItem('adminUsers', JSON.stringify(usersNow));
-                    }
-
-                    setAdminSession(username);
-                    renderDashboard();
-                } catch (err) {
-                    authMsg2.textContent = 'CRITICAL LOGIN ERROR: ' + err.message;
                 }
-            });
+            } catch (e) {
+                // Silently use local storage - no network needed for offline use
+            }
 
-            // Allow ENTER key to submit
-            const handleEnter = function(e) {
-                if (e.key === 'Enter') {
-                    document.getElementById('admin-login-btn').click();
-                }
-            };
-            document.getElementById('admin-username').addEventListener('keypress', handleEnter);
-            document.getElementById('admin-password').addEventListener('keypress', handleEnter);
-
-            if (!users.length) {
+            // --- Step 3: Show restricted message if no accounts exist ---
+            if (knownUsers.length === 0) {
                 noAdminUsers.classList.remove('hidden');
                 adminLoginPanel.classList.add('hidden');
                 return;
             }
 
+            // --- Step 4: Attach the Sign In button handler ---
+            document.getElementById('admin-login-btn').addEventListener('click', async () => {
+                const btn = document.getElementById('admin-login-btn');
+                authMsg2.textContent = '';
+                authMsg2.style.color = '#ef4444';
+
+                const username = (document.getElementById('admin-username').value || '').trim();
+                const password = document.getElementById('admin-password').value || '';
+
+                if (!username) { authMsg2.textContent = '⚠️ Please enter your username.'; return; }
+                if (!password) { authMsg2.textContent = '⚠️ Please enter your password.'; return; }
+
+                btn.textContent = 'Authenticating...';
+                btn.disabled = true;
+
+                try {
+                    // Always re-fetch latest user list on login attempt
+                    let usersNow = JSON.parse(localStorage.getItem('adminUsers') || '[]');
+                    try {
+                        const res = await fetch('/api/staff?nocache=' + Date.now(), {
+                            headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' }
+                        });
+                        if (res.ok) {
+                            const cloud = await res.json();
+                            if (Array.isArray(cloud) && cloud.length > 0) {
+                                usersNow = cloud;
+                                localStorage.setItem('adminUsers', JSON.stringify(cloud));
+                            }
+                        }
+                    } catch (e) { /* use local */ }
+
+                    // Find user (case-insensitive)
+                    const user = usersNow.find(u => (u.username || '').toLowerCase() === username.toLowerCase());
+                    if (!user) {
+                        authMsg2.textContent = `❌ Account "${username}" not found. Contact Super Admin.`;
+                        btn.textContent = 'Sign In';
+                        btn.disabled = false;
+                        return;
+                    }
+
+                    // Validate password — supports both hashed and legacy plain-text
+                    const passwordHash = await sha256Hex(password);
+                    const storedHash = user.passwordHash || user.passwordhash;
+                    const isHashMatch = storedHash && storedHash === passwordHash;
+                    const isLegacyMatch = user.password && user.password === password;
+
+                    if (!isHashMatch && !isLegacyMatch) {
+                        authMsg2.textContent = '❌ Incorrect password. Please try again.';
+                        btn.textContent = 'Sign In';
+                        btn.disabled = false;
+                        return;
+                    }
+
+                    // Upgrade legacy plain-text password to hash silently
+                    if (isLegacyMatch && !storedHash) {
+                        user.passwordHash = passwordHash;
+                        delete user.password;
+                        localStorage.setItem('adminUsers', JSON.stringify(usersNow));
+                    }
+
+                    // ✅ Login successful
+                    authMsg2.style.color = '#16a34a';
+                    authMsg2.textContent = '✅ Login successful! Loading dashboard...';
+                    setAdminSession(user.username);
+                    setTimeout(() => renderDashboard(), 400);
+
+                } catch (err) {
+                    authMsg2.textContent = '⚠️ Error: ' + err.message;
+                    btn.textContent = 'Sign In';
+                    btn.disabled = false;
+                }
+            });
+
+            // Allow Enter key to submit
+            ['admin-username', 'admin-password'].forEach(id => {
+                document.getElementById(id).addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') document.getElementById('admin-login-btn').click();
+                });
+            });
         }
 
         initAuth();

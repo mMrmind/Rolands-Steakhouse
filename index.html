@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+    <script>if (location.protocol === 'file:') location.replace('http://localhost:3000/index.html');</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Roland's Steak House</title>
@@ -714,7 +715,7 @@
             }
         }, 3000);
 
-        // Payment status polling (Verified/Rejected)
+        // Payment status polling (Verified/Rejected — for manual payments only)
         setInterval(() => {
             const hist = JSON.parse(localStorage.getItem('reservationHistory') || '[]');
             const myName = localStorage.getItem('customerName');
@@ -722,57 +723,87 @@
 
             let newlyVerified = false;
             let newlyRejected = false;
+            let verifiedRes = null;
+            let rejectedRes = null;
 
             hist.forEach(r => {
-                if (r.customerName === myName) {
-                    if (r.paymentStatus === 'verified' && !r.receiptAcknowledged) {
-                        newlyVerified = true;
-                        r.receiptAcknowledged = true;
-                    } else if (r.paymentStatus === 'rejected' && !r.rejectionAcknowledged) {
-                        newlyRejected = true;
-                        r.rejectionAcknowledged = true;
-                    }
+                if (r.customerName !== myName) return;
+
+                // Skip PayMongo-processed payments — they are handled by payment-success.html
+                if (r.paymentMethod === 'paymongo' || r.paymentStatus === 'paid' || r.paymentStatus === 'pending_paymongo') return;
+
+                // Only show "Verified" popup for admin-verified MANUAL payments not yet acknowledged
+                if (r.paymentStatus === 'verified' && !r.receiptAcknowledged) {
+                    newlyVerified = true;
+                    verifiedRes = r;
+                    r.receiptAcknowledged = true;
+                }
+
+                // Only show "Rejected" popup for admin-explicitly-rejected entries not yet acknowledged
+                if (r.paymentStatus === 'rejected' && !r.rejectionAcknowledged) {
+                    newlyRejected = true;
+                    rejectedRes = r;
+                    r.rejectionAcknowledged = true;
                 }
             });
 
-            if (newlyVerified || newlyRejected) {
-                localStorage.setItem('reservationHistory', JSON.stringify(hist));
+            if (!newlyVerified && !newlyRejected) return;
 
-                const overlay = document.createElement('div');
-                overlay.style.cssText = "position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:9999; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(5px);";
+            localStorage.setItem('reservationHistory', JSON.stringify(hist));
 
-                if (newlyVerified) {
-                    overlay.innerHTML = `
-                        <div style="background:white; padding:40px; border-radius:24px; text-align:center; max-width:420px; width:90%; position:relative; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5); animation: zoomIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);">
-                            <div style="font-size:70px; margin-bottom:20px;">✅</div>
-                            <h2 style="font-family:'Playfair Display',serif; color:#1b5e20; margin-bottom:12px; font-size:28px;">Payment Verified!</h2>
-                            <p style="color:#64748b; margin-bottom:30px; line-height:1.6; font-size:16px;">Your payment has been successfully verified! Your receipt is now available in your Live Chat support.</p>
-                            <button onclick="closeStatusPopup(this.parentElement.parentElement, true)" style="background:#1b5e20; color:white; border:none; padding:16px 24px; border-radius:12px; font-weight:700; cursor:pointer; width:100%; font-size:16px; transition:0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">View Receipt in Chat</button>
-                        </div>
-                        <style>@keyframes zoomIn { from { transform: scale(0.9); opacity:0; } to { transform: scale(1); opacity:1; } }</style>
-                    `;
-                } else if (newlyRejected) {
-                    overlay.innerHTML = `
-                        <div style="background:white; padding:40px; border-radius:24px; text-align:center; max-width:420px; width:90%; position:relative; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5); animation: zoomIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);">
-                            <div style="font-size:70px; margin-bottom:20px;">⚠️</div>
-                            <h2 style="font-family:'Playfair Display',serif; color:#b91c1c; margin-bottom:12px; font-size:28px;">Payment Invalid</h2>
-                            <p style="color:#64748b; margin-bottom:30px; line-height:1.6; font-size:16px;">Sorry, your payment is invalid after checking. Please check your transaction details and re-upload your proof of payment.</p>
-                            <button onclick="closeStatusPopup(this.parentElement.parentElement, false)" style="background:#b91c1c; color:white; border:none; padding:16px 24px; border-radius:12px; font-weight:700; cursor:pointer; width:100%; font-size:16px; transition:0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">I Understand</button>
-                        </div>
-                        <style>@keyframes zoomIn { from { transform: scale(0.9); opacity:0; } to { transform: scale(1); opacity:1; } }</style>
-                    `;
-                }
+            const overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:9999; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(6px); animation:fadeIn 0.2s ease;';
 
-                document.body.appendChild(overlay);
+            const style = `<style>
+                @keyframes zoomIn { from { transform: scale(0.88); opacity:0; } to { transform: scale(1); opacity:1; } }
+                @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+                .pay-popup-card { background:white; padding:44px 36px; border-radius:24px; text-align:center; max-width:420px; width:90%; box-shadow:0 25px 60px rgba(0,0,0,0.35); animation:zoomIn 0.35s cubic-bezier(0.34,1.56,0.64,1); }
+                .pay-popup-icon { font-size:72px; margin-bottom:16px; }
+                .pay-popup-title { font-family:'Playfair Display',serif; font-size:26px; margin-bottom:10px; }
+                .pay-popup-msg { color:#64748b; line-height:1.65; font-size:15px; margin-bottom:28px; }
+                .pay-popup-resno { font-size:12px; color:#94a3b8; margin-bottom:24px; font-weight:600; }
+                .pay-popup-btn { border:none; padding:15px 24px; border-radius:12px; font-weight:700; cursor:pointer; width:100%; font-size:15px; transition:transform 0.15s; font-family:'Roboto',sans-serif; }
+                .pay-popup-btn:hover { transform:scale(1.02); }
+            </style>`;
 
-                window.closeStatusPopup = function (el, openChat) {
-                    el.remove();
-                    if (openChat) {
-                        const panel = document.getElementById('chatPanel');
-                        if (!panel.classList.contains('active')) toggleChat();
-                    }
-                };
+            if (newlyVerified) {
+                const resNo = verifiedRes ? verifiedRes.reservationNumber : '';
+                overlay.innerHTML = style + `
+                    <div class="pay-popup-card">
+                        <div class="pay-popup-icon">✅</div>
+                        <h2 class="pay-popup-title" style="color:#1b5e20;">Payment Verified!</h2>
+                        <p class="pay-popup-msg">Your payment has been confirmed by our team. Your reservation is now secured!</p>
+                        ${resNo ? `<div class="pay-popup-resno">Reservation #${resNo}</div>` : ''}
+                        <button class="pay-popup-btn" style="background:#1b5e20; color:white;" 
+                            onclick="closeStatusPopup(this.closest('[style*=fixed]'), true)">
+                            💬 View Receipt in Chat
+                        </button>
+                    </div>`;
+
+            } else if (newlyRejected) {
+                const resNo = rejectedRes ? rejectedRes.reservationNumber : '';
+                overlay.innerHTML = style + `
+                    <div class="pay-popup-card">
+                        <div class="pay-popup-icon">⚠️</div>
+                        <h2 class="pay-popup-title" style="color:#b91c1c;">Payment Invalid</h2>
+                        <p class="pay-popup-msg">Sorry, your payment could not be verified. Please check your transaction details and re-upload your proof of payment.</p>
+                        ${resNo ? `<div class="pay-popup-resno">Reservation #${resNo}</div>` : ''}
+                        <button class="pay-popup-btn" style="background:#b91c1c; color:white;"
+                            onclick="closeStatusPopup(this.closest('[style*=fixed]'), false)">
+                            I Understand
+                        </button>
+                    </div>`;
             }
+
+            document.body.appendChild(overlay);
+
+            window.closeStatusPopup = function(el, openChat) {
+                if (el) el.remove();
+                if (openChat) {
+                    const panel = document.getElementById('chatPanel');
+                    if (panel && !panel.classList.contains('active')) toggleChat();
+                }
+            };
         }, 3000);
     </script>
 

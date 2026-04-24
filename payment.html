@@ -392,6 +392,11 @@
                 Pay Now via PayMongo
             </button>
 
+            <!-- Dev Mode Bypass (Always visible for testing) -->
+            <button id="dev-mock-btn" onclick="mockSuccess()" style="width:100%; margin-bottom:20px; padding:16px; background:#ff9800; border:none; border-radius:14px; color:white; font-size:16px; font-weight:800; cursor:pointer; box-shadow: 0 4px 12px rgba(255,152,0,0.4); display:flex; align-items:center; justify-content:center; gap:10px;">
+                🧪 TEST DATA: Mock Success (Skip PayMongo)
+            </button>
+
             <button class="cancel-btn" onclick="cancelBooking()">✕ Cancel Booking</button>
 
             <p style="text-align:center; font-size:12px; color:#aaa; margin:10px 0 0;">
@@ -444,7 +449,7 @@
         const d = new Date(arrivalDate + 'T' + arrivalTime);
         const displayDt = isNaN(d) ? arrivalDate + ' ' + arrivalTime : d.toLocaleString(undefined, {
             weekday: 'short', month: 'short', day: 'numeric',
-            hour: 'numeric', minute: '2-digit', hour12: true
+            hour: '2-digit', minute: '2-digit', hour12: false
         });
         document.getElementById('summary-date').textContent = displayDt || '—';
         localStorage.setItem('arrivalDateTimeDisplay', displayDt);
@@ -708,6 +713,12 @@
                 window.onbeforeunload = null;
                 window.location.href = 'pre-order.html';
             }
+        }
+        async function mockSuccess() {
+            const resNo = localStorage.getItem('reservationNumber') || ('RES-' + Math.floor(100000 + Math.random() * 900000));
+            saveReservationDraft(resNo, 'paid'); 
+            window.onbeforeunload = null;
+            window.location.href = 'payment-success.html?resno=' + resNo;
         }
     </script>
 </body>

@@ -697,6 +697,13 @@
             });
 
             if (confirmed) {
+                // Actually clear the cart as the warning stated
+                localStorage.removeItem('preOrderCart');
+                localStorage.removeItem('totalBill');
+                localStorage.removeItem('orderSummary');
+                localStorage.removeItem('beefNote');
+                localStorage.removeItem('currentCartObj');
+                
                 window.location.href = 'seat-selection.html';
             } else {
                 // If they cancel, push the state back to keep the "back button" trapped

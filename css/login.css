@@ -261,3 +261,25 @@
                 padding: 13px;
             }
         }
+
+        /* OTP Input Styles */
+        .otp-input {
+            width: 45px;
+            height: 55px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 24px;
+            font-weight: 700;
+            text-align: center;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .otp-input:focus {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: #4caf50;
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.3);
+            transform: translateY(-2px);
+        }

@@ -266,11 +266,14 @@
             <!-- Payment Methods -->
             <div class="methods-label">Accepted Payment Methods</div>
             <div class="methods-row">
-                <div class="method-pill"><span class="dot dot-gcash"></span> GCash</div>
-                <div class="method-pill"><span class="dot dot-maya"></span> Maya</div>
                 <div class="method-pill"><span class="dot dot-card"></span> Credit / Debit Card</div>
-                <div class="method-pill"><span class="dot dot-dob"></span> Online Banking</div>
+                <div class="method-pill" style="opacity: 0.5;"><span class="dot dot-dob"></span> Online Banking (Test)</div>
             </div>
+
+            <!-- Dev Mode Bypass (Always visible for testing) -->
+            <button id="dev-mock-btn" onclick="mockSuccess()" style="width:100%; margin-bottom:20px; padding:16px; background:#ff9800; border:none; border-radius:14px; color:white; font-size:16px; font-weight:800; cursor:pointer; box-shadow: 0 4px 12px rgba(255,152,0,0.4); display:flex; align-items:center; justify-content:center; gap:10px;">
+                🧪 TEST DATA: Mock Success (Skip PayMongo)
+            </button>
 
             <!-- PayMongo CTA -->
             <button class="pay-btn" id="paymongo-btn" onclick="initiatePayMongoCheckout()">
@@ -280,9 +283,9 @@
                 Pay Deposit via PayMongo
             </button>
 
-            <button class="cancel-btn" onclick="cancelBooking()">✕ Cancel Booking</button>
+            <button class="cancel-btn" onclick="cancelBooking()" style="margin-top:12px;">✕ Cancel Booking</button>
             <p style="text-align:center; font-size:12px; color:#aaa; margin:10px 0 0;">
-                Cancellation will remove your reservation and return you to the homepage.
+                Cancellation will remove your reservation and return you to the table selection area.
             </p>
 
             <!-- Manual fallback -->
@@ -326,7 +329,7 @@
         const d = new Date(arrivalDate + 'T' + arrivalTime);
         const displayDt = isNaN(d) ? arrivalDate + ' ' + arrivalTime : d.toLocaleString(undefined, {
             weekday: 'short', month: 'short', day: 'numeric',
-            hour: 'numeric', minute: '2-digit', hour12: true
+            hour: '2-digit', minute: '2-digit', hour12: false
         });
         localStorage.setItem('arrivalDateTimeDisplay', displayDt);
 
@@ -517,8 +520,14 @@
                 localStorage.removeItem('tempPaymentUpload');
                 localStorage.removeItem('pendingReservation');
                 window.onbeforeunload = null;
-                window.location.href = 'index.html';
+                window.location.href = 'seat-selection.html';
             }
+        }
+        async function mockSuccess() {
+            const resNo = localStorage.getItem('reservationNumber') || ('RES-' + Math.floor(100000 + Math.random() * 900000));
+            saveReservationDraft(resNo, 'paid'); 
+            window.onbeforeunload = null;
+            window.location.href = 'payment-success.html?resno=' + resNo;
         }
     </script>
 </body>

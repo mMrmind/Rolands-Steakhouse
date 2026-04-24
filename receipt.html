@@ -120,7 +120,7 @@
         let total = localStorage.getItem('totalBill') || '0';
         let orders = localStorage.getItem('orderSummary') || 'No items selected';
         let reservationNumber = localStorage.getItem('reservationNumber') || 'TBD';
-        let arrivalDisplay = localStorage.getItem('arrivalDateTimeDisplay') || new Date().toLocaleString();
+        let arrivalDisplay = localStorage.getItem('arrivalDateTimeDisplay') || new Date().toLocaleString('en-GB', { hour12: false });
 
         if (urlRes) {
             const hist = JSON.parse(localStorage.getItem('reservationHistory') || '[]');
@@ -131,7 +131,7 @@
                 total = myRes.paymentAmount || '0';
                 orders = myRes.orderSummary || 'No items selected';
                 reservationNumber = myRes.reservationNumber;
-                arrivalDisplay = myRes.arrivalDateTimeDisplay || new Date().toLocaleString();
+                arrivalDisplay = myRes.arrivalDateTimeDisplay || new Date().toLocaleString('en-GB', { hour12: false });
             }
         }
 

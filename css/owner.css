@@ -8,7 +8,12 @@ header { background: #064e3b; color: white; padding: 18px 30px; display: flex; j
 
 .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom: 30px; }
 @media (max-width: 1024px) { .grid-4 { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 600px) { .grid-4 { grid-template-columns: 1fr; } }
+@media (max-width: 600px) { 
+    .grid-4 { grid-template-columns: 1fr; gap: 14px; } 
+    .page-title { font-size: 28px; }
+    .kpi-value { font-size: 32px; }
+    .container { padding: 20px 14px; }
+}
 
 .kpi-card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); border: 1px solid #e5e7eb; border-top: 4px solid #10b981; }
 .kpi-title { font-size: 14px; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; }

@@ -26,6 +26,12 @@ header {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     transition: 0.3s;
     min-height: 70px;
+    /* Ensure the header container doesn't block clicks in its empty areas on mobile */
+    pointer-events: none;
+}
+
+header > * {
+    pointer-events: auto;
 }
 
 header.transparent {
@@ -160,7 +166,7 @@ section {
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    padding: 100px 40px 60px;
+    padding: 120px 40px 60px;
     box-sizing: border-box;
     will-change: opacity, transform;
 }
@@ -350,6 +356,7 @@ body::after {
     margin: 30px auto;
     cursor: pointer;
     user-select: none;
+    touch-action: none; /* Block browser gestures to allow custom flip */
 }
 
 .menu-book-wrap {
@@ -522,7 +529,8 @@ button:hover {
     }
 
     #home h1 {
-        font-size: 45px;
+        font-size: clamp(32px, 10vw, 56px);
+        line-height: 1.1;
     }
 
     section {
@@ -560,6 +568,16 @@ button:hover {
 
     .table-seat img {
         height: 75px;
+    }
+
+    /* Compact header for mobile */
+    header {
+        padding: 10px 20px;
+        gap: 8px;
+    }
+    
+    nav ul {
+        gap: 10px;
     }
 }
 
@@ -1228,7 +1246,12 @@ button:hover {
 
     /* Menu book */
     .menu-book-container {
-        width: 92vw;
+        width: 95vw;
+        margin: 20px auto;
+    }
+    
+    .menu-book {
+        aspect-ratio: 1 / 1.35; /* Slightly shorter for phone screens */
     }
 }
 
@@ -1484,7 +1507,16 @@ body.vip-mode .reservation-filter label span {
 }
 
 @media (max-width: 540px) {
-    .vip-card { padding: 32px 20px; }
+    .vip-card { 
+        padding: 30px 18px; 
+        border-radius: 20px;
+    }
+    .vip-title { font-size: 26px; }
+    .vip-crown { font-size: 40px; }
+    .vip-price-main { font-size: 32px; }
+    .vip-pills { gap: 6px; }
+    .vip-pill { padding: 6px 12px; font-size: 12px; }
+    .vip-reserve-btn { padding: 14px 30px; font-size: 15px; width: 100%; }
 }
 
 /* --- FOOTER --- */

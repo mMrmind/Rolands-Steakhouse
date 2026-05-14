@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/design-system.css">
     <script src="js/design-system.js"></script>
+    <link rel="stylesheet" href="css/responsive.css">
 </head>
 <body class="seat-selection-page">
 
@@ -28,7 +29,7 @@
 
     <!-- ═══ HEADER ═══ -->
     <header id="main-header">
-        <div class="logo"><img src="images/rolandsLOGO.jpg" alt="Logo"></div>
+        <div class="logo"><img src="images/Rolands logo 2.png" alt="Roland's Steak House"></div>
         <nav>
             <ul>
                 <li><a href="index.html#home" class="nav-link">Home</a></li>
@@ -85,31 +86,24 @@
 
         <!-- ── Table grid (Standard & Priority) ── -->
         <div id="table-grid-container">
-            <p id="instruction-text">Please select a table:</p>
-            <div class="floor-plan">
-                <div class="table-seat available" data-id="Table 1"><img src="images/T1.jpg" alt="Table 1" data-label="Table 1"><div class="table-label">Table 1</div></div>
-                <div class="table-seat available" data-id="Table 2"><img src="images/T2.jpg" alt="Table 2" data-label="Table 2"><div class="table-label">Table 2</div></div>
-                <div class="table-seat available" data-id="Table 3"><img src="images/T3.jpg" alt="Table 3" data-label="Table 3"><div class="table-label">Table 3</div></div>
-                <div class="table-seat available" data-id="Table 4"><img src="images/T4.jpg" alt="Table 4" data-label="Table 4"><div class="table-label">Table 4</div></div>
-                <div class="table-seat available" data-id="Table 5"><img src="images/T5.jpg" alt="Table 5" data-label="Table 5"><div class="table-label">Table 5</div></div>
-                <div class="table-seat available" data-id="Table 6"><img src="images/T6.jpg" alt="Table 6" data-label="Table 6"><div class="table-label">Table 6</div></div>
-                <div class="table-seat available" data-id="Table 7"><img src="images/T7.jpg" alt="Table 7" data-label="Table 7"><div class="table-label">Table 7</div></div>
-                <div class="table-seat available" data-id="Table 8"><img src="images/T8.jpg" alt="Table 8" data-label="Table 8"><div class="table-label">Table 8</div></div>
-                <div class="table-seat available" data-id="Table 9"><img src="images/T9.jpg" alt="Table 9" data-label="Table 9"><div class="table-label">Table 9</div></div>
-                <div class="table-seat available" data-id="Table 10"><img src="images/T10.jpg" alt="Table 10" data-label="Table 10"><div class="table-label">Table 10</div></div>
+            <p id="instruction-text" style="font-size: 14px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 25px;">
+                Step 2: Choose Your Table
+            </p>
+            <div class="floor-plan" id="dynamic-floor-plan">
+                <!-- Tables generated dynamically -->
             </div>
         </div>
 
         <!-- ── Checkout panel (Standard & Priority) ── -->
         <div class="checkout-panel" id="checkout-panel">
-            <p style="font-size:18px; margin-bottom:20px;">
-                Selection: <strong id="selected-seat-display" style="color:#2e7d32;">None</strong>
-            </p>
-            <button id="confirm-final-btn" disabled>Confirm Booking</button>
-            <button type="button" onclick="window.location.href='index.html#reservations'" 
-                    style="width: 100%; border: 1px solid #e2e8f0; background: white; color: #64748b; padding: 14px; border-radius: 12px; font-weight: bold; margin-top: 12px; cursor: pointer; transition: all 0.2s;"
-                    onmouseover="this.style.background='#f8fafc'; this.style.color='#ef4444'; this.style.borderColor='#fee2e2'"
-                    onmouseout="this.style.background='white'; this.style.color='#64748b'; this.style.borderColor='#e2e8f0'">
+            <div class="selection-summary">
+                <span class="selection-label">Selected Table</span>
+                <div id="selected-seat-display" class="selected-table-name">None</div>
+            </div>
+            
+            <button id="confirm-final-btn" disabled>Confirm Booking <span>→</span></button>
+            
+            <button type="button" class="cancel-selection-btn" onclick="window.location.href='index.html#reservations'">
                 Cancel & Go Back
             </button>
         </div>
@@ -124,6 +118,40 @@
     </div>
 
     <script>
+        // ──────────────────────────────────────────────────────────
+        // DYNAMIC FLOOR PLAN GENERATION
+        // ──────────────────────────────────────────────────────────
+        function getFloorPlanConfig() {
+            try {
+                const saved = localStorage.getItem('floorPlanConfig');
+                if (saved) return JSON.parse(saved);
+            } catch(e) {}
+            return [
+                { id: "Table 1", name: "Table 1", image: "images/T1.jpg" },
+                { id: "Table 2", name: "Table 2", image: "images/T2.jpg" },
+                { id: "Table 3", name: "Table 3", image: "images/T3.jpg" },
+                { id: "Table 4", name: "Table 4", image: "images/T4.jpg" },
+                { id: "Table 5", name: "Table 5", image: "images/T5.jpg" },
+                { id: "Table 6", name: "Table 6", image: "images/T6.jpg" },
+                { id: "Table 7", name: "Table 7", image: "images/T7.jpg" },
+                { id: "Table 8", name: "Table 8", image: "images/T8.jpg" },
+                { id: "Table 9", name: "Table 9", image: "images/T9.jpg" },
+                { id: "Table 10", name: "Table 10", image: "images/T10.jpg" },
+                { id: "VIP Room", name: "VIP Room", image: "images/VIP1.jpg", isVip: true }
+            ];
+        }
+
+        const floorPlanContainer = document.getElementById('dynamic-floor-plan');
+        getFloorPlanConfig().forEach(t => {
+            if (t.isVip) return; // VIP Room is handled in its own section
+            const img = t.image || 'images/T1.jpg'; // fallback
+            const div = document.createElement('div');
+            div.className = 'table-seat available';
+            div.setAttribute('data-id', t.id);
+            div.innerHTML = `<img src="${img}" alt="${t.name}" data-label="${t.name}"><div class="table-label">${t.name}</div>${t.description ? `<div style="font-size:11px; color:#475569; margin-top:2px; text-align:center;">🪑 ${t.description}</div>` : ''}`;
+            floorPlanContainer.appendChild(div);
+        });
+
         // ──────────────────────────────────────────────────────────
         // LIGHTBOX
         // ──────────────────────────────────────────────────────────

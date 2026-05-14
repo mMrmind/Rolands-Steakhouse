@@ -6,6 +6,7 @@
     <title>Kitchen Display System (KDS) | Roland's</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/kds.css">
+    <link rel="stylesheet" href="css/responsive.css">
 </head>
 <body>
 
@@ -36,50 +37,77 @@
 
         function loadTickets() {
             const hist = JSON.parse(localStorage.getItem('reservationHistory') || '[]');
+            const overrides = JSON.parse(localStorage.getItem('tableOverrides') || '{}');
             const grid = document.getElementById('ticket-grid');
             grid.innerHTML = '';
             
-            // Filter orders with foods that are NOT served
-            const foodOrders = hist.filter(r => r.foods && r.foods.length > 0 && r.kdsStatus !== 'served');
+            // Separate into active queue and continuous orders
+            const activeOrders = [];
+            const continuousOrders = [];
+
+            hist.forEach(r => {
+                if (!r.foods || r.foods.length === 0) return;
+                
+                const isSeated = overrides[r.bookedTable] === 'seated';
+                const isServed = r.kdsStatus === 'served';
+
+                if (isSeated && isServed) {
+                    continuousOrders.push(r);
+                } else if (!isServed) {
+                    activeOrders.push(r);
+                }
+            });
             
             // Sort to push Ready to the end, or oldest to the front
-            foodOrders.sort((a, b) => {
+            activeOrders.sort((a, b) => {
                 if (a.kdsStatus === 'ready' && b.kdsStatus !== 'ready') return 1;
                 if (b.kdsStatus === 'ready' && a.kdsStatus !== 'ready') return -1;
-                // Otherwise sort by arrival time
-                if (a.arrivalTime && b.arrivalTime) {
-                    return a.arrivalTime.localeCompare(b.arrivalTime);
-                }
+                if (a.arrivalTime && b.arrivalTime) return a.arrivalTime.localeCompare(b.arrivalTime);
                 return 0;
             });
             
-            if (foodOrders.length === 0) {
+            if (activeOrders.length === 0 && continuousOrders.length === 0) {
                 grid.innerHTML = `<div class="no-tickets">No Active Pre-Orders in Queue</div>`;
                 return;
             }
 
-            foodOrders.forEach(r => {
+            // Render function for a single ticket
+            const renderTicket = (r, isContinuous) => {
                 // Find real index for saving back to localStorage
                 const realIdx = hist.findIndex(hr => hr.reservationNumber === r.reservationNumber);
                 
-                const status = r.kdsStatus || 'pending';
+                const status = isContinuous ? 'continuous' : (r.kdsStatus || 'pending');
                 const t = document.createElement('div');
                 t.className = `ticket status-${status}`;
+                if (isContinuous) t.style.opacity = '0.8'; // slight dim for continuous
                 
                 // Construct the food line items natively 
-                const foodsHtml = (r.foods || []).map(f => `<li><span class="qty">1x</span> ${f}</li>`).join('');
+                let beefNoteHtml = '';
+                if (r.beefNote) {
+                    const bn = r.beefNote.toLowerCase();
+                    if (bn.includes('rare') || bn.includes('medium')) {
+                        beefNoteHtml = `<li style="color: #dc2626; font-weight: 800; font-size: 1.1em; background: #fee2e2; padding: 4px 8px; border-radius: 4px; margin-bottom: 5px; border: 1px solid #f87171;">🔥 ${r.beefNote.toUpperCase()}</li>`;
+                    } else {
+                        beefNoteHtml = `<li style="font-style: italic; color: #b45309; font-weight: bold; margin-bottom: 5px;">Note: ${r.beefNote}</li>`;
+                    }
+                }
+                const foodsHtml = beefNoteHtml + (r.foods || []).map(f => `<li><span class="qty">1x</span> ${f}</li>`).join('');
                 
                 let btns = '';
-                if (status === 'pending') {
-                    btns = `<button class="btn-cook" onclick="updateStatus(${realIdx}, 'cooking')">Start Cooking</button>`;
-                } else if (status === 'cooking') {
-                    btns = `<button class="btn-ready" onclick="updateStatus(${realIdx}, 'ready')">Mark Ready</button>`;
-                } else if (status === 'ready') {
-                    btns = `<button class="btn-clear" onclick="updateStatus(${realIdx}, 'served')">Dismiss (Served)</button>`;
+                if (!isContinuous) {
+                    if (status === 'pending') {
+                        btns = `<button class="btn-cook" onclick="updateStatus(${realIdx}, 'cooking')">Start Cooking</button>`;
+                    } else if (status === 'cooking') {
+                        btns = `<button class="btn-ready" onclick="updateStatus(${realIdx}, 'ready')">Mark Ready</button>`;
+                    } else if (status === 'ready') {
+                        btns = `<button class="btn-clear" onclick="updateStatus(${realIdx}, 'served')">Dismiss (Served)</button>`;
+                    }
+                } else {
+                    btns = `<div style="text-align:center; font-size:12px; color:#6b7280; font-weight:bold;">Open Bill - Clears when table is un-seated</div>`;
                 }
 
                 t.innerHTML = `
-                    <div class="ticket-header">
+                    <div class="ticket-header" style="${isContinuous ? 'background:#f3f4f6;' : ''}">
                         <div>
                             <div class="ticket-table">${r.bookedTable || 'Waiting'}</div>
                             <div class="ticket-name">${r.customerName}</div>
@@ -87,14 +115,27 @@
                         </div>
                         <div class="ticket-meta">
                             <div class="ticket-time">${r.arrivalTime || 'ASAP'}</div>
-                            <div class="ticket-status status-text-${status}">${status}</div>
+                            <div class="ticket-status status-text-${status}">${isContinuous ? 'OPEN BILL' : status}</div>
                         </div>
                     </div>
                     <ul class="food-list">${foodsHtml}</ul>
                     <div class="actions">${btns}</div>
                 `;
-                grid.appendChild(t);
-            });
+                return t;
+            };
+
+            // Append active orders
+            activeOrders.forEach(r => grid.appendChild(renderTicket(r, false)));
+
+            // Append continuous orders section if any exist
+            if (continuousOrders.length > 0) {
+                const sep = document.createElement('div');
+                sep.style.cssText = 'grid-column: 1 / -1; margin-top: 20px; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 2px dashed #cbd5e1; color: #475569; font-family: Playfair Display, serif; font-size: 24px; font-weight: bold;';
+                sep.textContent = '🔄 Continuous Orders (Open Bills)';
+                grid.appendChild(sep);
+                
+                continuousOrders.forEach(r => grid.appendChild(renderTicket(r, true)));
+            }
         }
 
         window.updateStatus = function(idx, newStatus) {

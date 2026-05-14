@@ -22,6 +22,66 @@ if (supabaseUrl && supabaseKey) {
 }
 
 
+const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER || 'your.restaurant.email@gmail.com',
+        pass: process.env.EMAIL_PASS || 'your-app-password'
+    }
+});
+
+app.post('/api/send-receipt', async (req, res) => {
+    const { email, customerName, amount, reservationNumber, paymentMethod } = req.body;
+
+    if (!email) {
+        return res.status(400).json({ error: 'No email provided' });
+    }
+
+    const mailOptions = {
+        from: process.env.EMAIL_USER || 'your.restaurant.email@gmail.com',
+        to: email,
+        subject: `Roland's Steak House - Receipt for ${reservationNumber}`,
+        html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
+                <div style="background: #1b5e20; padding: 20px; text-align: center; color: white;">
+                    <h2 style="margin: 0;">Roland's Steak House</h2>
+                    <p style="margin: 5px 0 0; opacity: 0.9;">Digital Receipt</p>
+                </div>
+                <div style="padding: 30px;">
+                    <h3 style="color: #1e293b; margin-top: 0;">Thank you for your payment, ${customerName || 'Guest'}!</h3>
+                    <p style="color: #475569;">We have successfully received your payment via <strong>${paymentMethod || 'PayMongo'}</strong>.</p>
+                    
+                    <div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span style="color: #64748b;">Reservation No:</span>
+                            <strong style="color: #1e293b;">${reservationNumber}</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding-top: 10px; border-top: 1px dashed #cbd5e1;">
+                            <span style="color: #64748b;">Total Paid:</span>
+                            <strong style="color: #16a34a; font-size: 18px;">₱${amount}</strong>
+                        </div>
+                    </div>
+                    
+                    <p style="color: #475569; line-height: 1.5;">Your order is now confirmed. You can show this receipt to our staff upon arrival or check your reservation status via our terminal.</p>
+                </div>
+                <div style="background: #f1f5f9; padding: 15px; text-align: center; color: #64748b; font-size: 12px;">
+                    &copy; 2026 Roland's Steak House. All rights reserved.
+                </div>
+            </div>
+        `
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        res.status(200).json({ success: true, message: 'Email sent!' });
+    } catch (error) {
+        console.error('Error sending email:', error);
+        res.status(500).json({ error: 'Failed to send email' });
+    }
+});
+
 /* LOGIN */
 app.post('/login', async (req, res) => {
     const { email, password } = req.body;
@@ -102,7 +162,7 @@ app.post('/api/auth/send-code', async (req, res) => {
 
         // 3. Send via uSpeedo
         const accessKeyId = process.env.USPEEDO_ACCESSKEY_ID;
-        const secretKey   = process.env.USPEEDO_ACCESSKEY_SECRET;
+        const secretKey = process.env.USPEEDO_ACCESSKEY_SECRET;
         const senderEmail = process.env.USPEEDO_SENDER_EMAIL || 'rolands@gensan.com';
 
         if (!accessKeyId || !secretKey) {
@@ -111,7 +171,7 @@ app.post('/api/auth/send-code', async (req, res) => {
         }
 
         const auth = Buffer.from(`${accessKeyId}:${secretKey}`).toString('base64');
-        
+
         console.log(`✉️ Sending verification code ${code} to ${email} via uSpeedo...`);
 
         const usRes = await fetch('https://api.uspeedo.com/v1/emails/send', {
@@ -129,7 +189,7 @@ app.post('/api/auth/send-code', async (req, res) => {
         });
 
         const usData = await usRes.json();
-        
+
         if (usRes.ok && usData.RetCode === 0) {
             res.json({ success: true });
         } else {
@@ -245,19 +305,26 @@ app.get('/reservations', async (req, res) => {
 /* SAVE NEW RESERVATION */
 app.post('/reserve', async (req, res) => {
     console.log("Saving new reservation for:", req.body.name);
-    const { name, date, time, table } = req.body;
+    const { name, date, time, table, cartItems, status } = req.body;
 
     try {
         const { error } = await supabase
             .from('reservations')
-            .insert([{ 
-                name: name, 
-                arrivalDate: date, 
-                arrivalTime: time, 
-                tableNo: table 
+            .insert([{
+                name: name,
+                arrivalDate: date,
+                arrivalTime: time,
+                tableNo: table,
+                status: status || 'pending'
             }]);
 
         if (error) throw error;
+
+        // Trigger stock deduction if cartItems provided
+        if (cartItems && cartItems.length > 0) {
+            await deductStock(cartItems);
+        }
+
         res.json({ success: true });
 
     } catch (err) {
@@ -266,11 +333,66 @@ app.post('/reserve', async (req, res) => {
     }
 });
 
+/* DEDUCT STOCK HELPER */
+async function deductStock(cartItems) {
+    if (!supabase) return; // Skip if no DB connection
+    console.log(`Deducting stock for ${cartItems.length} items...`);
+    try {
+        for (const item of cartItems) {
+            // Find current item in DB
+            const { data: invData, error: invError } = await supabase
+                .from('inventoryItems')
+                .select('id, total_stock')
+                .eq('id', item.id)
+                .single();
+
+            if (invError || !invData) continue;
+
+            const qty = item.quantity || 1;
+            const newStock = Math.max(0, (invData.total_stock || 0) - qty);
+
+            await supabase
+                .from('inventoryItems')
+                .update({ total_stock: newStock })
+                .eq('id', item.id);
+        }
+    } catch (err) {
+        console.error("Stock Deduction Error:", err);
+    }
+}
+
+/* UPDATE RESERVATION STATUS */
+app.post('/api/reservations/update-status', async (req, res) => {
+    const { id, status } = req.body;
+    try {
+        if (!supabase) throw new Error("No database connection");
+
+        // Find by name/date/time since 'id' might be a reservation number string
+        // If frontend passes a real Supabase UUID, use it. Otherwise, match by name if id is missing.
+        // We'll assume the frontend passes `resNumber` which corresponds to Supabase `id`.
+
+        // To be safe and compatible with local testing where Supabase might not have the ID:
+        if (id) {
+            const { error } = await supabase
+                .from('reservations')
+                .update({ status: status })
+                .eq('id', id);
+
+            if (error) throw error;
+        }
+
+        res.json({ success: true });
+    } catch (err) {
+        console.error("Update Status Error:", err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
 /* CREATE PAYMONGO CHECKOUT SESSION (Card-only, no QR) */
 app.post('/api/paymongo/checkout', async (req, res) => {
     const { amount, description, customerName } = req.body;
 
-    const mode     = (process.env.PAYMONGO_MODE || 'test').toLowerCase();
+    const mode = (process.env.PAYMONGO_MODE || 'test').toLowerCase();
     const finalKey = mode === 'live'
         ? (process.env.PAYMONGO_SECRET_KEY_LIVE || process.env.PAYMONGO_SECRET_KEY)
         : (process.env.PAYMONGO_SECRET_KEY_TEST || process.env.PAYMONGO_SECRET_KEY);
@@ -319,7 +441,8 @@ app.post('/api/paymongo/checkout', async (req, res) => {
         }
 
         const checkoutUrl = data?.data?.attributes?.checkout_url;
-        res.json({ checkout_url: checkoutUrl });
+        const sessionId   = data?.data?.id;
+        res.json({ checkout_url: checkoutUrl, session_id: sessionId });
 
     } catch (err) {
         console.error('PayMongo error:', err);

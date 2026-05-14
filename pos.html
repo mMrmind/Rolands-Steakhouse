@@ -1,408 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>POS Terminal | Roland's Steakhouse</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@400;500;700;900&display=swap"
+        rel="stylesheet">
     <script src="https://unpkg.com/html5-qrcode"></script>
     <link rel="stylesheet" href="css/design-system.css">
     <script src="js/design-system.js"></script>
-    <style>
-        :root {
-            --primary: #1b5e20;
-            --primary-light: #f0fdf4;
-            --secondary: #2e7d32;
-            --accent: #fbbf24;
-            --text-dark: #1e293b;
-            --text-muted: #64748b;
-            --bg-gray: #f8fafc;
-            --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-        }
-
-        body {
-            margin: 0;
-            font-family: 'Roboto', sans-serif;
-            background: #f1f5f9;
-            color: var(--text-dark);
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        header {
-            background: white;
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #e2e8f0;
-            z-index: 100;
-        }
-
-        .brand {
-            font-family: 'Playfair Display', serif;
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .terminal-status {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--text-muted);
-            background: var(--bg-gray);
-            padding: 6px 14px;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            background: #10b981;
-            border-radius: 50%;
-            box-shadow: 0 0 10px #10b981;
-        }
-
-        main {
-            flex: 1;
-            display: grid;
-            grid-template-columns: 1fr 400px;
-            overflow: hidden;
-        }
-
-        /* --- Left Side: Catalog / Scanner --- */
-        .catalog-side {
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            overflow-y: auto;
-            background: var(--bg-gray);
-        }
-
-        .mode-tabs {
-            display: flex;
-            gap: 15px;
-            background: white;
-            padding: 8px;
-            border-radius: 14px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-        }
-
-        .mode-btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 10px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            background: transparent;
-            color: var(--text-muted);
-        }
-
-        .mode-btn.active {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 4px 12px rgba(27, 94, 32, 0.3);
-        }
-
-        /* Category Filter */
-        .category-scroll {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding-bottom: 5px;
-        }
-
-        .cat-chip {
-            padding: 10px 20px;
-            background: white;
-            border-radius: 30px;
-            font-size: 14px;
-            font-weight: 700;
-            white-space: nowrap;
-            cursor: pointer;
-            border: 1px solid #e2e8f0;
-            transition: 0.2s;
-        }
-
-        .cat-chip.active {
-            background: var(--primary-light);
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        .product-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 16px;
-        }
-
-        .product-card {
-            background: white;
-            border-radius: 16px;
-            padding: 12px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            cursor: pointer;
-            transition: 0.2s;
-            position: relative;
-            border: 2px solid transparent;
-        }
-
-        .product-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--primary);
-        }
-
-        .product-img {
-            width: 100%;
-            height: 120px;
-            object-fit: cover;
-            border-radius: 12px;
-            margin-bottom: 10px;
-        }
-
-        .product-name {
-            font-weight: 700;
-            font-size: 14px;
-            margin-bottom: 4px;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            height: 34px;
-        }
-
-        .product-price {
-            color: var(--primary);
-            font-weight: 900;
-            font-size: 16px;
-        }
-
-        .stock-badge {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: rgba(0,0,0,0.6);
-            color: white;
-            font-size: 10px;
-            padding: 4px 8px;
-            border-radius: 6px;
-            backdrop-filter: blur(4px);
-        }
-
-        /* Scanner Specific */
-        .scanner-container {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            text-align: center;
-            max-width: 600px;
-            margin: 40px auto;
-            box-shadow: var(--card-shadow);
-        }
-
-        #pos-reader {
-            width: 100%;
-            border-radius: 12px;
-            overflow: hidden;
-            background: #000;
-        }
-
-        /* --- Right Side: Cart --- */
-        .cart-side {
-            background: white;
-            border-left: 2px solid #e2e8f0;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-        }
-
-        .cart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .cart-header h2 {
-            margin: 0;
-            font-size: 20px;
-            font-family: 'Playfair Display', serif;
-        }
-
-        .cart-items {
-            flex: 1;
-            overflow-y: auto;
-            margin-bottom: 20px;
-        }
-
-        .cart-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 15px;
-            padding: 10px;
-            background: #f8fafc;
-            border-radius: 12px;
-        }
-
-        .cart-item-info {
-            flex: 1;
-        }
-
-        .cart-item-name {
-            font-weight: 700;
-            font-size: 13px;
-        }
-
-        .cart-item-price {
-            font-size: 12px;
-            color: var(--primary);
-            font-weight: 700;
-        }
-
-        .qty-ctrl {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .qty-btn {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            border: 1px solid #cbd5e1;
-            background: white;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .cart-summary {
-            border-top: 1px dashed #e2e8f0;
-            padding-top: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-        }
-
-        .order-meta {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .meta-input {
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
-            font-size: 13px;
-        }
-
-        .checkout-btn {
-            background: var(--primary);
-            color: white;
-            padding: 16px;
-            border: none;
-            border-radius: 14px;
-            font-size: 18px;
-            font-weight: 900;
-            cursor: pointer;
-            box-shadow: 0 10px 15px -3px rgba(27, 94, 32, 0.4);
-            transition: 0.2s;
-        }
-
-        .checkout-btn:hover {
-            transform: scale(1.02);
-            background: var(--secondary);
-        }
-
-        /* --- Modals --- */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(8px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-
-        .modal-card {
-            background: white;
-            border-radius: 24px;
-            width: 90%;
-            max-width: 450px;
-            padding: 30px;
-            text-align: center;
-            animation: springIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        @keyframes springIn {
-            0% { transform: scale(0.8); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        .hidden { display: none !important; }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-
-        /* POS Auth Gate */
-        #pos-auth-gate {
-            position: fixed; inset: 0; background: #f0fdf4; z-index: 10000;
-            display: flex; align-items: center; justify-content: center; padding: 20px;
-        }
-        .auth-card {
-            background: #ffffff; padding: 40px; border-radius: 20px; width: 100%; max-width: 400px;
-            text-align: center; border: 2px solid #dcfce7; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
-        }
-        .auth-card h1 { font-family: 'Playfair Display', serif; color: #166534; margin: 0 0 10px; font-size: 28px; }
-        .auth-card p { color: #64748b; font-size: 14px; margin-bottom: 30px; }
-        .auth-card .pin-dots { display: flex; justify-content: center; gap: 15px; margin-bottom: 30px; }
-        .auth-card .pin-dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #e2e8f0; transition: 0.2s; }
-        .auth-card .pin-dot.filled { background: #10b981; border-color: #10b981; box-shadow: 0 0 10px rgba(16, 185, 129, 0.3); }
-        .auth-card input {
-            position: absolute; opacity: 0; pointer-events: none;
-        }
-        .auth-card .numpad {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
-        }
-        .auth-card .num-btn {
-            background: #f8fafc; color: #1e293b; border: 1px solid #e2e8f0; padding: 15px; border-radius: 12px;
-            font-size: 20px; font-weight: 900; cursor: pointer; transition: 0.2s;
-        }
-        .auth-card .num-btn:hover { background: #f0fdf4; border-color: #10b981; color: #10b981; }
-        .auth-card .num-btn:active { transform: scale(0.95); }
-        .auth-msg { color: #ef4444; font-size: 13px; font-weight: 700; margin-top: 15px; min-height: 18px; }
-
-        /* Success state */
-        .auth-card.success h1 { color: #10b981; }
-    </style>
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/pos.css">
 </head>
+
 <body>
     <!-- AUTH GATE -->
     <div id="pos-auth-gate">
@@ -443,7 +55,9 @@
             <div class="terminal-status">
                 <div class="status-dot"></div> SYNCED WITH INVENTORY
             </div>
-            <button onclick="window.close()" style="background:none; border:none; cursor:pointer; font-weight:bold; color:var(--text-muted);">✕ Exit</button>
+            <button onclick="window.close()"
+                style="background:none; border:none; cursor:pointer; font-weight:bold; color:var(--text-muted); font-size: 16px; padding: 10px; display: flex; align-items: center; gap: 6px; min-height: 44px;">✕
+                Exit</button>
         </div>
     </header>
 
@@ -451,8 +65,10 @@
         <!-- LEFT: CATALOG & SCANNER -->
         <section class="catalog-side">
             <div class="mode-tabs">
-                <button id="mode-ordering" class="mode-btn active" onclick="switchMode('ordering')">🛍️ New Order</button>
-                <button id="mode-scanning" class="mode-btn" onclick="switchMode('scanning')">📷 Scan Receipt</button>
+                <button id="mode-ordering" class="mode-btn active" onclick="switchMode('ordering')">🛍️ New
+                    Order</button>
+                <button id="mode-status" class="mode-btn" onclick="switchMode('status')">📋 Order Status</button>
+                <button id="mode-scanning" class="mode-btn" onclick="switchMode('scanning')">📷 Scan QR</button>
             </div>
 
             <!-- Ordering View -->
@@ -462,15 +78,38 @@
                 <div class="product-grid" id="product-grid"></div>
             </div>
 
+            <!-- Order Status View -->
+            <div id="view-status" class="hidden">
+                <div
+                    style="background: white; border-radius: 20px; padding: 20px; max-width: 600px; margin: 20px auto; box-shadow: var(--card-shadow);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <h2 style="font-family:'Playfair Display'; margin:0; color:var(--primary);">Order Status</h2>
+                        <button onclick="renderOrderStatus()"
+                            style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-weight:bold;">🔄
+                            Refresh</button>
+                    </div>
+                    <p style="color:var(--text-muted); font-size:14px; margin-bottom:15px;">Track orders sent to Staff
+                        Admin for approval</p>
+                    <div id="pos-order-status-list"
+                        style="display:flex; flex-direction:column; gap:10px; max-height:500px; overflow-y:auto; padding-right:5px;">
+                        <!-- List injected here -->
+                    </div>
+                </div>
+            </div>
+
             <!-- Scanning View -->
             <div id="view-scanning" class="hidden">
                 <div class="scanner-container">
                     <h2 style="font-family:'Playfair Display'; margin-top:0;">Verify Receipt</h2>
-                    <p style="color:var(--text-muted); font-size:14px; margin-bottom:25px;">Point camera at the receipt's QR code</p>
+                    <p style="color:var(--text-muted); font-size:14px; margin-bottom:25px;">Point camera at the
+                        customer's QR code</p>
                     <div id="pos-reader"></div>
                     <div style="margin-top: 20px;">
-                        <button id="scan-start-btn" onclick="startScanner()" class="checkout-btn" style="width: 100%; font-size: 16px;">Open Camera</button>
-                        <button id="scan-stop-btn" onclick="stopScanner()" class="hidden" style="width: 100%; padding:15px; background:#ef4444; border:none; border-radius:12px; color:white; font-weight:700; cursor:pointer;">Stop Camera</button>
+                        <button id="scan-start-btn" onclick="startScanner()" class="checkout-btn"
+                            style="width: 100%; font-size: 16px;">Open Camera</button>
+                        <button id="scan-stop-btn" onclick="stopScanner()" class="hidden"
+                            style="width: 100%; padding:15px; background:#ef4444; border:none; border-radius:12px; color:white; font-weight:700; cursor:pointer;">Stop
+                            Camera</button>
                     </div>
                 </div>
             </div>
@@ -479,48 +118,99 @@
         <!-- RIGHT: CART -->
         <section class="cart-side">
             <div class="cart-header">
-                <h2>Current Order</h2>
-                <button onclick="clearCart()" style="background:none; border:none; color:#ef4444; font-size:12px; font-weight:700; cursor:pointer;">Clear All</button>
+                <h2 id="cart-title">Current Order</h2>
+                <div style="display:flex; gap:10px;">
+                    <button id="btn-cancel-edit" onclick="cancelEdit()"
+                        style="display:none; background:none; border:none; color:var(--text-muted); font-size:12px; font-weight:700; cursor:pointer;">Cancel
+                        Edit</button>
+                    <button onclick="clearCart()"
+                        style="background:none; border:none; color:#ef4444; font-size:12px; font-weight:700; cursor:pointer;">Clear
+                        All</button>
+                </div>
             </div>
 
-            <div class="cart-items" id="cart-list">
-                <!-- Items here -->
-            </div>
+            <div class="cart-scroll-area">
+                <div class="cart-items" id="cart-list">
+                    <!-- Items here -->
+                </div>
 
-            <div class="cart-summary">
-                <div class="order-meta">
+                <div class="order-meta-container">
+                    <div class="order-meta">
                     <select class="meta-input" id="order-table">
                         <option value="">-- Table --</option>
-                        <option>Table 1</option><option>Table 2</option><option>Table 3</option>
-                        <option>Table 4</option><option>Table 5</option><option>Table 6</option>
-                        <option>Table 7</option><option>Table 8</option><option>Table 9</option>
+                        <option>Table 1</option>
+                        <option>Table 2</option>
+                        <option>Table 3</option>
+                        <option>Table 4</option>
+                        <option>Table 5</option>
+                        <option>Table 6</option>
+                        <option>Table 7</option>
+                        <option>Table 8</option>
+                        <option>Table 9</option>
                         <option>Table 10</option>
                     </select>
                     <input type="number" class="meta-input" id="order-guests" placeholder="Guests" min="1">
                 </div>
-                <input type="text" class="meta-input" id="order-name" placeholder="Customer Name (Optional)" style="width:100%; margin-bottom:15px; box-sizing:border-box;">
+                <input type="text" class="meta-input" id="order-name" placeholder="Customer Name (Optional)"
+                    style="width:100%; margin-bottom:15px; box-sizing:border-box;">
+
+                <!-- ── PWD / Senior Discount Panel ── -->
+                <div class="discount-panel">
+                    <div class="discount-label">🏷️ PH Discount (PWD / Senior)</div>
+                    <select class="discount-select" id="pos-discount-type" onchange="handlePosDiscountChange()">
+                        <option value="none">No Discount</option>
+                        <option value="pwd">👨‍🦽 PWD – 20% Discount</option>
+                        <option value="senior">👴 Senior Citizen – 20% Discount</option>
+                    </select>
+                    <input type="text" class="discount-id-input" id="pos-discount-id"
+                        placeholder="Enter PWD / Senior ID number" oninput="updateCartUI()">
+                    <div class="discount-row-badge" id="pos-discount-badge">
+                        <span id="pos-discount-label-text">Discount</span>
+                        <span id="pos-discount-amount">-₱0</span>
+                    </div>
+                </div>
+                </div> <!-- /order-meta-container -->
+            </div> <!-- /cart-scroll-area -->
+
+            <div class="cart-summary">
 
                 <div class="summary-row">
                     <span>Subtotal</span>
                     <span id="subtotal">₱0</span>
                 </div>
+                <div class="summary-row" id="pos-discount-summary-row"
+                    style="display:none; color:#16a34a; font-weight:700;">
+                    <span id="pos-discount-summary-label">PWD Discount (20%)</span>
+                    <span id="pos-discount-summary-val">-₱0</span>
+                </div>
                 <div class="summary-row" style="font-weight:900; font-size:22px; margin-top:5px; color:var(--primary);">
                     <span>Total</span>
                     <span id="total-val">₱0</span>
                 </div>
-                <button class="checkout-btn" onclick="processCheckout()" style="margin-top:15px;">COMPLETE TRANSACTION</button>
+                <button class="checkout-btn" onclick="processCheckout()" style="margin-top:10px; width: 100%;">COMPLETE
+                    TRANSACTION</button>
             </div>
         </section>
     </main>
 
-    <!-- SUCCESS MODAL -->
-    <div id="modal-success" class="modal-overlay">
-        <div class="modal-card">
-            <div style="font-size:60px; margin-bottom:20px;">✅</div>
-            <h2 style="font-family:'Playfair Display'; margin:0 0 10px;">Transaction Success</h2>
-            <p id="success-msg" style="color:var(--text-muted); font-size:14px; line-height:1.5;">Order saved and inventory updated.</p>
-            <button id="pos-receipt-btn" onclick="openPOSReceipt()" class="checkout-btn" style="width:100%; margin-top:20px; background: #0f172a;">🖨️ Print Receipt</button>
-            <button onclick="closeModals()" class="checkout-btn" style="width:100%; margin-top:10px; background: var(--text-muted);">Done</button>
+
+    <!-- CONFIRM BILL OUT MODAL -->
+    <div id="modal-confirm-bill" class="modal-overlay">
+        <div class="modal-card"
+            style="background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%); border: 2px solid var(--primary); box-shadow: 0 15px 30px rgba(21, 128, 61, 0.2);">
+            <div
+                style="font-size:40px; margin-bottom:15px; background: white; width: 80px; height: 80px; margin: 0 auto 15px auto; display: flex; align-items: center; justify-content: center; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.05); color: var(--primary);">
+                🧾</div>
+            <h2 style="font-family:'Playfair Display'; margin:0 0 10px; color: var(--primary);">Bill Out Order</h2>
+            <p id="confirm-bill-msg" style="color:#475569; font-size:15px; line-height:1.6; font-weight: 500;">Are you
+                sure you want to bill out this order? It will be marked as paid and transferred to History.</p>
+
+            <div style="display:flex; gap:12px; margin-top:25px;">
+                <button id="btn-confirm-bill" class="checkout-btn"
+                    style="flex:1; background: var(--primary); border-radius: 12px; box-shadow: 0 4px 12px rgba(21, 128, 61, 0.3);">Confirm</button>
+                <button onclick="closeModals()" class="checkout-btn"
+                    style="flex:1; background: white; color: var(--primary); border: 2px solid var(--primary); border-radius: 12px; box-shadow: none;">Cancel</button>
+            </div>
         </div>
     </div>
 
@@ -529,22 +219,24 @@
         <div class="modal-card">
             <div id="verify-icon" style="font-size:60px; margin-bottom:20px;">🔍</div>
             <h2 id="verify-title" style="font-family:'Playfair Display'; margin:0 0 15px;">QR Verification</h2>
-            <div id="verify-body" style="text-align:left; background:#f8fafc; padding:20px; border-radius:15px; margin-bottom:20px; font-size:14px;"></div>
+            <div id="verify-body"
+                style="text-align:left; background:#f8fafc; padding:20px; border-radius:15px; margin-bottom:20px; font-size:14px;">
+            </div>
             <button onclick="closeModals()" class="checkout-btn" style="width:100%;">Close</button>
         </div>
     </div>
 
     <script>
         const CATEGORIES = [
-            { key: 'All',           label: '🏠 All Items' },
-            { key: 'Beef',          label: '🥩 Beef' },
-            { key: 'T-Bone',        label: '🦴 T-Bone' },
+            { key: 'All', label: '🏠 All Items' },
+            { key: 'Beef', label: '🥩 Beef' },
+            { key: 'T-Bone', label: '🦴 T-Bone' },
             { key: 'Sirloin Steak', label: '🥩 Sirloin Steak' },
-            { key: 'Chicken & Fish',label: '🍗 Chicken & Fish' },
-            { key: 'Sandwich',      label: '🍔 Sandwich' },
-            { key: 'Side Orders',   label: '🍟 Side Orders' },
-            { key: 'Drinks',        label: '🍹 Drinks' },
-            { key: 'Wines',         label: '🍷 Wines' }
+            { key: 'Chicken & Fish', label: '🍗 Chicken & Fish' },
+            { key: 'Sandwich', label: '🍔 Sandwich' },
+            { key: 'Side Orders', label: '🍟 Side Orders' },
+            { key: 'Drinks', label: '🍹 Drinks' },
+            { key: 'Wines', label: '🍷 Wines' }
         ];
 
         let currentCat = "All";
@@ -552,12 +244,13 @@
         let scanner = null;
         let currentPin = "";
         let lastTransactionId = null;
+        let editingTransactionId = null;
 
         function appendPin(num) {
-            if(currentPin.length >= 4) return;
+            if (currentPin.length >= 4) return;
             currentPin += num;
             updatePinDots();
-            if(currentPin.length === 4) checkPosAuth();
+            if (currentPin.length === 4) checkPosAuth();
         }
         function clearPin() {
             currentPin = "";
@@ -627,15 +320,15 @@
                 // Legacy ID Migration
                 if (invItems.length > 0) {
                     const legacyMap = {
-                        'm5':'INV-B1','m6':'INV-B2','m7':'INV-B3','m8':'INV-B4','m9':'INV-B5',
-                        't1':'INV-T1','t2':'INV-T2','t3':'INV-T3','t4':'INV-T4','t5':'INV-T5',
-                        's1':'INV-S1','s2':'INV-S2','s3':'INV-S3','s4':'INV-S4',
-                        'm1':'INV-CF1','m2':'INV-CF2','m3':'INV-CF3','m4':'INV-CF4',
-                        'sw1':'INV-SW1','sw2':'INV-SW2','sw3':'INV-SW3','sw4':'INV-SW4','sw5':'INV-SW5',
-                        'sd1':'INV-SO1','sd2':'INV-SO2','sd3':'INV-SO3','sd4':'INV-SO4','sd5':'INV-SO5','sd6':'INV-SO6','sd7':'INV-SO7','sd8':'INV-SO8',
-                        'd1':'INV-D1', 'd2':'INV-D2', 'd3':'INV-D3', 'd4':'INV-D4', 'd5':'INV-D5', 'd6':'INV-D6', 'd7':'INV-D7', 'd8':'INV-D8', 'd9':'INV-D9', 'd10':'INV-D10', 
-                        'd11':'INV-D11', 'd12':'INV-D12', 'd13':'INV-D13', 'd14':'INV-D14', 'd15':'INV-D15', 'd16':'INV-D16',
-                        'w1':'INV-W1', 'w2':'INV-W2', 'w3':'INV-W3'
+                        'm5': 'INV-B1', 'm6': 'INV-B2', 'm7': 'INV-B3', 'm8': 'INV-B4', 'm9': 'INV-B5',
+                        't1': 'INV-T1', 't2': 'INV-T2', 't3': 'INV-T3', 't4': 'INV-T4', 't5': 'INV-T5',
+                        's1': 'INV-S1', 's2': 'INV-S2', 's3': 'INV-S3', 's4': 'INV-S4',
+                        'm1': 'INV-CF1', 'm2': 'INV-CF2', 'm3': 'INV-CF3', 'm4': 'INV-CF4',
+                        'sw1': 'INV-SW1', 'sw2': 'INV-SW2', 'sw3': 'INV-SW3', 'sw4': 'INV-SW4', 'sw5': 'INV-SW5',
+                        'sd1': 'INV-SO1', 'sd2': 'INV-SO2', 'sd3': 'INV-SO3', 'sd4': 'INV-SO4', 'sd5': 'INV-SO5', 'sd6': 'INV-SO6', 'sd7': 'INV-SO7', 'sd8': 'INV-SO8',
+                        'd1': 'INV-D1', 'd2': 'INV-D2', 'd3': 'INV-D3', 'd4': 'INV-D4', 'd5': 'INV-D5', 'd6': 'INV-D6', 'd7': 'INV-D7', 'd8': 'INV-D8', 'd9': 'INV-D9', 'd10': 'INV-D10',
+                        'd11': 'INV-D11', 'd12': 'INV-D12', 'd13': 'INV-D13', 'd14': 'INV-D14', 'd15': 'INV-D15', 'd16': 'INV-D16',
+                        'w1': 'INV-W1', 'w2': 'INV-W2', 'w3': 'INV-W3'
                     };
                     let migrated = false;
                     invItems.forEach(i => {
@@ -663,63 +356,63 @@
                 // Full default menu — always used as the base
                 const defaultItems = [
                     // Beef
-                    { id:'INV-B1', title:'Fillet Mignon', category:'Beef', price:935, stock: 100 },
-                    { id:'INV-B2', title:'Tenderloin Steak (200g)', category:'Beef', price:740, stock: 100 },
-                    { id:'INV-B3', title:'Tenderloin Tips (200g)', category:'Beef', price:740, stock: 100 },
-                    { id:'INV-B4', title:'Rib Eye Steak (200g-350g)', category:'Beef', price:675, stock: 100 },
-                    { id:'INV-B5', title:'Hamburger Steak (204g)', category:'Beef', price:505, stock: 100 },
+                    { id: 'INV-B1', title: 'Fillet Mignon', category: 'Beef', price: 935, stock: 100 },
+                    { id: 'INV-B2', title: 'Tenderloin Steak (200g)', category: 'Beef', price: 740, stock: 100 },
+                    { id: 'INV-B3', title: 'Tenderloin Tips (200g)', category: 'Beef', price: 740, stock: 100 },
+                    { id: 'INV-B4', title: 'Rib Eye Steak (200g-350g)', category: 'Beef', price: 675, stock: 100 },
+                    { id: 'INV-B5', title: 'Hamburger Steak (204g)', category: 'Beef', price: 505, stock: 100 },
                     // T-Bone
-                    { id:'INV-T1', title:'T-Bone Medium (250g-400g)', category:'T-Bone', price:715, stock: 100 },
-                    { id:'INV-T2', title:'T-Bone Large (550g-650g)', category:'T-Bone', price:790, stock: 100 },
-                    { id:'INV-T3', title:'T-Bone Extra Large', category:'T-Bone', price:865, stock: 100 },
-                    { id:'INV-T4', title:'T-Bone XX Large', category:'T-Bone', price:940, stock: 100 },
-                    { id:'INV-T5', title:'Porter House (551g-600g)', category:'T-Bone', price:1015, stock: 100 },
+                    { id: 'INV-T1', title: 'T-Bone Medium (250g-400g)', category: 'T-Bone', price: 715, stock: 100 },
+                    { id: 'INV-T2', title: 'T-Bone Large (550g-650g)', category: 'T-Bone', price: 790, stock: 100 },
+                    { id: 'INV-T3', title: 'T-Bone Extra Large', category: 'T-Bone', price: 865, stock: 100 },
+                    { id: 'INV-T4', title: 'T-Bone XX Large', category: 'T-Bone', price: 940, stock: 100 },
+                    { id: 'INV-T5', title: 'Porter House (551g-600g)', category: 'T-Bone', price: 1015, stock: 100 },
                     // Sirloin
-                    { id:'INV-S1', title:'Sirloin Mini (250g-300g)', category:'Sirloin Steak', price:485, stock: 100 },
-                    { id:'INV-S2', title:'Sirloin Small (251g-350g)', category:'Sirloin Steak', price:545, stock: 100 },
-                    { id:'INV-S3', title:'Sirloin Mid Size (351g-450g)', category:'Sirloin Steak', price:605, stock: 100 },
-                    { id:'INV-S4', title:'Sirloin Big Size (401g-450g)', category:'Sirloin Steak', price:670, stock: 100 },
+                    { id: 'INV-S1', title: 'Sirloin Mini (250g-300g)', category: 'Sirloin Steak', price: 485, stock: 100 },
+                    { id: 'INV-S2', title: 'Sirloin Small (251g-350g)', category: 'Sirloin Steak', price: 545, stock: 100 },
+                    { id: 'INV-S3', title: 'Sirloin Mid Size (351g-450g)', category: 'Sirloin Steak', price: 605, stock: 100 },
+                    { id: 'INV-S4', title: 'Sirloin Big Size (401g-450g)', category: 'Sirloin Steak', price: 670, stock: 100 },
                     // Chicken & Fish
-                    { id:'INV-CF1', title:'Whole Chicken', category:'Chicken & Fish', price:660, stock: 100 },
-                    { id:'INV-CF2', title:'Half Chicken', category:'Chicken & Fish', price:335, stock: 100 },
-                    { id:'INV-CF3', title:'Fish Steak (Tanigue)', category:'Chicken & Fish', price:495, stock: 100 },
-                    { id:'INV-CF4', title:'Bangus Steak', category:'Chicken & Fish', price:510, stock: 100 },
+                    { id: 'INV-CF1', title: 'Whole Chicken', category: 'Chicken & Fish', price: 660, stock: 100 },
+                    { id: 'INV-CF2', title: 'Half Chicken', category: 'Chicken & Fish', price: 335, stock: 100 },
+                    { id: 'INV-CF3', title: 'Fish Steak (Tanigue)', category: 'Chicken & Fish', price: 495, stock: 100 },
+                    { id: 'INV-CF4', title: 'Bangus Steak', category: 'Chicken & Fish', price: 510, stock: 100 },
                     // Sandwich
-                    { id:'INV-SW1', title:'Big Sunny Burger with Fries', category:'Sandwich', price:430, stock: 100 },
-                    { id:'INV-SW2', title:'Big Sunny Steak Sandwich with Fries', category:'Sandwich', price:400, stock: 100 },
-                    { id:'INV-SW3', title:'Steak Sandwich', category:'Sandwich', price:165, stock: 100 },
-                    { id:'INV-SW4', title:'Cheeseburger', category:'Sandwich', price:170, stock: 100 },
-                    { id:'INV-SW5', title:'Hamburger', category:'Sandwich', price:160, stock: 100 },
+                    { id: 'INV-SW1', title: 'Big Sunny Burger with Fries', category: 'Sandwich', price: 430, stock: 100 },
+                    { id: 'INV-SW2', title: 'Big Sunny Steak Sandwich with Fries', category: 'Sandwich', price: 400, stock: 100 },
+                    { id: 'INV-SW3', title: 'Steak Sandwich', category: 'Sandwich', price: 165, stock: 100 },
+                    { id: 'INV-SW4', title: 'Cheeseburger', category: 'Sandwich', price: 170, stock: 100 },
+                    { id: 'INV-SW5', title: 'Hamburger', category: 'Sandwich', price: 160, stock: 100 },
                     // Drinks
-                    { id:'INV-D1', title:'Mango Juice', category:'Drinks', price:135, stock: 100 },
-                    { id:'INV-D2', title:'Four Seasons', category:'Drinks', price:95, stock: 100 },
-                    { id:'INV-D3', title:'Pineapple Juice', category:'Drinks', price:95, stock: 100 },
-                    { id:'INV-D4', title:'Pine-Orange Juice', category:'Drinks', price:90, stock: 100 },
-                    { id:'INV-D5', title:'Iced Tea', category:'Drinks', price:85, stock: 100 },
-                    { id:'INV-D6', title:'Cucumber Juice', category:'Drinks', price:90, stock: 100 },
-                    { id:'INV-D7', title:'Blue Lemonade', category:'Drinks', price:95, stock: 100 },
-                    { id:'INV-D8', title:'Calamansi Juice (Hot/Cold)', category:'Drinks', price:70, stock: 100 },
-                    { id:'INV-D9', title:'Coke in Can', category:'Drinks', price:95, stock: 100 },
-                    { id:'INV-D10', title:'Sprite | Royal in Can', category:'Drinks', price:95, stock: 100 },
-                    { id:'INV-D11', title:'San Miguel Pale Pilsen', category:'Drinks', price:85, stock: 100 },
-                    { id:'INV-D12', title:'San Mig Light', category:'Drinks', price:95, stock: 100 },
-                    { id:'INV-D13', title:'Hot Tea', category:'Drinks', price:70, stock: 100 },
-                    { id:'INV-D14', title:'Drip Coffee', category:'Drinks', price:85, stock: 100 },
-                    { id:'INV-D15', title:'Coffee with Cream', category:'Drinks', price:55, stock: 100 },
-                    { id:'INV-D16', title:'Bottled Water (500ml)', category:'Drinks', price:35, stock: 100 },
+                    { id: 'INV-D1', title: 'Mango Juice', category: 'Drinks', price: 135, stock: 100 },
+                    { id: 'INV-D2', title: 'Four Seasons', category: 'Drinks', price: 95, stock: 100 },
+                    { id: 'INV-D3', title: 'Pineapple Juice', category: 'Drinks', price: 95, stock: 100 },
+                    { id: 'INV-D4', title: 'Pine-Orange Juice', category: 'Drinks', price: 90, stock: 100 },
+                    { id: 'INV-D5', title: 'Iced Tea', category: 'Drinks', price: 85, stock: 100 },
+                    { id: 'INV-D6', title: 'Cucumber Juice', category: 'Drinks', price: 90, stock: 100 },
+                    { id: 'INV-D7', title: 'Blue Lemonade', category: 'Drinks', price: 95, stock: 100 },
+                    { id: 'INV-D8', title: 'Calamansi Juice (Hot/Cold)', category: 'Drinks', price: 70, stock: 100 },
+                    { id: 'INV-D9', title: 'Coke in Can', category: 'Drinks', price: 95, stock: 100 },
+                    { id: 'INV-D10', title: 'Sprite | Royal in Can', category: 'Drinks', price: 95, stock: 100 },
+                    { id: 'INV-D11', title: 'San Miguel Pale Pilsen', category: 'Drinks', price: 85, stock: 100 },
+                    { id: 'INV-D12', title: 'San Mig Light', category: 'Drinks', price: 95, stock: 100 },
+                    { id: 'INV-D13', title: 'Hot Tea', category: 'Drinks', price: 70, stock: 100 },
+                    { id: 'INV-D14', title: 'Drip Coffee', category: 'Drinks', price: 85, stock: 100 },
+                    { id: 'INV-D15', title: 'Coffee with Cream', category: 'Drinks', price: 55, stock: 100 },
+                    { id: 'INV-D16', title: 'Bottled Water (500ml)', category: 'Drinks', price: 35, stock: 100 },
                     // Wines
-                    { id:'INV-W1', title:'Carlo Rossi (Red Wine)', category:'Wines', price:700, stock: 100 },
-                    { id:'INV-W2', title:'Carlo Rossi (White Wine)', category:'Wines', price:700, stock: 100 },
-                    { id:'INV-W3', title:'Adega De Pegoos', category:'Wines', price:600, stock: 100 },
+                    { id: 'INV-W1', title: 'Carlo Rossi (Red Wine)', category: 'Wines', price: 700, stock: 100 },
+                    { id: 'INV-W2', title: 'Carlo Rossi (White Wine)', category: 'Wines', price: 700, stock: 100 },
+                    { id: 'INV-W3', title: 'Adega De Pegoos', category: 'Wines', price: 600, stock: 100 },
                     // Sides
-                    { id:'INV-SO1', title:'Cream of Mushroom Soup', category:'Side Orders', price:80, stock: 100 },
-                    { id:'INV-SO2', title:'Cream of Chicken Soup', category:'Side Orders', price:80, stock: 100 },
-                    { id:'INV-SO3', title:'Mashed Potato', category:'Side Orders', price:90, stock: 100 },
-                    { id:'INV-SO4', title:'Potato Salad', category:'Side Orders', price:155, stock: 100 },
-                    { id:'INV-SO5', title:'French Fries', category:'Side Orders', price:155, stock: 100 },
-                    { id:'INV-SO6', title:'Garlic Bread', category:'Side Orders', price:45, stock: 100 },
-                    { id:'INV-SO7', title:'Garlic Rice', category:'Side Orders', price:55, stock: 100 },
-                    { id:'INV-SO8', title:'Plain Rice', category:'Side Orders', price:40, stock: 100 }
+                    { id: 'INV-SO1', title: 'Cream of Mushroom Soup', category: 'Side Orders', price: 80, stock: 100 },
+                    { id: 'INV-SO2', title: 'Cream of Chicken Soup', category: 'Side Orders', price: 80, stock: 100 },
+                    { id: 'INV-SO3', title: 'Mashed Potato', category: 'Side Orders', price: 90, stock: 100 },
+                    { id: 'INV-SO4', title: 'Potato Salad', category: 'Side Orders', price: 155, stock: 100 },
+                    { id: 'INV-SO5', title: 'French Fries', category: 'Side Orders', price: 155, stock: 100 },
+                    { id: 'INV-SO6', title: 'Garlic Bread', category: 'Side Orders', price: 45, stock: 100 },
+                    { id: 'INV-SO7', title: 'Garlic Rice', category: 'Side Orders', price: 55, stock: 100 },
+                    { id: 'INV-SO8', title: 'Plain Rice', category: 'Side Orders', price: 40, stock: 100 }
                 ];
 
                 const validCats = ['Beef', 'T-Bone', 'Sirloin Steak', 'Chicken & Fish', 'Sandwich', 'Side Orders', 'Drinks', 'Wines', 'Supplies', 'Others'];
@@ -780,7 +473,7 @@
         function renderProducts() {
             const mainItems = getInventory();
             const grid = document.getElementById('product-grid');
-            
+
             const filtered = mainItems.filter(i => {
                 const cat = i.category || '';
                 if (currentCat === 'All') return true;
@@ -806,7 +499,7 @@
             }
 
             if (cart[id]) {
-                if(cart[id] >= item.stock_val) return;
+                if (cart[id] >= item.stock_val) return;
                 cart[id]++;
             } else {
                 cart[id] = 1;
@@ -817,7 +510,7 @@
         function changeQty(id, delta) {
             const items = getInventory();
             const item = items.find(i => i.id === id);
-            
+
             cart[id] += delta;
             if (cart[id] > item.stock_val) cart[id] = item.stock_val;
             if (cart[id] <= 0) delete cart[id];
@@ -826,20 +519,61 @@
 
         function clearCart() {
             cart = {};
+            document.getElementById('order-table').value = '';
+            document.getElementById('order-guests').value = '';
+            document.getElementById('order-name').value = '';
             updateCartUI();
+        }
+
+        function cancelEdit() {
+            editingTransactionId = null;
+            clearCart();
+            switchMode('status');
+        }
+
+        /* ── Discount helpers ── */
+        function handlePosDiscountChange() {
+            const type = document.getElementById('pos-discount-type').value;
+            const idInput = document.getElementById('pos-discount-id');
+            idInput.classList.toggle('show', type !== 'none');
+            updateCartUI();
+        }
+
+        function getPosDiscount(subtotal) {
+            const type = document.getElementById('pos-discount-type')?.value || 'none';
+            if (type === 'none') return { type: 'none', rate: 0, amount: 0, label: '' };
+            // Philippine law: 20% discount on total bill for PWD/Senior
+            const rate = 0.20;
+            const amount = Math.round(subtotal * rate * 100) / 100;
+            const label = type === 'pwd' ? 'PWD Discount (20%)' : 'Senior Citizen Discount (20%)';
+            return { type, rate, amount, label };
         }
 
         function updateCartUI() {
             const list = document.getElementById('cart-list');
+            const titleEl = document.getElementById('cart-title');
+            const cancelBtn = document.getElementById('btn-cancel-edit');
+            const checkoutBtn = document.querySelector('button[onclick="processCheckout()"]');
+
+            if (editingTransactionId) {
+                if (titleEl) titleEl.innerHTML = `Editing <span style="color:var(--primary);">${editingTransactionId}</span>`;
+                if (cancelBtn) cancelBtn.style.display = 'block';
+                if (checkoutBtn) checkoutBtn.textContent = 'SAVE CHANGES';
+            } else {
+                if (titleEl) titleEl.textContent = 'Current Order';
+                if (cancelBtn) cancelBtn.style.display = 'none';
+                if (checkoutBtn) checkoutBtn.textContent = 'COMPLETE TRANSACTION';
+            }
+
             const items = getInventory();
-            let total = 0;
+            let subtotal = 0;
             let html = '';
 
             for (const id in cart) {
                 const item = items.find(i => i.id === id);
                 if (item) {
                     const lineTotal = item.price * cart[id];
-                    total += lineTotal;
+                    subtotal += lineTotal;
                     html += `
                         <div class="cart-item">
                             <div class="cart-item-info">
@@ -857,62 +591,148 @@
             }
 
             list.innerHTML = Object.keys(cart).length ? html : '<div style="text-align:center; padding:40px; color:#cbd5e1;">Order is empty</div>';
-            document.getElementById('subtotal').textContent = `₱${total.toLocaleString()}`;
-            document.getElementById('total-val').textContent = `₱${total.toLocaleString()}`;
+
+            // Discount calculation
+            const disc = getPosDiscount(subtotal);
+            const finalTotal = subtotal - disc.amount;
+
+            document.getElementById('subtotal').textContent = `₱${subtotal.toLocaleString()}`;
+
+            const discSummaryRow = document.getElementById('pos-discount-summary-row');
+            const badge = document.getElementById('pos-discount-badge');
+
+            if (disc.amount > 0) {
+                // Update summary row
+                document.getElementById('pos-discount-summary-label').textContent = disc.label;
+                document.getElementById('pos-discount-summary-val').textContent = `-₱${disc.amount.toLocaleString()}`;
+                discSummaryRow.style.display = 'flex';
+
+                // Update badge inside panel
+                document.getElementById('pos-discount-label-text').textContent = disc.label;
+                document.getElementById('pos-discount-amount').textContent = `-₱${disc.amount.toLocaleString()}`;
+                badge.classList.add('show');
+            } else {
+                discSummaryRow.style.display = 'none';
+                badge.classList.remove('show');
+            }
+
+            document.getElementById('total-val').textContent = `₱${finalTotal.toLocaleString()}`;
         }
 
         /* --- CHECKOUT --- */
         function processCheckout() {
             if (Object.keys(cart).length === 0) return superModal({ title: 'Empty Cart 🛒', message: 'Please add items to the order before finalizing.' });
-            
+
             const table = document.getElementById('order-table').value;
             const guests = document.getElementById('order-guests').value;
             const name = document.getElementById('order-name').value || 'Walk-in Guest';
 
             if (!table) return superModal({ title: 'Table Required 📍', message: 'Please select a table to complete the transaction.' });
 
-            // 1. Deduct Stock
+            const history = JSON.parse(localStorage.getItem('reservationHistory') || '[]');
+            let oldCart = {};
+            let isEdit = !!editingTransactionId;
+            let existingRes = null;
+
+            if (isEdit) {
+                existingRes = history.find(r => r.reservationNumber === editingTransactionId);
+                if (existingRes && existingRes.foods) {
+                    const liveItems = getInventory();
+                    existingRes.foods.forEach(fStr => {
+                        const match = fStr.match(/^(\d+)x\s+(.+)$/);
+                        if (match) {
+                            const qty = parseInt(match[1], 10);
+                            const item = liveItems.find(i => (i.title || i.name) === match[2]);
+                            if (item && item.id) oldCart[item.id] = qty;
+                        }
+                    });
+                }
+            }
+
+            // 1. Deduct Stock Delta
             const items = JSON.parse(localStorage.getItem('inventoryItems') || '[]');
             for (const id in cart) {
+                const newQty = cart[id];
+                const oldQty = oldCart[id] || 0;
+                const delta = newQty - oldQty;
+
+                const idx = items.findIndex(i => i.id === id);
+                if (idx > -1 && delta !== 0) {
+                    if (items[idx].total_stock !== undefined) {
+                        items[idx].total_stock = Math.max(0, items[idx].total_stock - delta);
+                        items[idx].sold_stock = Math.max(0, (items[idx].sold_stock || 0) + delta);
+                    } else {
+                        items[idx].stock = Math.max(0, items[idx].stock - delta);
+                    }
+                }
+                delete oldCart[id]; // marked as processed
+            }
+
+            // For items that were in oldCart but removed completely
+            for (const id in oldCart) {
+                const delta = -oldCart[id]; // refund stock
                 const idx = items.findIndex(i => i.id === id);
                 if (idx > -1) {
-                    if(items[idx].total_stock !== undefined) {
-                        items[idx].total_stock = Math.max(0, items[idx].total_stock - cart[id]);
-                        items[idx].sold_stock = (items[idx].sold_stock || 0) + cart[id];
+                    if (items[idx].total_stock !== undefined) {
+                        items[idx].total_stock = Math.max(0, items[idx].total_stock - delta);
+                        items[idx].sold_stock = Math.max(0, (items[idx].sold_stock || 0) + delta);
                     } else {
-                        items[idx].stock = Math.max(0, items[idx].stock - cart[id]);
+                        items[idx].stock = Math.max(0, items[idx].stock - delta);
                     }
                 }
             }
             localStorage.setItem('inventoryItems', JSON.stringify(items));
 
             // 2. Save Order History
-            const resNo = 'POS-' + Math.floor(1000 + Math.random() * 9000);
+            const resNo = isEdit ? editingTransactionId : 'POS-' + Math.floor(1000 + Math.random() * 9000);
             const orderList = [];
-            let totalAmt = 0;
+            let subtotalAmt = 0;
             const liveItems = getInventory();
             for (const id in cart) {
                 const item = liveItems.find(i => i.id === id);
                 orderList.push(`${cart[id]}x ${item.title || item.name}`);
-                totalAmt += item.price * cart[id];
+                subtotalAmt += item.price * cart[id];
             }
 
-            const reservation = {
-                reservationNumber: resNo,
-                customerName: name,
-                bookedTable: table,
-                numberOfGuests: guests,
-                reservationType: 'standard',
-                foods: orderList,
-                paymentAmount: totalAmt,
-                paymentStatus: 'paid',
-                bookedBy: 'staff',
-                completedAt: new Date().toISOString(),
-                arrivalDateTimeDisplay: 'POS Walk-in'
-            };
+            // Discount
+            const disc = getPosDiscount(subtotalAmt);
+            const totalAmt = subtotalAmt - disc.amount;
+            const discountIdNo = (document.getElementById('pos-discount-id')?.value || '').trim();
 
-            const history = JSON.parse(localStorage.getItem('reservationHistory') || '[]');
-            history.push(reservation);
+            if (isEdit && existingRes) {
+                existingRes.customerName = name;
+                existingRes.bookedTable = table;
+                existingRes.numberOfGuests = guests;
+                existingRes.foods = orderList;
+                existingRes.subtotalAmount = subtotalAmt;
+                existingRes.discountType = disc.type;
+                existingRes.discountAmount = disc.amount;
+                existingRes.discountIdNo = discountIdNo;
+                existingRes.paymentAmount = totalAmt;
+                existingRes.modified = true;
+                existingRes.approvalStatus = 'pending'; // Needs re-approval
+                existingRes.kdsStatus = 'pending'; // Reset kitchen status to pending
+            } else {
+                const reservation = {
+                    reservationNumber: resNo,
+                    customerName: name,
+                    bookedTable: table,
+                    numberOfGuests: guests,
+                    reservationType: 'standard',
+                    foods: orderList,
+                    subtotalAmount: subtotalAmt,
+                    discountType: disc.type,
+                    discountAmount: disc.amount,
+                    discountIdNo: discountIdNo,
+                    paymentAmount: totalAmt,
+                    paymentStatus: 'pending_check',
+                    approvalStatus: 'pending',
+                    bookedBy: 'staff',
+                    completedAt: new Date().toISOString(),
+                    arrivalDateTimeDisplay: 'POS Walk-in'
+                };
+                history.push(reservation);
+            }
             localStorage.setItem('reservationHistory', JSON.stringify(history));
 
             // 3. Reset
@@ -920,32 +740,191 @@
             document.getElementById('order-table').value = '';
             document.getElementById('order-guests').value = '';
             document.getElementById('order-name').value = '';
-            
+            // Reset discount
+            document.getElementById('pos-discount-type').value = 'none';
+            document.getElementById('pos-discount-id').classList.remove('show');
+            document.getElementById('pos-discount-id').value = '';
+            editingTransactionId = null; // Clear edit state
+
             renderProducts();
-            
+
             lastTransactionId = resNo;
-            document.getElementById('success-msg').innerHTML = `Transaction <b>${resNo}</b> saved successfully! Stock updated in real-time.`;
-            document.getElementById('modal-success').style.display = 'flex';
+            if (typeof superModal === 'function') {
+                superModal({ title: 'Order Sent 🍳', message: `Order <b>${resNo}</b> has been successfully sent to the kitchen.` });
+            } else {
+                alert(`Order ${resNo} has been successfully sent to the kitchen.`);
+            }
         }
 
-        function openPOSReceipt() {
-            if (!lastTransactionId) return;
-            window.open(`receipt.html?res=${lastTransactionId}`, '_blank');
+
+
+        function renderOrderStatus() {
+            const list = document.getElementById('pos-order-status-list');
+            const history = JSON.parse(localStorage.getItem('reservationHistory') || '[]');
+
+            // Get active orders from today created by POS/staff (exclude completed)
+            const posOrders = history.filter(r => r.bookedBy === 'staff' && r.reservationNumber.startsWith('POS-') && r.approvalStatus !== 'completed').reverse();
+
+            if (posOrders.length === 0) {
+                list.innerHTML = `<div style="text-align:center; padding:30px; color:#94a3b8;">No POS orders found yet.</div>`;
+                return;
+            }
+
+            let html = '';
+            posOrders.forEach(r => {
+                const status = r.approvalStatus || 'pending';
+                let statusBadge = '';
+                if (status === 'pending') {
+                    statusBadge = `<span style="background:#fef08a; color:#854d0e; padding:4px 8px; border-radius:12px; font-size:12px; font-weight:bold;">Pending Approval</span>`;
+                } else if (status === 'approved' || status === 'seated') {
+                    statusBadge = `<span style="background:#dcfce7; color:#166534; padding:4px 8px; border-radius:12px; font-size:12px; font-weight:bold;">Approved ✅</span>`;
+                } else if (status === 'rejected') {
+                    statusBadge = `<span style="background:#fee2e2; color:#991b1b; padding:4px 8px; border-radius:12px; font-size:12px; font-weight:bold;">Rejected ❌</span>`;
+                }
+
+                if (r.modified) {
+                    statusBadge += ` <span style="background:#ffedd5; color:#ea580c; padding:4px 8px; border-radius:12px; font-size:12px; font-weight:bold; margin-left:5px;">Modified ✏️</span>`;
+                }
+
+                if (r.kdsStatus) {
+                    if (r.kdsStatus === 'cooking') {
+                        statusBadge += ` <span style="background:#ffedd5; color:#c2410c; padding:4px 8px; border-radius:12px; font-size:12px; font-weight:bold; margin-left:5px;">👨‍🍳 Cooking</span>`;
+                    } else if (r.kdsStatus === 'ready') {
+                        statusBadge += ` <span style="background:#dcfce7; color:#15803d; padding:4px 8px; border-radius:12px; font-size:12px; font-weight:bold; margin-left:5px;">✅ Cooked</span>`;
+                    } else if (r.kdsStatus === 'served') {
+                        statusBadge += ` <span style="background:#e0e7ff; color:#4338ca; padding:4px 8px; border-radius:12px; font-size:12px; font-weight:bold; margin-left:5px;">🍽️ Served</span>`;
+                    }
+                }
+
+                html += `
+                    <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:15px; position:relative;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                            <strong style="color:var(--text-dark);">${r.reservationNumber}</strong>
+                            <div>${statusBadge}</div>
+                        </div>
+                        <div style="font-size:13px; color:var(--text-muted); margin-bottom:5px;">👤 ${r.customerName || 'Walk-in'} &nbsp; | &nbsp; 🪑 ${r.bookedTable || 'None'}</div>
+                        <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+                            <div style="font-size:13px; color:var(--text-dark); font-weight:bold;">💰 ₱${Number(r.paymentAmount).toLocaleString()}</div>
+                            <div>
+                                <button onclick="billOutOrder('${r.reservationNumber}')" style="background:#f1f5f9; color:#475569; border:none; padding:6px 12px; border-radius:6px; font-size:12px; font-weight:bold; cursor:pointer; margin-right:5px;">🧾 Bill Out</button>
+                                <button onclick="editOrder('${r.reservationNumber}')" style="background:var(--primary); color:white; border:none; padding:6px 12px; border-radius:6px; font-size:12px; font-weight:bold; cursor:pointer;">✏️ Edit</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            list.innerHTML = html;
+        }
+
+        function editOrder(resNo) {
+            const history = JSON.parse(localStorage.getItem('reservationHistory') || '[]');
+            const r = history.find(h => h.reservationNumber === resNo);
+            if (!r) return;
+
+            // 1. Clear current cart
+            cart = {};
+
+            // 2. Parse existing foods and populate cart
+            const liveItems = getInventory();
+            if (r.foods && r.foods.length > 0) {
+                r.foods.forEach(fStr => {
+                    const match = fStr.match(/^(\d+)x\s+(.+)$/);
+                    if (match) {
+                        const qty = parseInt(match[1], 10);
+                        const title = match[2];
+                        const item = liveItems.find(i => (i.title || i.name) === title);
+                        if (item && item.id) {
+                            cart[item.id] = qty;
+                        }
+                    }
+                });
+            }
+
+            // 3. Populate fields
+            document.getElementById('order-table').value = r.bookedTable || '';
+            document.getElementById('order-guests').value = r.numberOfGuests || '';
+            document.getElementById('order-name').value = r.customerName || '';
+
+            // Populate Discount fields
+            if (r.discountType) {
+                document.getElementById('pos-discount-type').value = r.discountType;
+            } else {
+                document.getElementById('pos-discount-type').value = 'none';
+            }
+            if (r.discountIdNo) {
+                document.getElementById('pos-discount-id').value = r.discountIdNo;
+            } else {
+                document.getElementById('pos-discount-id').value = '';
+            }
+            handlePosDiscountChange();
+
+            // 4. Set state to editing
+            editingTransactionId = resNo;
+
+            // 5. Switch to ordering tab
+            switchMode('ordering');
+            updateCartUI();
+        }
+
+        function billOutOrder(resNo) {
+            document.getElementById('confirm-bill-msg').innerHTML = `Are you sure you want to bill out <b>${resNo}</b>? It will be marked as paid and transferred to History.`;
+            document.getElementById('modal-confirm-bill').style.display = 'flex';
+
+            document.getElementById('btn-confirm-bill').onclick = function () {
+                const history = JSON.parse(localStorage.getItem('reservationHistory') || '[]');
+                const idx = history.findIndex(h => h.reservationNumber === resNo);
+
+                if (idx > -1) {
+                    // Transfer to Admin/Super history by marking it paid and completed
+                    history[idx].paymentStatus = 'paid';
+                    history[idx].approvalStatus = 'completed';
+                    history[idx].completedAt = new Date().toISOString();
+
+                    // Release the table
+                    const bookedTable = history[idx].bookedTable;
+                    if (bookedTable) {
+                        const overrides = JSON.parse(localStorage.getItem('tableOverrides') || '{}');
+                        overrides[bookedTable] = 'available';
+                        localStorage.setItem('tableOverrides', JSON.stringify(overrides));
+                    }
+
+                    localStorage.setItem('reservationHistory', JSON.stringify(history));
+                }
+
+                closeModals();
+
+                // Print/Generate the receipt
+                window.open(`receipt.html?res=${resNo}`, '_blank');
+
+                // Re-render to remove it from the POS view
+                renderOrderStatus();
+            };
+        }
+
+        /* --- MODE LOGIC --- */
+        function switchMode(mode) {
+            document.getElementById('mode-ordering').classList.toggle('active', mode === 'ordering');
+            document.getElementById('mode-status').classList.toggle('active', mode === 'status');
+            document.getElementById('mode-scanning').classList.toggle('active', mode === 'scanning');
+
+            document.getElementById('view-ordering').classList.toggle('hidden', mode !== 'ordering');
+            document.getElementById('view-status').classList.toggle('hidden', mode !== 'status');
+            document.getElementById('view-scanning').classList.toggle('hidden', mode !== 'scanning');
+
+            if (mode === 'status') {
+                renderOrderStatus();
+            }
+            if (mode !== 'scanning') {
+                stopScanner();
+            }
         }
 
         /* --- SCANNER LOGIC --- */
-        function switchMode(mode) {
-            document.getElementById('mode-ordering').classList.toggle('active', mode === 'ordering');
-            document.getElementById('mode-scanning').classList.toggle('active', mode === 'scanning');
-            document.getElementById('view-ordering').classList.toggle('hidden', mode !== 'ordering');
-            document.getElementById('view-scanning').classList.toggle('hidden', mode !== 'scanning');
-            if (mode !== 'scanning') stopScanner();
-        }
-
         async function startScanner() {
             document.getElementById('scan-start-btn').classList.add('hidden');
             document.getElementById('scan-stop-btn').classList.remove('hidden');
-            
+
             html5QrCode = new Html5Qrcode("pos-reader");
             try {
                 await html5QrCode.start(
@@ -954,20 +933,24 @@
                     onScanSuccess
                 );
             } catch (err) {
-                superModal({ title: 'Camera Error 📸', message: 'Could not access camera: ' + err });
+                if (typeof superModal === 'function') {
+                    superModal({ title: 'Camera Error 📸', message: 'Could not access camera: ' + err });
+                }
                 stopScanner();
             }
         }
 
         async function stopScanner() {
-            if (html5QrCode) {
+            if (window.html5QrCode) {
                 try {
                     await html5QrCode.stop();
                     html5QrCode = null;
-                } catch(e) {}
+                } catch (e) { }
             }
-            document.getElementById('scan-start-btn')?.classList.remove('hidden');
-            document.getElementById('scan-stop-btn')?.classList.add('hidden');
+            const startBtn = document.getElementById('scan-start-btn');
+            const stopBtn = document.getElementById('scan-stop-btn');
+            if (startBtn) startBtn.classList.remove('hidden');
+            if (stopBtn) stopBtn.classList.add('hidden');
         }
 
         function onScanSuccess(decodedText) {
@@ -986,7 +969,6 @@
 
             if (res) {
                 if (res.isVerified) {
-                    // DOUBLE SCAN DETECTED
                     icon.textContent = '⚠️';
                     title.textContent = 'Already Verified';
                     body.innerHTML = `
@@ -999,9 +981,8 @@
                         <div style="font-size:12px; color:#9a3412; font-weight:600; margin-top:15px; text-align:center;">FRAUD PROTECTION ACTIVE</div>
                     `;
                 } else {
-                    // FIRST TIME SCAN
                     history[resIndex].isVerified = true;
-                    history[resIndex].verifiedAt = new Date().toLocaleString('en-GB', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', hour12: false });
+                    history[resIndex].verifiedAt = new Date().toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
                     localStorage.setItem('reservationHistory', JSON.stringify(history));
 
                     icon.textContent = '✅';
@@ -1028,4 +1009,5 @@
         init();
     </script>
 </body>
+
 </html>

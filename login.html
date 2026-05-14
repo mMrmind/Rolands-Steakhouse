@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="css/login.css">
     <link rel="stylesheet" href="css/design-system.css">
     <script src="js/design-system.js"></script>
+    <link rel="stylesheet" href="css/responsive.css">
 </head>
 
 <body>
@@ -29,12 +30,8 @@
 
             <!-- Login form -->
             <form id="login-form" class="active" onsubmit="handleLogin(event)">
-                <div class="auth-icon" id="user-logo-egg">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="12" cy="7" r="4"></circle>
-                    </svg>
+                <div class="auth-icon-wrap" id="user-logo-egg">
+                    <img src="images/Rolands logo 2.png" alt="Roland's" class="auth-brand-logo">
                 </div>
                 <div class="auth-header">
                     <h2>Welcome Back</h2>
@@ -61,14 +58,8 @@
 
             <!-- Sign up form -->
             <form id="signup-form" onsubmit="handleSignUp(event)">
-                <div class="auth-icon">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="8.5" cy="7" r="4"></circle>
-                        <line x1="20" y1="8" x2="20" y2="14"></line>
-                        <line x1="23" y1="11" x2="17" y2="11"></line>
-                    </svg>
+                <div class="auth-icon-wrap">
+                    <img src="images/Rolands logo 2.png" alt="Roland's" class="auth-brand-logo">
                 </div>
                 <div class="auth-header">
                     <h2>Create Account</h2>
@@ -101,12 +92,8 @@
 
             <!-- Forgot password form (Step 1: Enter Email) -->
             <form id="forgot-form" onsubmit="handleForgot(event)">
-                <div class="auth-icon">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                    </svg>
+                <div class="auth-icon-wrap">
+                    <img src="images/Rolands logo 2.png" alt="Roland's" class="auth-brand-logo">
                 </div>
                 <div class="auth-header">
                     <h2>Reset Password</h2>
@@ -134,11 +121,8 @@
 
             <!-- Verification form (Step 2: Enter Code) -->
             <form id="verify-form" onsubmit="handleVerify(event)">
-                <div class="auth-icon">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                    </svg>
+                <div class="auth-icon-wrap">
+                    <img src="images/Rolands logo 2.png" alt="Roland's" class="auth-brand-logo">
                 </div>
                 <div class="auth-header">
                     <h2>Verify Email</h2>
@@ -164,11 +148,8 @@
 
             <!-- Reset Password form (Step 3: New Password) -->
             <form id="reset-form" onsubmit="handleReset(event)">
-                <div class="auth-icon">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3L15.5 7.5z"></path>
-                    </svg>
+                <div class="auth-icon-wrap">
+                    <img src="images/Rolands logo 2.png" alt="Roland's" class="auth-brand-logo">
                 </div>
                 <div class="auth-header">
                     <h2>New Password</h2>
@@ -321,6 +302,7 @@
 
                 if (data.success) {
                     localStorage.setItem('loggedInUserName', data.name);
+                    localStorage.setItem('loggedInUserEmail', email);
                     window.location.href = 'index.html';
                 } else {
                     superModal({ title: 'Login Failed ❌', message: 'Invalid email or password. Please try again.' });
@@ -333,6 +315,7 @@
                 const namePart = email.split('@')[0];
                 const name = namePart.charAt(0).toUpperCase() + namePart.slice(1);
                 localStorage.setItem('loggedInUserName', name);
+                localStorage.setItem('loggedInUserEmail', email);
                 window.location.href = 'index.html';
             }
         }
@@ -359,6 +342,7 @@
                 // Server offline — log in locally
                 console.warn('Server offline, using local fallback:', err);
                 localStorage.setItem('loggedInUserName', name);
+                localStorage.setItem('loggedInUserEmail', email);
                 window.location.href = 'index.html';
             } finally {
                 btn.textContent = 'Sign Up';

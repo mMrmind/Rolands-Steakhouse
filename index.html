@@ -7,17 +7,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Roland's Steak House</title>
     <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Roboto:wght@400;500;700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/design-system.css">
     <script src="js/design-system.js"></script>
+    <link rel="stylesheet" href="css/responsive.css">
 </head>
 
 <body>
 
     <header id="main-header" class="transparent">
-        <div class="logo"><img src="images/rolandsLOGO.jpg" alt="Logo"></div>
+        <div class="logo"><img src="images/Rolands logo 2.png" alt="Roland's Steak House"></div>
         <nav>
             <ul>
                 <li><a href="#home" class="nav-link active">Home</a></li>
@@ -49,8 +50,7 @@
         </div>
     </section>
 
-    <!-- LIVE PROMOTIONS BANNER -->
-    <div id="live-promotions-container" style="background: #fdfaf5; padding: 60px 20px; display: none;"></div>
+
 
     <section id="about">
         <div class="container">
@@ -115,51 +115,68 @@
 
     <section id="reservations">
         <div class="form-container reveal">
-            <h2 style="font-family: 'Playfair Display'; font-size: 40px; color: #1b5e20; margin-bottom: 10px;">Book Your
-                Table</h2>
-            <p style="color: #666; margin-bottom: 30px;">Reserve in advance to guarantee your spot.</p>
+            <div class="booking-card">
+                <h2 class="section-title">Book Your Table</h2>
+                <p class="section-subtitle">Experience General Santos' finest fire-grilled steaks.</p>
 
-            <div id="login-area" style="max-width: 500px; margin: 0 auto 20px auto; text-align: left;">
-                <div
-                    style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-                    <div style="font-weight: 500; color: #555;">
-                        Login (optional):
-                        <span id="logged-in-user"
-                            style="font-weight: 700; color: #2e7d32; margin-left: 6px;">None</span>
+                <div id="login-area" class="login-prompt">
+                    <div class="login-info">
+                        <span class="muted-label">Reservation Account:</span>
+                        <span id="logged-in-user" class="active-user">Guest</span>
                     </div>
-                    <div
-                        style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; width: 100%; margin-top: 10px;">
-                        <button type="button" id="logout-btn" style="max-width: 140px;" disabled>Logout</button>
-                        <button type="button" id="go-login-page-btn" style="max-width: 180px;">Login / Sign up</button>
+                    <div class="login-actions">
+                        <button type="button" id="logout-btn" class="login-btn-small outline" disabled>Logout</button>
+                        <button type="button" id="go-login-page-btn" class="login-btn-small">Login / Sign up</button>
                     </div>
                 </div>
+
+                <form id="booking-form" onsubmit="goToNextPage(event)">
+                    <div class="form-group">
+                        <label for="customer-name-input">Full Name</label>
+                        <input type="text" id="customer-name-input" placeholder="Enter your full name" required
+                            oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <div class="phone-input-group">
+                                <span class="phone-prefix">+63</span>
+                                <input type="tel" placeholder="9XX XXX XXXX" required maxlength="10" 
+                                    oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Email <span style="font-size:11px; color:#64748b; font-weight:normal;">(Optional - For Receipt / Login)</span></label>
+                            <input type="email" id="customer-email-input" placeholder="example@email.com">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="arrival-date-input">Arrival Date</label>
+                            <input type="date" id="arrival-date-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="arrival-time-input">Arrival Time</label>
+                            <input type="time" id="arrival-time-input" min="10:30" max="21:00" required>
+                            <span class="time-limit-hint">Available: 10:30 AM - 9:00 PM</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Number of Guests</label>
+                        <select required>
+                            <option value="" disabled selected>Select party size</option>
+                            <option>1-2 Persons</option>
+                            <option>3-5 Persons</option>
+                            <option>6+ Persons</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="submit-booking-btn">Next: Choose Your Table <span>→</span></button>
+                </form>
             </div>
-
-            <form id="booking-form" onsubmit="goToNextPage(event)">
-                <input type="text" id="customer-name-input" placeholder="Full Name (Required)" required
-                    oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')">
-
-                <div style="display: flex; gap: 10px;">
-                    <input type="text" value="+63" readonly
-                        style="width: 70px; text-align: center; background: #f1f3f4; font-weight: bold; color: #555; cursor: not-allowed; padding: 15px 0;">
-                    <input type="tel" placeholder="9XX XXX XXXX (Required)" required maxlength="10" style="flex: 1;"
-                        oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-                </div>
-
-                <input type="email" placeholder="Email Address (Optional)">
-                <input type="date" id="arrival-date-input" required>
-                <div style="display: flex; flex-direction: column; gap: 4px;">
-                    <label style="font-size: 13px; color: #555; text-align: left; margin-left: 2px;">Arrival Time (10:30 - 21:00)</label>
-                    <input type="time" id="arrival-time-input" min="10:30" max="21:00" required>
-                </div>
-                <select required>
-                    <option value="" disabled selected>Number of Guests</option>
-                    <option>1-2 Persons</option>
-                    <option>3-5 Persons</option>
-                    <option>6+ Persons</option>
-                </select>
-                <button type="submit">Next: Choose Your Table</button>
-            </form>
         </div>
     </section>
     
@@ -253,18 +270,34 @@
         function goToNextPage(event) {
             event.preventDefault();
             const nameInput = document.getElementById('customer-name-input');
+            const emailInput = document.getElementById('customer-email-input');
             const arrivalDateInput = document.getElementById('arrival-date-input');
             const arrivalTimeInput = document.getElementById('arrival-time-input');
 
             // Enforce time bounds manually for older browsers
-            if (arrivalTimeInput && arrivalTimeInput.value) {
-                if (arrivalTimeInput.value < "10:30" || arrivalTimeInput.value > "21:00") {
-                    superModal({ title: 'Invalid Time 🕒', message: 'Please select an arrival time between 10:30 AM and 9:00 PM.' });
+            if (arrivalDateInput && arrivalTimeInput && arrivalTimeInput.value) {
+                const selectedDate = arrivalDateInput.value;
+                const selectedTime = arrivalTimeInput.value;
+
+                if (selectedTime < "10:30" || selectedTime > "21:00") {
+                    superModal({ title: 'Invalid Time \uD83D\uDD52', message: 'Please select an arrival time between 10:30 AM and 9:00 PM.' });
                     return;
+                }
+
+                // If today is selected, block past times
+                const now = new Date();
+                const todayStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+                if (selectedDate === todayStr) {
+                    const nowTimeStr = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+                    if (selectedTime <= nowTimeStr) {
+                        superModal({ title: 'Time Already Passed \uD83D\uDD52', message: 'The selected time has already passed. Please choose a later time for today.' });
+                        return;
+                    }
                 }
             }
 
             localStorage.setItem('customerName', (nameInput?.value || '').trim());
+            localStorage.setItem('customerEmail', (emailInput?.value || '').trim());
             localStorage.setItem('arrivalDate', arrivalDateInput?.value || '');
             localStorage.setItem('arrivalTime', arrivalTimeInput?.value || '');
 
@@ -279,34 +312,39 @@
         }
 
         (function initLocalLogin() {
-            const storedName = localStorage.getItem('loggedInUserName');
-            const nameInput = document.getElementById('customer-name-input');
-            const loggedInLabel = document.getElementById('logged-in-user');
-            const logoutBtn = document.getElementById('logout-btn');
+            const storedName  = localStorage.getItem('loggedInUserName');
+            const storedEmail = localStorage.getItem('loggedInUserEmail');
+            const nameInput      = document.getElementById('customer-name-input');
+            const loggedInLabel  = document.getElementById('logged-in-user');
+            const logoutBtn      = document.getElementById('logout-btn');
             const goLoginPageBtn = document.getElementById('go-login-page-btn');
 
             if (!nameInput || !loggedInLabel || !logoutBtn || !goLoginPageBtn) return;
 
-            const applyLoginState = (value) => {
-                const clean = (value || '').trim();
-                if (clean) {
-                    nameInput.value = clean;
-                    loggedInLabel.textContent = clean;
+            const applyLoginState = (name, email) => {
+                const cleanName  = (name  || '').trim();
+                const cleanEmail = (email || '').trim();
+
+                if (cleanName || cleanEmail) {
+                    // Show email as the account identifier; leave Full Name blank for the customer to type
+                    loggedInLabel.textContent = cleanEmail || cleanName;
+                    nameInput.value = ''; // Do NOT auto-fill — customer types their own name
                     logoutBtn.disabled = false;
                     goLoginPageBtn.disabled = true;
                 } else {
-                    loggedInLabel.textContent = 'None';
-                    if (storedName && nameInput.value === storedName) nameInput.value = '';
+                    loggedInLabel.textContent = 'Guest';
+                    nameInput.value = '';
                     logoutBtn.disabled = true;
                     goLoginPageBtn.disabled = false;
                 }
             };
 
-            applyLoginState(storedName);
+            applyLoginState(storedName, storedEmail);
 
             logoutBtn.addEventListener('click', () => {
                 localStorage.removeItem('loggedInUserName');
-                applyLoginState('');
+                localStorage.removeItem('loggedInUserEmail');
+                applyLoginState('', '');
             });
 
             goLoginPageBtn.addEventListener('click', () => {
@@ -434,47 +472,6 @@
 
         // Live promotions
         (function initPromotions() {
-            const container = document.getElementById('live-promotions-container');
-            if (!container) return;
-
-            function renderPromos() {
-                try {
-                    const promos = JSON.parse(localStorage.getItem('activePromos') || '[]');
-                    if (promos.length === 0) {
-                        container.style.display = 'none';
-                        return;
-                    }
-
-                    container.style.display = 'block';
-                    let html = '<h2 style="text-align:center; font-family:\'Playfair Display\',serif; font-size:40px; color:#1b5e20; margin-bottom:40px;">Special Offers & Promotions</h2>';
-                    html += '<div style="max-width:1200px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:30px; padding: 0 15px;">';
-
-                    promos.forEach(p => {
-                        html += `
-                            <div style="background:white; border-radius:12px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.08); transition:transform 0.3s;" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
-                                <img src="${p.image}" style="width:100%; height:220px; object-fit:cover;">
-                                <div style="padding:24px;">
-                                    <h3 style="font-family:\'Playfair Display\',serif; color:#1b5e20; font-size:24px; margin:0 0 10px;">${p.title}</h3>
-                                    <p style="color:#555; line-height:1.6; margin:0 0 20px;">${p.desc}</p>
-                                    <div style="font-size:12px; color:#888; font-weight:700;">🏷️ VALID SINCE: ${p.publishedAt}</div>
-                                </div>
-                            </div>
-                        `;
-                    });
-
-                    html += '</div>';
-                    // Only update DOM if changed to prevent flashing
-                    if (container.innerHTML !== html) {
-                        container.innerHTML = html;
-                    }
-                } catch (e) {
-                    console.error("Failed to parse promos", e);
-                }
-            }
-
-            renderPromos();
-            setInterval(renderPromos, 5000); // Keep in sync across tabs without refresh
-            
             // --- FLOATING AD TRIGGER ---
             window.closePromoModal = function() {
                 document.getElementById('promo-modal').classList.remove('active');
@@ -516,35 +513,67 @@
             }, 5000);
         })();
 
-        // Date limiter
+        // Date + Time limiter (linked so today blocks past times)
         (function initDateBounds() {
             const dateInput = document.getElementById('arrival-date-input');
-            if (dateInput) {
-                const today = new Date();
+            const timeInput = document.getElementById('arrival-time-input');
+            if (!dateInput || !timeInput) return;
 
-                // Format YYYY-MM-DD
-                const formatDate = (date) => {
-                    const y = date.getFullYear();
-                    const m = String(date.getMonth() + 1).padStart(2, '0');
-                    const d = String(date.getDate()).padStart(2, '0');
-                    return `${y}-${m}-${d}`;
-                };
+            const today = new Date();
 
-                const minDate = formatDate(today);
+            // Format YYYY-MM-DD
+            const formatDate = (date) => {
+                const y = date.getFullYear();
+                const m = String(date.getMonth() + 1).padStart(2, '0');
+                const d = String(date.getDate()).padStart(2, '0');
+                return `${y}-${m}-${d}`;
+            };
 
-                // Max date: exactly 1 year from today
-                const maxDateObj = new Date(today);
-                maxDateObj.setFullYear(maxDateObj.getFullYear() + 1);
-                const maxDate = formatDate(maxDateObj);
+            // Format HH:MM
+            const formatTime = (date) => {
+                return `${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
+            };
 
-                dateInput.setAttribute('min', minDate);
-                dateInput.setAttribute('max', maxDate);
+            const todayStr = formatDate(today);
 
-                // Stop manual key typing if they try to bypass the picker
-                dateInput.addEventListener('keydown', (e) => {
-                    e.preventDefault();
-                });
+            const minDate = todayStr;
+            const maxDateObj = new Date(today);
+            maxDateObj.setFullYear(maxDateObj.getFullYear() + 1);
+            const maxDate = formatDate(maxDateObj);
+
+            dateInput.setAttribute('min', minDate);
+            dateInput.setAttribute('max', maxDate);
+
+            // Update time min whenever date changes
+            function updateTimeMin() {
+                const selectedDate = dateInput.value;
+                if (!selectedDate) return;
+
+                if (selectedDate === todayStr) {
+                    // For today: min time = current time (so past times are blocked)
+                    const nowTime = formatTime(new Date());
+                    // Clamp: if current time is before 10:30, use 10:30
+                    const minTime = nowTime > "10:30" ? nowTime : "10:30";
+                    timeInput.setAttribute('min', minTime);
+
+                    // If user already picked a time that's now in the past, clear it
+                    if (timeInput.value && timeInput.value <= formatTime(new Date())) {
+                        timeInput.value = '';
+                    }
+                } else {
+                    // Future date: allow from 10:30 onwards
+                    timeInput.setAttribute('min', '10:30');
+                }
             }
+
+            dateInput.addEventListener('change', updateTimeMin);
+            // Run once on load in case a date is already prefilled
+            updateTimeMin();
+
+            // Stop manual key typing on date field
+            dateInput.addEventListener('keydown', (e) => {
+                e.preventDefault();
+            });
         })();
 
         // Hero background slideshow
@@ -579,9 +608,88 @@
             const panel = document.getElementById('chatPanel');
             panel.classList.toggle('active');
             if (panel.classList.contains('active')) {
-                loadChatMessages();
-                checkActiveReservation();
+                const isLoggedIn = !!localStorage.getItem('loggedInUserName');
+                if (!isLoggedIn) {
+                    renderChatLoginGate();
+                } else {
+                    renderChatContent();
+                    loadChatMessages();
+                    checkActiveReservation();
+                }
             }
+        }
+
+        function renderChatLoginGate() {
+            const body = document.getElementById('chatBody');
+            const footer = document.getElementById('chatFooter');
+            const resInfo = document.getElementById('chatResInfo');
+
+            if (resInfo) resInfo.style.display = 'none';
+            if (footer) footer.style.display = 'none';
+
+            body.innerHTML = `
+                <div style="
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    height: 100%;
+                    padding: 30px 20px;
+                    text-align: center;
+                    gap: 16px;
+                ">
+                    <div style="font-size: 52px; line-height:1;">🔒</div>
+                    <h3 style="
+                        font-family: 'Playfair Display', serif;
+                        font-size: 20px;
+                        color: #1b5e20;
+                        margin: 0;
+                    ">Login Required</h3>
+                    <p style="
+                        font-size: 13px;
+                        color: #64748b;
+                        line-height: 1.6;
+                        margin: 0;
+                        max-width: 220px;
+                    ">Please log in to your account to access Live Support and chat with our team.</p>
+                    <button onclick="window.location.href='login.html'" style="
+                        background: linear-gradient(135deg, #1b5e20, #2e7d32);
+                        color: white;
+                        border: none;
+                        border-radius: 12px;
+                        padding: 12px 28px;
+                        font-size: 14px;
+                        font-weight: 700;
+                        font-family: 'Roboto', sans-serif;
+                        cursor: pointer;
+                        box-shadow: 0 4px 15px rgba(27,94,32,0.35);
+                        transition: transform 0.15s, box-shadow 0.15s;
+                        width: 100%;
+                        max-width: 220px;
+                    " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(27,94,32,0.45)';" onmouseout="this.style.transform=''; this.style.boxShadow='0 4px 15px rgba(27,94,32,0.35)';">Login / Sign Up</button>
+                    <button onclick="document.getElementById('chatPanel').classList.remove('active')" style="
+                        background: transparent;
+                        border: 1.5px solid #cbd5e1;
+                        border-radius: 12px;
+                        padding: 10px 28px;
+                        font-size: 13px;
+                        font-weight: 600;
+                        color: #64748b;
+                        cursor: pointer;
+                        font-family: 'Roboto', sans-serif;
+                        transition: background 0.15s;
+                        width: 100%;
+                        max-width: 220px;
+                    " onmouseover="this.style.background='#f1f5f9';" onmouseout="this.style.background='transparent';">Maybe Later</button>
+                </div>
+            `;
+        }
+
+        function renderChatContent() {
+            const resInfo = document.getElementById('chatResInfo');
+            const footer = document.getElementById('chatFooter');
+            if (resInfo) resInfo.style.display = '';
+            if (footer) footer.style.display = '';
         }
 
         function getChatId() {
@@ -598,7 +706,7 @@
             const cName = localStorage.getItem('customerName');
             const resInfo = document.getElementById('chatResInfo');
             if (cName) {
-                const myRes = hist.reverse().find(r => r.customerName === cName);
+                const myRes = [...hist].reverse().find(r => r.customerName === cName);
                 if (myRes) {
                     let foodText = '';
                     if (myRes.reservationType === 'standard') {
@@ -610,11 +718,43 @@
                         foodText = 'None';
                     }
 
+                    // Kitchen status badge
+                    const kds = myRes.kdsStatus || 'pending';
+                    const kdsConfig = {
+                        pending:  { icon: '⏳', label: 'Order Received',  bg: '#fef3c7', color: '#92400e', border: '#fcd34d' },
+                        cooking:  { icon: '👨‍🍳', label: 'Now Cooking…',    bg: '#dbeafe', color: '#1e40af', border: '#93c5fd' },
+                        ready:    { icon: '🍽️', label: 'Food is Ready!',   bg: '#dcfce7', color: '#14532d', border: '#4ade80' },
+                        served:   { icon: '✅', label: 'Served',           bg: '#f0fdf4', color: '#166534', border: '#86efac' },
+                        cancelled:{ icon: '🚫', label: 'Order Cancelled',  bg: '#fee2e2', color: '#991b1b', border: '#fca5a5' },
+                    };
+                    const cfg = kdsConfig[kds] || kdsConfig.pending;
+
+                    const hasFoodOrder = myRes.foods && myRes.foods.length > 0;
+                    const kitchenBadge = hasFoodOrder ? `
+                        <div id="kitchen-status-badge" style="
+                            margin-top: 8px;
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
+                            background: ${cfg.bg};
+                            border: 1.5px solid ${cfg.border};
+                            border-radius: 10px;
+                            padding: 8px 12px;
+                            ${kds === 'ready' ? 'animation: kdsReadyPulse 1.8s ease-in-out infinite;' : ''}
+                        ">
+                            <span style="font-size:18px; line-height:1;">${cfg.icon}</span>
+                            <div>
+                                <div style="font-size:10px; color:${cfg.color}; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Kitchen Status</div>
+                                <div style="font-size:13px; color:${cfg.color}; font-weight:800;">${cfg.label}</div>
+                            </div>
+                        </div>` : '';
+
                     resInfo.innerHTML = `
                         <div style="text-align:left; line-height:1.4;">
                             <div style="font-size:13px; font-weight:700; margin-bottom:2px;">🎫 Reservation ${myRes.reservationNumber}</div>
                             <div style="font-size:11px; color:#555; margin-bottom:4px;">📅 ${myRes.arrivalDate} &nbsp; ⏰ ${myRes.arrivalTime}</div>
                             <div style="font-size:11px; font-weight:600; color:#1b5e20;">🍴 Order: <span style="font-weight:500; color:#333;">${foodText}</span></div>
+                            ${kitchenBadge}
                         </div>
                     `;
                     return;
@@ -760,17 +900,7 @@
             const overlay = document.createElement('div');
             overlay.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:9999; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(6px); animation:fadeIn 0.2s ease;';
 
-            const style = `<style>
-                @keyframes zoomIn { from { transform: scale(0.88); opacity:0; } to { transform: scale(1); opacity:1; } }
-                @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-                .pay-popup-card { background:white; padding:44px 36px; border-radius:24px; text-align:center; max-width:420px; width:90%; box-shadow:0 25px 60px rgba(0,0,0,0.35); animation:zoomIn 0.35s cubic-bezier(0.34,1.56,0.64,1); }
-                .pay-popup-icon { font-size:72px; margin-bottom:16px; }
-                .pay-popup-title { font-family:'Playfair Display',serif; font-size:26px; margin-bottom:10px; }
-                .pay-popup-msg { color:#64748b; line-height:1.65; font-size:15px; margin-bottom:28px; }
-                .pay-popup-resno { font-size:12px; color:#94a3b8; margin-bottom:24px; font-weight:600; }
-                .pay-popup-btn { border:none; padding:15px 24px; border-radius:12px; font-weight:700; cursor:pointer; width:100%; font-size:15px; transition:transform 0.15s; font-family:'Roboto',sans-serif; }
-                .pay-popup-btn:hover { transform:scale(1.02); }
-            </style>`;
+            const style = ``;
 
             if (newlyVerified) {
                 const resNo = verifiedRes ? verifiedRes.reservationNumber : '';
@@ -811,7 +941,301 @@
                 }
             };
         }, 3000);
+
+        // ══════════════════════════════════════════════
+        // 🍽️  FOOD-READY ALERT SYSTEM (Kitchen → Customer)
+        // Polls every 5s. When kitchen marks order as 'ready',
+        // fires a popup and badges the chat bubble.
+        // ══════════════════════════════════════════════
+        (function initFoodReadyPolling() {
+            let lastSeenKdsStatus = sessionStorage.getItem('lastKdsStatus') || null;
+
+            function checkFoodReady() {
+                const myName = localStorage.getItem('customerName');
+                if (!myName) return;
+
+                const hist = JSON.parse(localStorage.getItem('reservationHistory') || '[]');
+                const myRes = [...hist].reverse().find(r => r.customerName === myName);
+                if (!myRes || !myRes.foods || myRes.foods.length === 0) return;
+
+                const currentKds = myRes.kdsStatus || 'pending';
+
+                // Refresh the kitchen badge inside chat panel if it's open
+                if (document.getElementById('chatPanel')?.classList.contains('active')) {
+                    checkActiveReservation();
+                }
+
+                const hasFoodOrder = myRes.foods && myRes.foods.length > 0;
+
+                // Update the floating order-status pill
+                updateOrderPill(currentKds, hasFoodOrder);
+                // Manage the pulsing red dot on the chat bubble
+                const bubble = document.querySelector('.chat-bubble-btn');
+                if (bubble) {
+                    const existingDot = document.getElementById('chat-food-dot');
+                    if (currentKds === 'ready') {
+                        if (!existingDot) {
+                            const dot = document.createElement('span');
+                            dot.id = 'chat-food-dot';
+                            dot.style.cssText = `
+                                position: absolute; top: -4px; right: -4px;
+                                width: 16px; height: 16px; border-radius: 50%;
+                                background: #ef4444; border: 2.5px solid white;
+                                animation: foodDotPulse 1.4s ease-in-out infinite;
+                                pointer-events: none;
+                            `;
+                            bubble.style.position = 'relative';
+                            bubble.appendChild(dot);
+                        }
+                    } else {
+                        if (existingDot) existingDot.remove();
+                    }
+                }
+
+                // Fire the popup only ONCE per 'ready' event
+                if (currentKds === 'ready' && lastSeenKdsStatus !== 'ready') {
+                    lastSeenKdsStatus = 'ready';
+                    sessionStorage.setItem('lastKdsStatus', 'ready');
+                    showFoodReadyPopup(myRes);
+                }
+
+                // Reset tracking when status moves past 'ready'
+                if (currentKds === 'served' || currentKds === 'cancelled') {
+                    if (lastSeenKdsStatus === 'ready') {
+                        lastSeenKdsStatus = currentKds;
+                        sessionStorage.setItem('lastKdsStatus', currentKds);
+                    }
+                }
+
+                // Track cooking → ready transition
+                if (currentKds !== lastSeenKdsStatus && currentKds !== 'ready') {
+                    lastSeenKdsStatus = currentKds;
+                    sessionStorage.setItem('lastKdsStatus', currentKds);
+                }
+            }
+
+            function showFoodReadyPopup(res) {
+                const overlay = document.createElement('div');
+                overlay.id = 'food-ready-overlay';
+                overlay.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.72); z-index:9999; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(8px); animation:fadeIn 0.25s ease;';
+
+                const foodList = (res.foods || []).map(f => `<li style="margin:4px 0; font-size:14px; color:#333;">${f}</li>`).join('');
+
+                overlay.innerHTML = `
+                    <div class="food-ready-card">
+                        <span class="food-ready-icon">🍽️</span>
+                        <h2 class="food-ready-title">Your Food is Ready!</h2>
+                        <p class="food-ready-sub">Our kitchen has finished preparing your order. Please proceed to your table to enjoy your meal.</p>
+                        <ul class="food-ready-list">${foodList}</ul>
+                        ${res.reservationNumber ? `<div class="food-ready-res">Reservation #${res.reservationNumber} &nbsp;·&nbsp; Table: ${res.bookedTable || 'Assigned at door'}</div>` : ''}
+                        <button class="food-ready-btn-primary" onclick="closeFoodReadyPopup(true)">💬 Open Live Support</button>
+                        <button class="food-ready-btn-secondary" onclick="closeFoodReadyPopup(false)">Got it, Thank you!</button>
+                    </div>
+                `;
+
+                document.body.appendChild(overlay);
+
+                window.closeFoodReadyPopup = function(openChat) {
+                    const el = document.getElementById('food-ready-overlay');
+                    if (el) el.remove();
+                    if (openChat) {
+                        const panel = document.getElementById('chatPanel');
+                        if (panel && !panel.classList.contains('active')) toggleChat();
+                    }
+                };
+            }
+
+            // Inject keyframe animations into the page
+            const animStyle = document.createElement('style');
+            animStyle.textContent = `
+                @keyframes kdsReadyPulse { 0%,100% { box-shadow:0 0 0 0 rgba(74,222,128,0.55); } 50% { box-shadow:0 0 0 10px rgba(74,222,128,0); } }
+                @keyframes foodDotPulse  { 0%,100% { transform:scale(1); opacity:1; } 50% { transform:scale(1.3); opacity:0.65; } }
+                @keyframes pillSlideIn   { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+                @keyframes pillReadyGlow { 0%,100% { box-shadow:0 4px 18px rgba(22,163,74,0.25); } 50% { box-shadow:0 4px 28px rgba(22,163,74,0.65); } }
+                #order-status-pill {
+                    position: fixed;
+                    bottom: 100px;
+                    right: 24px;
+                    z-index: 8888;
+                    display: none;
+                    align-items: center;
+                    gap: 10px;
+                    padding: 10px 16px;
+                    border-radius: 40px;
+                    cursor: pointer;
+                    font-family: 'Roboto', sans-serif;
+                    font-size: 13px;
+                    font-weight: 700;
+                    border: none;
+                    outline: none;
+                    transition: transform 0.2s, box-shadow 0.2s;
+                    animation: pillSlideIn 0.35s ease forwards;
+                    min-width: 160px;
+                    max-width: 230px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+                #order-status-pill:hover { transform: translateY(-3px) scale(1.03); }
+                #order-status-pill.kds-pending  { background:#fffbeb; color:#92400e; box-shadow:0 4px 18px rgba(0,0,0,0.12); border:1.5px solid #fcd34d; }
+                #order-status-pill.kds-cooking  { background:#eff6ff; color:#1e40af; box-shadow:0 4px 18px rgba(0,0,0,0.12); border:1.5px solid #93c5fd; }
+                #order-status-pill.kds-ready    { background:#f0fdf4; color:#14532d; border:1.5px solid #4ade80; animation: pillSlideIn 0.35s ease forwards, pillReadyGlow 1.8s ease-in-out infinite; }
+                #order-status-pill.kds-served   { background:#f8fafc; color:#475569; box-shadow:0 4px 18px rgba(0,0,0,0.08); border:1.5px solid #e2e8f0; }
+                #order-status-pill.kds-cancelled{ background:#fff1f2; color:#991b1b; box-shadow:0 4px 18px rgba(0,0,0,0.08); border:1.5px solid #fca5a5; }
+                .pill-icon { font-size: 18px; flex-shrink: 0; }
+                .pill-text { display:flex; flex-direction:column; overflow:hidden; }
+                .pill-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; opacity:0.7; line-height:1; margin-bottom:2px; }
+                .pill-status { font-size:13px; font-weight:800; line-height:1; }
+            `;
+            document.head.appendChild(animStyle);
+
+            // Update the floating pill
+            function updateOrderPill(kdsStatus, hasFoodOrder) {
+                const pill = document.getElementById('order-status-pill');
+                if (!pill) return;
+
+                if (!hasFoodOrder || kdsStatus === 'served' || kdsStatus === 'cancelled') {
+                    pill.style.display = 'none';
+                    return;
+                }
+
+                const kdsMap = {
+                    pending:  { icon: '⏳', label: 'Kitchen Status', status: 'Order Received',  cls: 'kds-pending'  },
+                    cooking:  { icon: '👨‍🍳', label: 'Kitchen Status', status: 'Now Cooking…',   cls: 'kds-cooking'  },
+                    ready:    { icon: '🍽️', label: '🔔 Food Ready!',  status: 'Tap to view',    cls: 'kds-ready'    },
+                };
+                const cfg = kdsMap[kdsStatus] || kdsMap.pending;
+
+                pill.className = cfg.cls;
+                pill.style.display = 'flex';
+                pill.innerHTML = `
+                    <span class="pill-icon">${cfg.icon}</span>
+                    <span class="pill-text">
+                        <span class="pill-label">${cfg.label}</span>
+                        <span class="pill-status">${cfg.status}</span>
+                    </span>
+                `;
+            }
+
+            checkFoodReady();
+            setInterval(checkFoodReady, 5000);
+        })();
+
+        // ─── Chat Tab Switcher ───────────────────────────────────────
+        let _currentChatView = 'chat'; // 'chat' | 'history'
+
+        function switchChatTab(tab) {
+            _currentChatView = tab;
+            const tabChat    = document.getElementById('tabChat');
+            const tabHistory = document.getElementById('tabHistory');
+            const activeStyle   = 'color:#1b5e20; border-bottom:2.5px solid #1b5e20; background:transparent;';
+            const inactiveStyle = 'color:#94a3b8; border-bottom:2.5px solid transparent; background:transparent;';
+
+            if (tab === 'chat') {
+                tabChat.style.cssText    += activeStyle;
+                tabHistory.style.cssText += inactiveStyle;
+                // Re-apply active styles (override specificity)
+                tabChat.style.color    = '#1b5e20'; tabChat.style.borderBottom    = '2.5px solid #1b5e20';
+                tabHistory.style.color = '#94a3b8'; tabHistory.style.borderBottom = '2.5px solid transparent';
+                renderChatContent();
+                loadChatMessages();
+                checkActiveReservation();
+            } else {
+                tabHistory.style.color = '#1b5e20'; tabHistory.style.borderBottom = '2.5px solid #1b5e20';
+                tabChat.style.color    = '#94a3b8'; tabChat.style.borderBottom    = '2.5px solid transparent';
+                // Hide footer & resInfo while in history view
+                const footer  = document.getElementById('chatFooter');
+                const resInfo = document.getElementById('chatResInfo');
+                if (footer)  footer.style.display  = 'none';
+                if (resInfo) resInfo.style.display  = 'none';
+                showReservationHistory();
+            }
+        }
+
+        function showReservationHistory() {
+            const body  = document.getElementById('chatBody');
+            const cName = localStorage.getItem('customerName');
+            const hist  = JSON.parse(localStorage.getItem('reservationHistory') || '[]');
+
+            if (!cName) {
+                body.innerHTML = `<div style="text-align:center;padding:40px 20px;color:#94a3b8;font-size:13px;">No account found.<br>Please complete a reservation first.</div>`;
+                return;
+            }
+
+            const myRes = hist.filter(r => r.customerName === cName).reverse();
+
+            if (myRes.length === 0) {
+                body.innerHTML = `<div style="text-align:center;padding:40px 20px;color:#94a3b8;font-size:13px;">No reservations found yet.</div>`;
+                return;
+            }
+
+            const kdsConfig = {
+                pending:  { icon:'⏳', label:'Order Received', bg:'#fef3c7', color:'#92400e', border:'#fcd34d' },
+                cooking:  { icon:'👨\u200d🍳', label:'Now Cooking…',  bg:'#dbeafe', color:'#1e40af', border:'#93c5fd' },
+                ready:    { icon:'🍽️', label:'Food Ready!',   bg:'#dcfce7', color:'#14532d', border:'#4ade80' },
+                served:   { icon:'✅', label:'Served',         bg:'#f0fdf4', color:'#166534', border:'#86efac' },
+                cancelled:{ icon:'🚫', label:'Cancelled',      bg:'#fee2e2', color:'#991b1b', border:'#fca5a5' },
+            };
+
+            const payConfig = {
+                verified:    { icon:'✅', label:'Verified',     color:'#166534' },
+                paid:        { icon:'💳', label:'Paid',         color:'#166534' },
+                pending_check:{ icon:'⏳', label:'Pending Review', color:'#92400e' },
+                pending_paymongo:{ icon:'⏳', label:'Processing', color:'#1e40af' },
+                rejected:    { icon:'⚠️', label:'Rejected',     color:'#991b1b' },
+                'walk-in':   { icon:'🚶', label:'Walk-in',      color:'#475569' },
+            };
+
+            let html = `<div style="padding:12px 12px 6px; font-size:11px; color:#94a3b8; font-weight:700; text-transform:uppercase; letter-spacing:0.6px;">Your Reservations (${myRes.length})</div>`;
+
+            myRes.forEach(r => {
+                const kds = r.kdsStatus || 'pending';
+                const kCfg = kdsConfig[kds] || kdsConfig.pending;
+                const pay = r.paymentStatus || '';
+                const pCfg = payConfig[pay] || { icon:'—', label: pay || 'Unknown', color:'#64748b' };
+
+                const hasFoods = r.foods && r.foods.length > 0;
+                const foodHtml = hasFoods
+                    ? r.foods.map(f => `<span style="display:inline-block;background:#f1f5f9;border-radius:6px;padding:2px 7px;font-size:11px;margin:2px 2px 0 0;color:#334155;">${f}</span>`).join('')
+                    : `<span style="color:#94a3b8;font-size:11px;">No food pre-ordered</span>`;
+
+                const kitchenBadgeHtml = hasFoods ? `
+                    <div style="display:flex;align-items:center;gap:6px;background:${kCfg.bg};border:1px solid ${kCfg.border};border-radius:8px;padding:6px 10px;margin-top:8px;${kds==='ready'?'animation:kdsReadyPulse 1.8s infinite;':''} ">
+                        <span style="font-size:15px;">${kCfg.icon}</span>
+                        <div>
+                            <div style="font-size:9px;font-weight:700;text-transform:uppercase;color:${kCfg.color};letter-spacing:0.5px;">Kitchen Status</div>
+                            <div style="font-size:12px;font-weight:800;color:${kCfg.color};">${kCfg.label}</div>
+                        </div>
+                    </div>` : '';
+
+                html += `
+                    <div style="
+                        margin:0 10px 10px;
+                        background:white;
+                        border-radius:14px;
+                        border:1.5px solid #e2e8f0;
+                        padding:14px;
+                        box-shadow:0 2px 8px rgba(0,0,0,0.05);
+                        font-family:'Roboto',sans-serif;
+                    ">
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+                            <div style="font-size:12px;font-weight:800;color:#1b5e20;">🎫 ${r.reservationNumber || 'N/A'}</div>
+                            <div style="font-size:10px;color:${pCfg.color};font-weight:700;">${pCfg.icon} ${pCfg.label}</div>
+                        </div>
+                        <div style="font-size:11px;color:#64748b;margin-bottom:6px;">📅 ${r.arrivalDate||'—'} &nbsp; ⏰ ${r.arrivalTime||'—'} &nbsp; 🪑 ${r.bookedTable||'TBD'}</div>
+                        <div style="margin-bottom:4px;">${foodHtml}</div>
+                        ${kitchenBadgeHtml}
+                    </div>
+                `;
+            });
+
+            body.innerHTML = html;
+            body.scrollTop = 0;
+        }
     </script>
+
+    <!-- FLOATING ORDER STATUS PILL -->
+    <button id="order-status-pill" onclick="toggleChat()" title="View your order status"></button>
 
     <!-- CHAT WIDGET -->
     <div class="chat-widget-container">
@@ -820,14 +1244,38 @@
                 <h4>Live Support</h4>
                 <button class="chat-close" onclick="toggleChat()">×</button>
             </div>
-            <div class="chat-res-info" id="chatResInfo">Loading reservation...</div>
+            <div class="chat-res-info" id="chatResInfo" style="cursor:default;">Loading reservation...</div>
+
+            <!-- Tab bar -->
+            <div id="chatTabBar" style="
+                display: flex;
+                border-bottom: 1.5px solid #e2e8f0;
+                background: #f8fafc;
+                flex-shrink: 0;
+            ">
+                <button id="tabChat" onclick="switchChatTab('chat')" style="
+                    flex:1; padding:9px 4px; font-size:12px; font-weight:700;
+                    font-family:'Roboto',sans-serif; border:none; cursor:pointer;
+                    background:transparent; color:#1b5e20;
+                    border-bottom: 2.5px solid #1b5e20;
+                    transition: background 0.15s;
+                ">💬 Chat</button>
+                <button id="tabHistory" onclick="switchChatTab('history')" style="
+                    flex:1; padding:9px 4px; font-size:12px; font-weight:700;
+                    font-family:'Roboto',sans-serif; border:none; cursor:pointer;
+                    background:transparent; color:#94a3b8;
+                    border-bottom: 2.5px solid transparent;
+                    transition: background 0.15s;
+                ">📋 My Reservations</button>
+            </div>
+
             <div class="chat-body" id="chatBody">
                 <div class="chat-msg staff">
                     Hello! How can we help you today?
                     <div class="chat-msg-time">System</div>
                 </div>
             </div>
-            <div class="chat-footer">
+            <div class="chat-footer" id="chatFooter">
                 <label for="chatAttach"
                     style="cursor:pointer; font-size:20px; color:#1b5e20; display:flex; align-items:center;">📷</label>
                 <input type="file" id="chatAttach" accept="image/*" style="display:none;"

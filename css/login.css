@@ -200,18 +200,24 @@
         }
 
         /* Logo icon at top */
-        .auth-icon {
-            width: 64px;
-            height: 64px;
-            background: rgba(46, 125, 50, 0.2);
-            border: 2px solid rgba(76, 175, 80, 0.5);
-            border-radius: 50%;
+        .auth-icon-wrap {
+            width: 120px;
+            margin: 0 auto 30px auto;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 20px auto;
-            color: #4caf50;
-            font-size: 28px;
+            transition: transform 0.3s ease;
+        }
+
+        .auth-brand-logo {
+            width: 100%;
+            height: auto;
+            filter: brightness(0) invert(1) drop-shadow(0 4px 12px rgba(0,0,0,0.2));
+            object-fit: contain;
+        }
+
+        .auth-icon-wrap:hover {
+            transform: scale(1.05);
         }
 
         /* =========================================

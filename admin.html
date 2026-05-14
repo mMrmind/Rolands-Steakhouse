@@ -1,15 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | Roland's</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="css/admin.css">
     <script src="https://unpkg.com/html5-qrcode"></script>
     <link rel="stylesheet" href="css/design-system.css">
     <script src="js/design-system.js"></script>
+    <link rel="stylesheet" href="css/responsive.css">
 </head>
+
 <body>
     <header>
         <div class="brand">Roland's Staff Admin</div>
@@ -28,7 +33,9 @@
                 <div id="no-admin-users" class="hidden" style="text-align: center; padding: 20px;">
                     <div style="font-size: 40px; margin-bottom: 15px;">🔒</div>
                     <h2 style="color: #1b5e20; margin-bottom: 10px;">Access Restricted</h2>
-                    <p style="color: #555; line-height: 1.5; font-size: 14px;">No staff admin accounts have been registered yet. Please contact the <strong>Super Admin</strong> to create your staff account.</p>
+                    <p style="color: #555; line-height: 1.5; font-size: 14px;">No staff admin accounts have been
+                        registered yet. Please contact the <strong>Super Admin</strong> to create your staff account.
+                    </p>
                 </div>
 
                 <div id="admin-login" class="">
@@ -40,39 +47,52 @@
                         <div class="half">
                             <div>
                                 <label for="admin-username">Username</label>
-                                <input id="admin-username" type="text" placeholder="Your admin username" autocomplete="off">
+                                <input id="admin-username" type="text" placeholder="Your admin username"
+                                    autocomplete="off">
                             </div>
                             <div>
                                 <label for="admin-password">Password</label>
-                                <input id="admin-password" type="password" placeholder="Your admin password" autocomplete="new-password">
+                                <input id="admin-password" type="password" placeholder="Your admin password"
+                                    autocomplete="new-password">
                             </div>
                         </div>
                         <div class="btnrow">
                             <button type="button" id="admin-login-btn">Sign In</button>
                         </div>
                     </form>
-                    <div class="msg" id="auth-message-2" style="margin-top:10px; min-height:20px; font-size:14px; font-weight:600;"></div>
+                    <div class="msg" id="auth-message-2"
+                        style="margin-top:10px; min-height:20px; font-size:14px; font-weight:600;"></div>
                 </div>
             </div>
 
             <!-- TERMINAL LAUNCH CENTER (Publicly accessible 'outside' the dashboard) -->
-            <div id="launch-center" style="margin-top: 40px; text-align: center; border-top: 1px dashed #cbd5e1; padding-top: 30px;">
-                <h3 style="font-family: 'Playfair Display', serif; color: #1b5e20; font-size: 20px; margin-bottom: 20px;">Terminal Launch Center</h3>
+            <div id="launch-center"
+                style="margin-top: 40px; text-align: center; border-top: 1px dashed #cbd5e1; padding-top: 30px;">
+                <h3
+                    style="font-family: 'Playfair Display', serif; color: #1b5e20; font-size: 20px; margin-bottom: 20px;">
+                    Terminal Launch Center</h3>
                 <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                    <button type="button" onclick="window.launchTerminal('kitchen.html')" 
+                    <button type="button" onclick="window.launchTerminal('kitchen.html')"
                         style="background:#3b82f6; border-radius:10px; padding: 12px 20px; display:flex; align-items:center; gap:8px; border:none; color:white; font-weight:700; cursor:pointer;">
                         👩‍🍳 Launch Cook Area
                     </button>
-                    <button type="button" onclick="window.launchTerminal('pos.html')" 
+                    <button type="button" onclick="window.launchTerminal('pos.html')"
                         style="background:#1b5e20; border-radius:10px; padding: 12px 20px; display:flex; align-items:center; gap:8px; color:white; border:none; cursor:pointer;">
                         📱 Launch POS Terminal
                     </button>
                 </div>
-                <p style="margin-top: 15px; font-size: 12px; color: #64748b; font-style: italic;">Note: Terminals run independently for cashier and kitchen staff.</p>
+                <p style="margin-top: 15px; font-size: 12px; color: #64748b; font-style: italic;">Note: Terminals run
+                    independently for cashier and kitchen staff.</p>
             </div>
             <div style="text-align: center; margin-top: 25px;">
-                <a href="superadmin.html" style="color: #2e7d32; font-size: 14px; text-decoration: none; transition: 0.2s; font-weight: 600;" onmouseover="this.style.color='#1b5e20'" onmouseout="this.style.color='#2e7d32'">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: middle;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                <a href="superadmin.html"
+                    style="color: #2e7d32; font-size: 14px; text-decoration: none; transition: 0.2s; font-weight: 600;"
+                    onmouseover="this.style.color='#1b5e20'" onmouseout="this.style.color='#2e7d32'">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round"
+                        style="margin-right: 4px; vertical-align: middle;">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
                     Super Admin Access
                 </a>
             </div>
@@ -86,29 +106,33 @@
                 <button class="tab-link" onclick="switchAdminTab('menu', this)">Live Inventory</button>
                 <button class="tab-link" onclick="switchAdminTab('chat', this)">Live Chat</button>
                 <button class="tab-link" onclick="switchAdminTab('promotions', this)">🎉 Promotions</button>
+
                 <button class="tab-link" onclick="switchAdminTab('payments', this)">💳 Payments</button>
             </div>
 
             <!-- WALK-IN RESERVATION TAB -->
             <div id="tab-walkin" class="admin-tab-content hidden">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
-                    <h2 style="margin:0; font-family:'Playfair Display',serif; color:#2e7d32; font-size:26px;">📋 Manual Reservation</h2>
-                    <span class="muted" style="font-weight:700;">Book a table directly for a walk-in or phone customer</span>
+                <div
+                    style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+                    <h2 style="margin:0; font-family:'Playfair Display',serif; color:#2e7d32; font-size:26px;">📋 Manual
+                        Reservation</h2>
+                    <span class="muted" style="font-weight:700;">Book a table directly for a walk-in or phone
+                        customer</span>
                 </div>
 
                 <!-- Success toast -->
-                <div id="walkin-toast" style="display:none; background:#dcfce7; border:1px solid #86efac; border-radius:10px; padding:14px 18px; margin-bottom:20px; color:#166534; font-weight:600; font-size:14px;"></div>
+                <div id="walkin-toast"
+                    style="display:none; background:#dcfce7; border:1px solid #86efac; border-radius:10px; padding:14px 18px; margin-bottom:20px; color:#166534; font-weight:600; font-size:14px;">
+                </div>
 
                 <div class="card">
                     <!-- Type Toggle -->
                     <div style="display:flex; gap:10px; margin-bottom:22px;">
-                        <button type="button" id="walkin-type-priority"
-                            onclick="setWalkinType('priority')"
+                        <button type="button" id="walkin-type-priority" onclick="setWalkinType('priority')"
                             style="flex:1; padding:12px; border-radius:8px; border:2px solid #1b5e20; background:#1b5e20; color:white; font-weight:700; font-size:14px; cursor:pointer; transition:all 0.2s;">
                             ⭐ Priority
                         </button>
-                        <button type="button" id="walkin-type-standard"
-                            onclick="setWalkinType('standard')"
+                        <button type="button" id="walkin-type-standard" onclick="setWalkinType('standard')"
                             style="flex:1; padding:12px; border-radius:8px; border:2px solid #cbd5e1; background:white; color:#64748b; font-weight:700; font-size:14px; cursor:pointer; transition:all 0.2s;">
                             🪑 Standard
                         </button>
@@ -116,61 +140,97 @@
 
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
                         <div>
-                            <label style="display:block; margin-bottom:5px; font-weight:700; font-size:13px; color:#555;">Customer Name *</label>
-                            <input type="text" id="walkin-name" placeholder="e.g. Juan Dela Cruz" style="width:100%; padding:11px 13px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-size:14px;">
+                            <label
+                                style="display:block; margin-bottom:5px; font-weight:700; font-size:13px; color:#555;">Customer
+                                Name *</label>
+                            <input type="text" id="walkin-name" placeholder="e.g. Juan Dela Cruz"
+                                style="width:100%; padding:11px 13px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-size:14px;">
                         </div>
                         <div>
-                            <label style="display:block; margin-bottom:5px; font-weight:700; font-size:13px; color:#555;">Contact Number</label>
-                            <input type="text" id="walkin-contact" placeholder="e.g. 09XX-XXX-XXXX" style="width:100%; padding:11px 13px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-size:14px;">
+                            <label
+                                style="display:block; margin-bottom:5px; font-weight:700; font-size:13px; color:#555;">Contact
+                                Number</label>
+                            <input type="text" id="walkin-contact" placeholder="e.g. 09XX-XXX-XXXX"
+                                style="width:100%; padding:11px 13px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-size:14px;">
                         </div>
                         <div>
-                            <label style="display:block; margin-bottom:5px; font-weight:700; font-size:13px; color:#555;">Arrival Date *</label>
-                            <input type="date" id="walkin-date" style="width:100%; padding:11px 13px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-size:14px;">
+                            <label
+                                style="display:block; margin-bottom:5px; font-weight:700; font-size:13px; color:#555;">Arrival
+                                Date *</label>
+                            <input type="date" id="walkin-date"
+                                style="width:100%; padding:11px 13px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-size:14px;">
                         </div>
                         <div>
-                            <label style="display:block; margin-bottom:5px; font-weight:700; font-size:13px; color:#555;">Arrival Time *</label>
-                            <input type="time" id="walkin-time" style="width:100%; padding:11px 13px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-size:14px;">
+                            <label
+                                style="display:block; margin-bottom:5px; font-weight:700; font-size:13px; color:#555;">Arrival
+                                Time *</label>
+                            <input type="time" id="walkin-time"
+                                style="width:100%; padding:11px 13px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-size:14px;">
                         </div>
                         <div>
-                            <label style="display:block; margin-bottom:5px; font-weight:700; font-size:13px; color:#555;">Table *</label>
-                            <select id="walkin-table" style="width:100%; padding:11px 13px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-size:14px; background:white;">
+                            <label
+                                style="display:block; margin-bottom:5px; font-weight:700; font-size:13px; color:#555;">Table
+                                *</label>
+                            <select id="walkin-table"
+                                style="width:100%; padding:11px 13px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-size:14px; background:white;">
                                 <option value="">-- Select Table --</option>
-                                <option>Table 1</option><option>Table 2</option><option>Table 3</option>
-                                <option>Table 4</option><option>Table 5</option><option>Table 6</option>
-                                <option>Table 7</option><option>Table 8</option><option>Table 9</option>
-                                <option>Table 10</option><option>VIP Room</option>
+                                <option>Table 1</option>
+                                <option>Table 2</option>
+                                <option>Table 3</option>
+                                <option>Table 4</option>
+                                <option>Table 5</option>
+                                <option>Table 6</option>
+                                <option>Table 7</option>
+                                <option>Table 8</option>
+                                <option>Table 9</option>
+                                <option>Table 10</option>
+                                <option>VIP Room</option>
                             </select>
                         </div>
                         <div>
-                            <label style="display:block; margin-bottom:5px; font-weight:700; font-size:13px; color:#555;">Number of Guests</label>
-                            <input type="number" id="walkin-guests" placeholder="e.g. 4" min="1" max="20" style="width:100%; padding:11px 13px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-size:14px;">
+                            <label
+                                style="display:block; margin-bottom:5px; font-weight:700; font-size:13px; color:#555;">Number
+                                of Guests</label>
+                            <input type="number" id="walkin-guests" placeholder="e.g. 4" min="1" max="20"
+                                style="width:100%; padding:11px 13px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-size:14px;">
                         </div>
                     </div>
 
                     <!-- Priority fields -->
                     <div id="walkin-priority-fields">
                         <div style="margin-bottom:14px;">
-                            <label style="display:block; margin-bottom:5px; font-weight:700; font-size:13px; color:#555;">Food Selection *</label>
-                            <button type="button" onclick="openWalkinFoodPicker()" 
+                            <label
+                                style="display:block; margin-bottom:5px; font-weight:700; font-size:13px; color:#555;">Food
+                                Selection *</label>
+                            <button type="button" onclick="openWalkinFoodPicker()"
                                 style="width:100%; padding:10px; border-radius:8px; border:1px solid #1b5e20; background:white; color:#1b5e20; font-weight:700; font-size:14px; cursor:pointer; transition:0.2s;">
                                 🍽️ Select Menu Items
                             </button>
-                            <div id="walkin-order-summary" style="margin-top:8px; padding:10px; border-radius:8px; background:#f9fafb; border:1px dashed #d1d5db; min-height:40px; font-size:13px; color:#4b5563;">
+                            <div id="walkin-order-summary"
+                                style="margin-top:8px; padding:10px; border-radius:8px; background:#f9fafb; border:1px dashed #d1d5db; min-height:40px; font-size:13px; color:#4b5563;">
                                 No items selected yet.
                             </div>
                         </div>
                         <div style="margin-bottom:14px;">
-                            <label style="display:block; margin-bottom:5px; font-weight:700; font-size:13px; color:#555;">Payment Amount (₱)</label>
-                            <input type="number" id="walkin-payment" placeholder="e.g. 1500" min="0" style="width:100%; padding:11px 13px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-size:14px;">
+                            <label
+                                style="display:block; margin-bottom:5px; font-weight:700; font-size:13px; color:#555;">Payment
+                                Amount (₱)</label>
+                            <input type="number" id="walkin-payment" placeholder="e.g. 1500" min="0"
+                                style="width:100%; padding:11px 13px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-size:14px;">
                         </div>
                     </div>
 
                     <div style="margin-bottom:20px;">
-                        <label style="display:block; margin-bottom:5px; font-weight:700; font-size:13px; color:#555;">Notes / Special Requests</label>
-                        <textarea id="walkin-notes" placeholder="e.g. Birthday celebration, window seat preferred..." rows="3" style="width:100%; padding:11px 13px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-size:14px; font-family:inherit; resize:vertical;"></textarea>
+                        <label
+                            style="display:block; margin-bottom:5px; font-weight:700; font-size:13px; color:#555;">Notes
+                            / Special Requests</label>
+                        <textarea id="walkin-notes" placeholder="e.g. Birthday celebration, window seat preferred..."
+                            rows="3"
+                            style="width:100%; padding:11px 13px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-size:14px; font-family:inherit; resize:vertical;"></textarea>
                     </div>
 
-                    <div id="walkin-error" style="display:none; color:#ef4444; font-size:13px; font-weight:600; margin-bottom:12px;"></div>
+                    <div id="walkin-error"
+                        style="display:none; color:#ef4444; font-size:13px; font-weight:600; margin-bottom:12px;"></div>
 
                     <button type="button" onclick="submitWalkinReservation()"
                         style="width:100%; padding:15px; font-size:15px; border-radius:10px; border:none; background:#1b5e20; color:white; font-weight:700; cursor:pointer; transition:all 0.2s;"
@@ -180,16 +240,20 @@
                 </div>
 
                 <!-- Recent manual log -->
-                <h3 style="margin: 28px 0 14px; color:#1b5e20; font-size:16px; text-transform:uppercase; letter-spacing:.5px;">Recent Manual Reservations</h3>
+                <h3
+                    style="margin: 28px 0 14px; color:#1b5e20; font-size:16px; text-transform:uppercase; letter-spacing:.5px;">
+                    Recent Manual Reservations</h3>
                 <div id="walkin-recent-list">
-                    <div style="color:#aaa; font-style:italic; text-align:center; padding:20px;">No manual reservations yet.</div>
+                    <div style="color:#aaa; font-style:italic; text-align:center; padding:20px;">No manual reservations
+                        yet.</div>
                 </div>
             </div>
 
             <!-- LIVE CHAT TAB -->
             <div id="tab-chat" class="admin-tab-content hidden">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <h2 style="margin:0; font-family: 'Playfair Display', serif; color: #2e7d32; font-size: 26px;">Live Customer Support</h2>
+                    <h2 style="margin:0; font-family: 'Playfair Display', serif; color: #2e7d32; font-size: 26px;">Live
+                        Customer Support</h2>
                 </div>
                 <div class="chat-layout">
                     <div class="chat-sidebar" id="adminChatList"></div>
@@ -201,66 +265,99 @@
 
             <!-- PROMOTIONS TAB -->
             <div id="tab-promotions" class="admin-tab-content hidden">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
-                    <h2 style="margin:0; font-family:'Playfair Display',serif; color:#2e7d32; font-size:26px;">🎉 Promotions & Ads</h2>
+                <div
+                    style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+                    <h2 style="margin:0; font-family:'Playfair Display',serif; color:#2e7d32; font-size:26px;">🎉
+                        Promotions & Ads</h2>
                     <span class="muted" style="font-weight:700;">Promos are shown live on the homepage</span>
                 </div>
 
                 <div class="card" style="margin-bottom:24px;">
-                    <h3 style="margin:0 0 16px; color:#1b5e20; font-size:16px; text-transform:uppercase; letter-spacing:.5px;">Upload New Promotion</h3>
+                    <h3
+                        style="margin:0 0 16px; color:#1b5e20; font-size:16px; text-transform:uppercase; letter-spacing:.5px;">
+                        Upload New Promotion</h3>
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
                         <div>
-                            <label style="display:block; margin-bottom:5px; font-weight:700; font-size:13px; color:#555;">Promo Title</label>
-                            <input type="text" id="promo-title" placeholder="e.g. Weekend Steak Special" style="width:100%; padding:10px 12px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-size:14px;">
+                            <label
+                                style="display:block; margin-bottom:5px; font-weight:700; font-size:13px; color:#555;">Promo
+                                Title</label>
+                            <input type="text" id="promo-title" placeholder="e.g. Weekend Steak Special"
+                                style="width:100%; padding:10px 12px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-size:14px;">
                         </div>
                         <div>
-                            <label style="display:block; margin-bottom:5px; font-weight:700; font-size:13px; color:#555;">Short Description</label>
-                            <input type="text" id="promo-desc" placeholder="e.g. 20% off all steaks this weekend!" style="width:100%; padding:10px 12px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-size:14px;">
+                            <label
+                                style="display:block; margin-bottom:5px; font-weight:700; font-size:13px; color:#555;">Short
+                                Description</label>
+                            <input type="text" id="promo-desc" placeholder="e.g. 20% off all steaks this weekend!"
+                                style="width:100%; padding:10px 12px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-size:14px;">
                         </div>
                     </div>
-                    <label style="display:block; margin-bottom:8px; font-weight:700; font-size:13px; color:#555;">Promo Image</label>
-                    <div style="border:2px dashed #c8e6c9; border-radius:10px; padding:24px; text-align:center; cursor:pointer; background:#f0fdf4; position:relative; margin-bottom:14px;" onclick="document.getElementById('promo-upload-input').click()">
+                    <label style="display:block; margin-bottom:8px; font-weight:700; font-size:13px; color:#555;">Promo
+                        Image</label>
+                    <div style="border:2px dashed #c8e6c9; border-radius:10px; padding:24px; text-align:center; cursor:pointer; background:#f0fdf4; position:relative; margin-bottom:14px;"
+                        onclick="document.getElementById('promo-upload-input').click()">
                         <div style="font-size:36px;">📷</div>
                         <div style="font-size:14px; color:#555; margin-top:8px;">Click to upload a promo image</div>
                         <div style="font-size:12px; color:#aaa; margin-top:4px;">PNG, JPG supported</div>
-                        <input type="file" id="promo-upload-input" accept="image/*" style="display:none;" onchange="previewPromoImage(this)">
+                        <input type="file" id="promo-upload-input" accept="image/*" style="display:none;"
+                            onchange="previewPromoImage(this)">
                     </div>
-                    <img id="promo-preview-img" src="" style="display:none; max-height:180px; border-radius:8px; margin-bottom:14px; border:1px solid #e2e8f0;">
-                    <button type="button" onclick="addPromo()" style="width:100%; padding:13px; font-size:15px;">✅ Publish Promotion</button>
+                    <img id="promo-preview-img" src=""
+                        style="display:none; max-height:180px; border-radius:8px; margin-bottom:14px; border:1px solid #e2e8f0;">
+                    <button type="button" onclick="addPromo()" style="width:100%; padding:13px; font-size:15px;">✅
+                        Publish Promotion</button>
                 </div>
 
-                <h3 style="margin:0 0 14px; color:#1b5e20; font-size:16px; text-transform:uppercase; letter-spacing:.5px;">Active Promotions</h3>
-                <div id="promo-list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap:16px;"></div>
-                <div id="promo-empty" style="color:#aaa; font-style:italic; text-align:center; padding:30px;">No promotions published yet.</div>
+                <h3
+                    style="margin:0 0 14px; color:#1b5e20; font-size:16px; text-transform:uppercase; letter-spacing:.5px;">
+                    Active Promotions</h3>
+                <div id="promo-list"
+                    style="display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap:16px;"></div>
+                <div id="promo-empty" style="color:#aaa; font-style:italic; text-align:center; padding:30px;">No
+                    promotions published yet.</div>
             </div>
 
             <!-- PAYMENTS TAB -->
             <div id="tab-payments" class="admin-tab-content hidden">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
-                    <h2 style="margin:0; font-family:'Playfair Display',serif; color:#2e7d32; font-size:26px;">💳 Payment History</h2>
-                    
-                    <div style="display:flex; background:#f1f5f9; padding:4px; border-radius:10px; gap:4px;">
-                        <button class="payment-sub-tab active" onclick="switchPaymentFilter('pending', this)" style="padding:8px 16px; border:none; border-radius:8px; font-weight:700; cursor:pointer; font-size:13px; transition:0.2s;">⏳ Pending Verification</button>
-                        <button class="payment-sub-tab" onclick="switchPaymentFilter('history', this)" style="padding:8px 16px; border:none; border-radius:8px; font-weight:700; cursor:pointer; font-size:13px; transition:0.2s;">📜 Payment History</button>
+                <div
+                    style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+                    <h2 style="margin:0; font-family:'Playfair Display',serif; color:#2e7d32; font-size:26px;">💳
+                        Payment History</h2>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <div style="display:flex; background:#f1f5f9; padding:4px; border-radius:10px; gap:4px;">
+                            <button class="payment-sub-tab active" onclick="switchPaymentFilter('pending', this)"
+                                style="padding:8px 16px; border:none; border-radius:8px; font-weight:700; cursor:pointer; font-size:13px; transition:0.2s;">⏳
+                                Pending Verification</button>
+                            <button class="payment-sub-tab" onclick="switchPaymentFilter('history', this)"
+                                style="padding:8px 16px; border:none; border-radius:8px; font-weight:700; cursor:pointer; font-size:13px; transition:0.2s;">📜
+                                Payment History</button>
+                        </div>
+                        <select id="payment-time-filter" class="payment-time-filter" onchange="renderPayments()">
+                            <option value="all">All Time</option>
+                            <option value="day">Today</option>
+                            <option value="week">This Week</option>
+                            <option value="month">This Month</option>
+                            <option value="year">This Year</option>
+                        </select>
                     </div>
                 </div>
 
-                <style>
-                    .payment-sub-tab { background: transparent; color: #64748b; }
-                    .payment-sub-tab.active { background: white; color: #1b5e20; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-                </style>
-                <div id="payment-history-list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap:16px;"></div>
-                <div id="payment-history-empty" style="color:#aaa; font-style:italic; text-align:center; padding:40px;">No payments recorded yet.</div>
+                <div id="payment-history-list"
+                    style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap:16px;"></div>
+                <div id="payment-history-empty" style="color:#aaa; font-style:italic; text-align:center; padding:40px;">
+                    No payments recorded yet.</div>
             </div>
 
             <!-- MENU ITEM OVERRIDES TAB -->
             <div id="tab-menu" class="admin-tab-content hidden">
                 <div class="card" style="margin-bottom: 24px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                        <h2 style="font-family: 'Playfair Display', serif; color: #2e7d32; margin: 0; font-size: 20px;">Live Inventory View</h2>
+                        <h2 style="font-family: 'Playfair Display', serif; color: #2e7d32; margin: 0; font-size: 20px;">
+                            Live Inventory View</h2>
                         <span style="font-size:12px; color:#666; font-weight:700;">Stock syncs with Super Admin</span>
                     </div>
-                    <p style="color: #666; margin: 0 0 20px 0; font-size: 14px;">Monitor real-time stock levels of products here. Only a Super Admin can add or modify the total stock items.</p>
+                    <p style="color: #666; margin: 0 0 20px 0; font-size: 14px;">Monitor real-time stock levels of
+                        products here. Only a Super Admin can add or modify the total stock items.</p>
                     <div id="admin-menu-grid">
                         <!-- Menu items rendered via JS -->
                     </div>
@@ -268,17 +365,23 @@
             </div>
 
             <!-- WALK-IN FOOD PICKER MODAL -->
-            <div id="walkin-food-modal" class="hidden" style="position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.5); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center;">
-                <div style="background:white; border-radius:20px; width:90%; max-width:600px; max-height:85vh; display:flex; flex-direction:column; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); overflow:hidden;">
+            <div id="walkin-food-modal" class="hidden"
+                style="position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.5); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center;">
+                <div
+                    style="background:white; border-radius:20px; width:90%; max-width:600px; max-height:85vh; display:flex; flex-direction:column; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); overflow:hidden;">
                     <!-- Header -->
-                    <div style="padding:20px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center; background:#f8fafc;">
-                        <h3 style="margin:0; font-family:'Playfair Display',serif; color:#1b5e20; font-size:20px;">Select Menu Items</h3>
-                        <button onclick="closeWalkinFoodPicker()" style="background:none; border:none; color:#64748b; cursor:pointer; padding:5px; font-size:20px;">✕</button>
+                    <div
+                        style="padding:20px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center; background:#f8fafc;">
+                        <h3 style="margin:0; font-family:'Playfair Display',serif; color:#1b5e20; font-size:20px;">
+                            Select Menu Items</h3>
+                        <button onclick="closeWalkinFoodPicker()"
+                            style="background:none; border:none; color:#64748b; cursor:pointer; padding:5px; font-size:20px;">✕</button>
                     </div>
-                    
+
                     <!-- Search -->
                     <div style="padding:15px 20px; border-bottom:1px solid #f1f5f9;">
-                        <input type="text" id="walkin-food-search" placeholder="Search menu items..." onkeyup="filterWalkinFoods(this.value)" 
+                        <input type="text" id="walkin-food-search" placeholder="Search menu items..."
+                            onkeyup="filterWalkinFoods(this.value)"
                             style="width:100%; padding:10px 14px; border:1px solid #e2e8f0; border-radius:10px; font-size:14px; box-sizing:border-box;">
                     </div>
 
@@ -288,12 +391,17 @@
                     </div>
 
                     <!-- Footer -->
-                    <div style="padding:20px; border-top:1px solid #f1f5f9; background:#f8fafc; display:flex; justify-content:space-between; align-items:center;">
+                    <div
+                        style="padding:20px; border-top:1px solid #f1f5f9; background:#f8fafc; display:flex; justify-content:space-between; align-items:center;">
                         <div>
-                            <div style="font-size:12px; color:#64748b; text-transform:uppercase; letter-spacing:0.5px; font-weight:700;">Estimate Total</div>
-                            <div style="font-size:24px; font-weight:800; color:#1b5e20;">₱<span id="walkin-modal-total">0</span></div>
+                            <div
+                                style="font-size:12px; color:#64748b; text-transform:uppercase; letter-spacing:0.5px; font-weight:700;">
+                                Estimate Total</div>
+                            <div style="font-size:24px; font-weight:800; color:#1b5e20;">₱<span
+                                    id="walkin-modal-total">0</span></div>
                         </div>
-                        <button onclick="confirmWalkinFoodSelection()" style="background:#1b5e20; color:white; border:none; padding:12px 24px; border-radius:10px; font-weight:700; cursor:pointer; transition:0.2s;">
+                        <button onclick="confirmWalkinFoodSelection()"
+                            style="background:#1b5e20; color:white; border:none; padding:12px 24px; border-radius:10px; font-weight:700; cursor:pointer; transition:0.2s;">
                             Confirm Selection
                         </button>
                     </div>
@@ -302,17 +410,19 @@
 
             <div id="tab-overview" class="admin-tab-content">
                 <!-- Dashboard Terminal Launch (Sticky/Quick Access) -->
-                <div style="background: #f0fdf4; border: 1px solid #dcfce7; border-radius: 12px; padding: 20px; margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;">
+                <div
+                    style="background: #f0fdf4; border: 1px solid #dcfce7; border-radius: 12px; padding: 20px; margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;">
                     <div>
                         <h3 style="margin: 0; color: #1b5e20; font-size: 18px;">Operational Terminals</h3>
-                        <p style="margin: 4px 0 0; font-size: 13px; color: #64748b;">Quick launch for Kitchen and POS staff.</p>
+                        <p style="margin: 4px 0 0; font-size: 13px; color: #64748b;">Quick launch for Kitchen and POS
+                            staff.</p>
                     </div>
                     <div style="display: flex; gap: 12px;">
-                        <button type="button" onclick="window.launchTerminal('kitchen.html')" 
+                        <button type="button" onclick="window.launchTerminal('kitchen.html')"
                             style="background:#3b82f6; color:white; border:none; padding: 10px 18px; border-radius: 8px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 14px;">
                             🍳 Kitchen
                         </button>
-                        <button type="button" onclick="window.launchTerminal('pos.html')" 
+                        <button type="button" onclick="window.launchTerminal('pos.html')"
                             style="background:#1b5e20; color:white; border:none; padding: 10px 18px; border-radius: 8px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 14px;">
                             📱 POS Terminal
                         </button>
@@ -321,174 +431,303 @@
                 <div class="grid">
                     <div class="card">
                         <h3>Total Reservations</h3>
-                    <div class="value" id="stat-total">0</div>
-                </div>
-                <div class="card">
-                    <h3>Priority Reservations</h3>
-                    <div class="value" id="stat-priority">0</div>
-                </div>
-                <div class="card">
-                    <h3>Total Revenue (Priority)</h3>
-                    <div class="value" id="stat-revenue">₱0</div>
-                </div>
-                <div class="card">
-                    <h3>Walk-in Reservations</h3>
-                    <div class="value" id="stat-walkins">0</div>
-                </div>
-                <div class="card" style="border-left: 4px solid #4ade80;">
-                    <h3>Online Customers</h3>
-                    <div class="value" id="stat-online" style="font-size: 22px;">0 Active</div>
-                    <div class="muted" id="online-list" style="margin-top: 6px; font-weight: bold;">None</div>
-                </div>
-            </div>
-
-            <style>
-                .status-filter { background: transparent; border: none; padding: 6px 14px; font-size: 13px; font-weight: 700; color: #64748b; cursor: pointer; border-radius: 6px; transition: all 0.2s; }
-                .status-filter.active { background: white; color: #1b5e20; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-                .status-filter:hover:not(.active) { background: rgba(0,0,0,0.05); color: #334155; }
-            </style>
-            
-            <div class="row" style="gap: 12px; align-items: center;">
-                <input id="search-input" type="text" placeholder="Search by Reservation # or Customer name..." style="flex: 1;">
-                
-                <div style="display:flex; background-color:#f1f5f9; border-radius:8px; padding:4px; gap: 4px;">
-                    <button id="filter-all" type="button" onclick="setResFilter('all')" class="status-filter active">All</button>
-                    <button id="filter-paid" type="button" onclick="setResFilter('paid')" class="status-filter">✅ Paid</button>
-                    <button id="filter-unpaid" type="button" onclick="setResFilter('unpaid')" class="status-filter">❌ Unpaid/Failed</button>
-                    <button id="filter-pending" type="button" onclick="setResFilter('pending')" class="status-filter">⏳ Pending</button>
-                </div>
-
-                <button type="button" id="export-csv-btn" class="secondary">Export CSV</button>
-            </div>
-
-            <div class="muted" id="summary-line"></div>
-
-            <div style="height: 12px;"></div>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>Reservation #</th>
-                        <th>Arrival</th>
-                        <th>Customer</th>
-                        <th>Table</th>
-                        <th>Type</th>
-                        <th>Foods / Notes</th>
-                        <th>Payment</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="history-tbody">
-                    <!-- Filled by JS -->
-                </tbody>
-            </table>
-
-            <div style="height: 16px;"></div>
-
-            <div class="grid" style="grid-template-columns: repeat(2, 1fr);">
-                <div class="card">
-                    <h3>Top Foods (Priority)</h3>
-                    <div class="muted" id="top-foods">No data</div>
-                </div>
-                <div class="card">
-                    <h3>Reservations By Date</h3>
-                    <div class="muted" id="by-date">No data</div>
-                </div>
-            </div>
-            
-            <!-- Edit Modal -->
-            <div id="edit-modal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 100;">
-                <div class="card" style="width: 100%; max-width: 450px; background: white; padding: 25px;">
-                    <h2 style="margin-top:0; color:#1b5e20;">Edit Reservation</h2>
-                    <input type="hidden" id="edit-index">
-                    
-                    <label style="display:block; margin: 10px 0 5px; font-weight:600; font-size:14px; text-transform:uppercase;">Customer Name</label>
-                    <input type="text" id="edit-customer" style="width: 100%; padding:10px; border:1px solid #ccc; border-radius:5px; box-sizing:border-box;">
-                    
-                    <label style="display:block; margin: 10px 0 5px; font-weight:600; font-size:14px; text-transform:uppercase;">Arrival Date</label>
-                    <input type="date" id="edit-date" style="width: 100%; padding:10px; border:1px solid #ccc; border-radius:5px; box-sizing:border-box;">
-                    
-                    <label style="display:block; margin: 10px 0 5px; font-weight:600; font-size:14px; text-transform:uppercase;">Arrival Time</label>
-                    <input type="time" id="edit-time" style="width: 100%; padding:10px; border:1px solid #ccc; border-radius:5px; box-sizing:border-box;">
-                    
-                    <label style="display:block; margin: 10px 0 5px; font-weight:600; font-size:14px; text-transform:uppercase;">Table Selection</label>
-                    <select id="edit-table" style="width: 100%; padding:10px; border:1px solid #ccc; border-radius:5px; box-sizing:border-box;">
-                        <option value="Table 1">Table 1</option>
-                        <option value="Table 2">Table 2</option>
-                        <option value="Table 3">Table 3</option>
-                        <option value="Table 4">Table 4</option>
-                        <option value="Table 5">Table 5</option>
-                        <option value="Table 6">Table 6</option>
-                        <option value="Table 7">Table 7</option>
-                        <option value="Table 8">Table 8</option>
-                        <option value="Table 9">Table 9</option>
-                        <option value="Table 10">Table 10</option>
-                    </select>
-
-                    <div id="edit-foods-container" style="display:none;">
-                        <label style="display:block; margin: 10px 0 5px; font-weight:600; font-size:14px; text-transform:uppercase;">Food Order <span style="font-size:11px;color:#888;">(Comma separated)</span></label>
-                        <input type="text" id="edit-foods" placeholder="e.g. Bangus Steak, French Fries" style="width: 100%; padding:10px; border:1px solid #ccc; border-radius:5px; box-sizing:border-box; margin-bottom:5px;">
-                        <input type="text" id="edit-beef" placeholder="Beef note (e.g. Medium Rare) (Optional)" style="width: 100%; padding:10px; border:1px solid #ccc; border-radius:5px; box-sizing:border-box; background:#f0fdf4;">
+                        <div class="value" id="stat-total">0</div>
                     </div>
-
-                    <div style="display:flex; gap: 10px; margin-top:20px;">
-                        <button type="button" class="secondary" onclick="closeEditModal()" style="flex:1;">Cancel</button>
-                        <button type="button" onclick="saveEditModal()" style="flex:1;">Save Changes</button>
+                    <div class="card">
+                        <h3>Priority Reservations</h3>
+                        <div class="value" id="stat-priority">0</div>
+                    </div>
+                    <div class="card">
+                        <h3>Total Revenue (Priority)</h3>
+                        <div class="value" id="stat-revenue">₱0</div>
+                    </div>
+                    <div class="card">
+                        <h3>Walk-in Reservations</h3>
+                        <div class="value" id="stat-walkins">0</div>
+                    </div>
+                    <div class="card" style="border-left: 4px solid #4ade80;">
+                        <h3>Online Customers</h3>
+                        <div class="value" id="stat-online" style="font-size: 22px;">0 Active</div>
+                        <div class="muted" id="online-list" style="margin-top: 6px; font-weight: bold;">None</div>
                     </div>
                 </div>
-            </div>
+
+
+                <div class="row" style="gap: 12px; align-items: center;">
+                    <input id="search-input" type="text" placeholder="Search by Reservation # or Customer name..."
+                        style="flex: 1;">
+
+                    <div style="display:flex; background-color:#f1f5f9; border-radius:8px; padding:4px; gap: 4px;">
+                        <button id="filter-all" type="button" onclick="setResFilter('all')"
+                            class="status-filter active">All</button>
+                        <button id="filter-paid" type="button" onclick="setResFilter('paid')" class="status-filter">✅
+                            Paid</button>
+                        <button id="filter-unpaid" type="button" onclick="setResFilter('unpaid')"
+                            class="status-filter">❌ Unpaid/Failed</button>
+                        <button id="filter-pending" type="button" onclick="setResFilter('pending')"
+                            class="status-filter">⏳ Pending</button>
+                        <button id="filter-discounted" type="button" onclick="setResFilter('discounted')"
+                            class="status-filter">🏷️ Discounted</button>
+                    </div>
+
+                    <button type="button" id="export-csv-btn" class="secondary">Export CSV</button>
+                </div>
+
+                <div class="muted" id="summary-line"></div>
+
+                <div style="height: 12px;"></div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Reservation #</th>
+                            <th>Arrival</th>
+                            <th>Customer</th>
+                            <th>Table</th>
+                            <th>Type</th>
+                            <th>Foods / Notes</th>
+                            <th>Payment</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-tbody">
+                        <!-- Filled by JS -->
+                    </tbody>
+                </table>
+
+                <div style="height: 16px;"></div>
+
+                <div class="grid" style="grid-template-columns: repeat(2, 1fr);">
+                    <div class="card">
+                        <h3>Top Foods (Priority)</h3>
+                        <div class="muted" id="top-foods">No data</div>
+                    </div>
+                    <div class="card">
+                        <h3>Reservations By Date</h3>
+                        <div class="muted" id="by-date">No data</div>
+                    </div>
+                </div>
+
+                <!-- Edit Modal -->
+                <div id="edit-modal" class="hidden"
+                    style="position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 100;">
+                    <div class="card" style="width: 100%; max-width: 450px; background: white; padding: 25px;">
+                        <h2 style="margin-top:0; color:#1b5e20;">Edit Reservation</h2>
+                        <input type="hidden" id="edit-index">
+
+                        <label
+                            style="display:block; margin: 10px 0 5px; font-weight:600; font-size:14px; text-transform:uppercase;">Customer
+                            Name</label>
+                        <input type="text" id="edit-customer"
+                            style="width: 100%; padding:10px; border:1px solid #ccc; border-radius:5px; box-sizing:border-box;">
+
+                        <label
+                            style="display:block; margin: 10px 0 5px; font-weight:600; font-size:14px; text-transform:uppercase;">Arrival
+                            Date</label>
+                        <input type="date" id="edit-date"
+                            style="width: 100%; padding:10px; border:1px solid #ccc; border-radius:5px; box-sizing:border-box;">
+
+                        <label
+                            style="display:block; margin: 10px 0 5px; font-weight:600; font-size:14px; text-transform:uppercase;">Arrival
+                            Time</label>
+                        <input type="time" id="edit-time"
+                            style="width: 100%; padding:10px; border:1px solid #ccc; border-radius:5px; box-sizing:border-box;">
+
+                        <label
+                            style="display:block; margin: 10px 0 5px; font-weight:600; font-size:14px; text-transform:uppercase;">Table
+                            Selection</label>
+                        <select id="edit-table"
+                            style="width: 100%; padding:10px; border:1px solid #ccc; border-radius:5px; box-sizing:border-box;">
+                            <option value="Table 1">Table 1</option>
+                            <option value="Table 2">Table 2</option>
+                            <option value="Table 3">Table 3</option>
+                            <option value="Table 4">Table 4</option>
+                            <option value="Table 5">Table 5</option>
+                            <option value="Table 6">Table 6</option>
+                            <option value="Table 7">Table 7</option>
+                            <option value="Table 8">Table 8</option>
+                            <option value="Table 9">Table 9</option>
+                            <option value="Table 10">Table 10</option>
+                        </select>
+
+                        <div id="edit-foods-container" style="display:none;">
+                            <label
+                                style="display:block; margin: 10px 0 5px; font-weight:600; font-size:14px; text-transform:uppercase;">Food
+                                Order <span style="font-size:11px;color:#888;">(Comma separated)</span></label>
+                            <input type="text" id="edit-foods" placeholder="e.g. Bangus Steak, French Fries"
+                                style="width: 100%; padding:10px; border:1px solid #ccc; border-radius:5px; box-sizing:border-box; margin-bottom:5px;">
+                            <input type="text" id="edit-beef" placeholder="Beef note (e.g. Medium Rare) (Optional)"
+                                style="width: 100%; padding:10px; border:1px solid #ccc; border-radius:5px; box-sizing:border-box; background:#f0fdf4;">
+                        </div>
+
+                        <div style="display:flex; gap: 10px; margin-top:20px;">
+                            <button type="button" class="secondary" onclick="closeEditModal()"
+                                style="flex:1;">Cancel</button>
+                            <button type="button" onclick="saveEditModal()" style="flex:1;">Save Changes</button>
+                        </div>
+                    </div>
+                </div>
 
             </div> <!-- End tab-overview -->
 
 
             <div id="tab-floorplan" class="admin-tab-content hidden">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h2 style="margin:0; font-family: 'Playfair Display', serif; color: #2e7d32; font-size: 26px;">Front-of-House Hostess</h2>
-                    <span class="muted" style="font-weight: 700;">Tap tables to manage live status</span>
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+                    <div>
+                        <h2 style="margin:0; font-family: 'Playfair Display', serif; color: #2e7d32; font-size: 26px;">
+                            Front-of-House Hostess</h2>
+                        <span class="muted" style="font-weight: 700;">Tap tables to manage live status</span>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button type="button" onclick="window.openFloorPlanEditor()"
+                            style="background:#f59e0b; color:white; border:none; padding:10px 16px; border-radius:8px; font-weight:700; cursor:pointer; font-size: 13px; box-shadow: 0 4px 6px rgba(245,158,11,0.2);">✏️
+                            Edit Tables</button>
+                        <button type="button" onclick="window.fullyBookFloor()"
+                            style="background:#ef4444; color:white; border:none; padding:10px 16px; border-radius:8px; font-weight:700; cursor:pointer; font-size: 13px; box-shadow: 0 4px 6px rgba(239,68,68,0.2);">🔒
+                            Full Booking</button>
+                        <button type="button" onclick="window.resetFloor()"
+                            style="background:#16a34a; color:white; border:none; padding:10px 16px; border-radius:8px; font-weight:700; cursor:pointer; font-size: 13px; box-shadow: 0 4px 6px rgba(22,163,74,0.2);">🔓
+                            Open All</button>
+                    </div>
                 </div>
                 <div class="legend">
-                    <div class="legend-item"><div class="dot dot-available"></div> Available</div>
-                    <div class="legend-item"><div class="dot dot-reserved"></div> Reserved</div>
-                    <div class="legend-item"><div class="dot dot-seated"></div> Seated / Dining</div>
-                    <div class="legend-item"><div class="dot dot-cleaning"></div> Cleaning</div>
-                    <div class="legend-item"><div class="dot dot-unavailable"></div> Unavailable</div>
+                    <div class="legend-item">
+                        <div class="dot dot-available"></div> Available
+                    </div>
+                    <div class="legend-item">
+                        <div class="dot dot-reserved"></div> Reserved
+                    </div>
+                    <div class="legend-item">
+                        <div class="dot dot-seated"></div> Seated / Dining
+                    </div>
+                    <div class="legend-item">
+                        <div class="dot dot-cleaning"></div> Cleaning
+                    </div>
+                    <div class="legend-item">
+                        <div class="dot dot-unavailable"></div> Unavailable
+                    </div>
                 </div>
                 <div class="floor-plan" id="hostess-grid">Loading floor plan...</div>
 
                 <!-- Toast Info Panel -->
                 <div id="floor-toast" style="
                     display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
-                    background: white; border-top: 4px solid #2e7d32;
-                    box-shadow: 0 -8px 30px rgba(0,0,0,0.15);
-                    padding: 20px 28px 28px; max-height: 60vh; overflow-y: auto;
-                    animation: slideUp 0.3s ease;
+                    background: #f8fafc; border-top-left-radius: 20px; border-top-right-radius: 20px;
+                    box-shadow: 0 -10px 40px rgba(0,0,0,0.15);
+                    padding: 0; max-height: 80vh; flex-direction: column;
+                    animation: slideUp 0.3s ease; border-top: 1px solid #e2e8f0;
                 ">
-
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 14px;">
-                        <span id="toast-table-title" style="font-family:'Playfair Display',serif; font-size:20px; font-weight:700; color:#1b5e20;"></span>
-                        <button class="toast-close" onclick="document.getElementById('floor-toast').style.display='none'">✕</button>
+                    <!-- Fixed Header -->
+                    <div
+                        style="display:flex; justify-content:space-between; align-items:center; padding: 20px 28px 16px; border-bottom: 1px solid #e2e8f0; background: white; border-top-left-radius: 20px; border-top-right-radius: 20px; z-index: 10;">
+                        <span id="toast-table-title"
+                            style="font-family:'Playfair Display',serif; font-size:22px; font-weight:800; color:#1e293b;"></span>
+                        <button class="toast-close"
+                            onclick="document.getElementById('floor-toast').style.display='none'"
+                            style="background: #f1f5f9; border: none; width: 36px; height: 36px; border-radius: 50%; font-size: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #475569; transition: 0.2s;"
+                            onmouseover="this.style.background='#e2e8f0'; this.style.color='#0f172a'"
+                            onmouseout="this.style.background='#f1f5f9'; this.style.color='#475569'">✕</button>
                     </div>
-                    <div id="toast-reservations-list"></div>
-                    <div id="toast-no-res" style="color:#888; font-style:italic; display:none;">No reservations for this table.</div>
+
+                    <!-- Scrollable Body -->
+                    <div id="toast-body" style="flex: 1; overflow-y: auto; padding: 20px 28px;">
+                        <div id="toast-reservations-list"></div>
+                        <div id="toast-no-res" style="color:#888; font-style:italic; display:none;">No reservations for
+                            this table.</div>
+                    </div>
+
+                    <!-- Fixed Footer -->
+                    <div id="toast-footer"
+                        style="padding: 16px 28px 24px; border-top: 1px solid #e2e8f0; background: white;">
+                    </div>
                 </div>
             </div>
 
         </div>
     </div>
 
+    <!-- Floor Plan Editor Modal -->
+    <div id="floor-editor-modal"
+        style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; z-index:9999;">
+        <div
+            style="background:white; border-radius:16px; width:100%; max-width:760px; padding:28px; max-height:90vh; display: flex; flex-direction: column; position:relative; margin:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+            <div
+                style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid #e2e8f0; padding-bottom: 16px; margin-bottom: 16px;">
+                <h2 style="margin:0; color:#1b5e20; font-family:'Playfair Display',serif;">✏️ Edit Floor Plan</h2>
+                <button onclick="document.getElementById('floor-editor-modal').style.display='none'"
+                    style="background: #f1f5f9; border: none; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px;">✕</button>
+            </div>
+
+            <div style="display:flex; gap:14px; flex:1; min-height: 480px; overflow:hidden;">
+                <!-- Table grid (reorder) -->
+                <div style="flex:1; min-width: 320px; display:flex; flex-direction:column; gap:10px; overflow:hidden;">
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+                        <div style="font-size:12px; font-weight:900; color:#64748b; text-transform:uppercase; letter-spacing:0.4px;">
+                            Drag to reorder • Click to edit
+                        </div>
+                    </div>
+                    <div id="floor-editor-canvas"
+                        style="flex:1; border:1px solid #e2e8f0; border-radius:12px; background: #ffffff; overflow:auto; padding:12px;">
+                    </div>
+                </div>
+
+                <!-- Properties -->
+                <div id="floor-editor-props"
+                    style="width: 280px; flex:0 0 280px; border:1px solid #e2e8f0; border-radius:12px; background:white; overflow:hidden; display:flex; flex-direction:column;">
+                    <div style="padding:12px 14px; border-bottom:1px solid #e2e8f0; background:#f8fafc;">
+                        <div style="font-size:12px; font-weight:900; color:#334155; text-transform:uppercase; letter-spacing:0.4px;">
+                            Properties
+                        </div>
+                        <div id="floor-props-sub" style="font-size:12px; color:#64748b; margin-top:4px;">Select a table</div>
+                    </div>
+                    <div id="floor-props-body" style="padding:12px 14px; overflow:auto; flex:1;">
+                        <div style="color:#94a3b8; font-weight:700; font-size:13px;">Click any table on the canvas.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; margin-top: 16px; display: flex; gap: 10px;">
+                <button onclick="window.addNewTable()"
+                    style="background:#3b82f6; color:white; flex:1; border-radius:8px;">➕ Add New Table</button>
+                <button onclick="window.saveFloorPlanConfig()"
+                    style="background:#16a34a; color:white; flex:1; border-radius:8px;">💾 Save Changes</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Payment Proof Modal (Global, outside all tabs) -->
-    <div id="proof-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; z-index:9999;">
-        <div style="background:white; border-radius:16px; width:100%; max-width:520px; padding:28px; max-height:90vh; overflow-y:auto; position:relative; margin:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
-            <button onclick="document.getElementById('proof-modal').style.display='none'" style="position:absolute; top:14px; right:16px; background:none; border:none; font-size:24px; cursor:pointer; color:#888; line-height:1;">✕</button>
+    <div id="proof-modal"
+        style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; z-index:9999;">
+        <div
+            style="background:white; border-radius:16px; width:100%; max-width:520px; padding:28px; max-height:90vh; overflow-y:auto; position:relative; margin:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+            <button onclick="document.getElementById('proof-modal').style.display='none'"
+                style="position:absolute; top:15px; right:15px; background: #f1f5f9; border: none; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; color:#475569; z-index: 20;">✕</button>
             <h2 style="margin:0 0 14px; color:#1b5e20; font-family:'Playfair Display',serif;">🧾 Payment Proof</h2>
-            <div id="proof-modal-info" style="margin-bottom:16px; font-size:14px; color:#555; border:1px solid #e2e8f0; border-radius:8px; padding:12px;"></div>
-            <img id="proof-modal-img" src="" style="width:100%; border-radius:10px; border:1px solid #e2e8f0; display:none;">
-            <div id="proof-modal-noimg" style="color:#aaa; font-style:italic; text-align:center; padding:20px;">No screenshot uploaded.</div>
+            <div id="proof-modal-info"
+                style="margin-bottom:16px; font-size:14px; color:#555; border:1px solid #e2e8f0; border-radius:8px; padding:12px;">
+            </div>
+            <img id="proof-modal-img" src=""
+                style="width:100%; border-radius:10px; border:1px solid #e2e8f0; display:none;">
+            <div id="proof-modal-noimg" style="color:#aaa; font-style:italic; text-align:center; padding:20px;">No
+                screenshot uploaded.</div>
+        </div>
+    </div>
+
+    <!-- Image Preview Modal (Global) -->
+    <div id="image-preview-modal"
+        style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.78); align-items:center; justify-content:center; z-index:10000;">
+        <div
+            style="position:relative; width:100%; max-width:920px; margin:20px; max-height:92vh; display:flex; align-items:center; justify-content:center;">
+            <button onclick="window.closeImagePreview()"
+                style="position:absolute; top:-12px; right:-12px; background: #f1f5f9; border: none; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; color:#0f172a; box-shadow:0 10px 30px rgba(0,0,0,0.25);">✕</button>
+            <img id="image-preview-img" alt="Preview"
+                style="max-width:100%; max-height:92vh; border-radius:14px; background:white; box-shadow:0 25px 70px rgba(0,0,0,0.45); border:1px solid rgba(226,232,240,0.6);" />
         </div>
     </div>
 
     <script>
-        window.launchTerminal = function(url) {
+        window.launchTerminal = function (url) {
             console.log("🚀 Launching Terminal:", url);
             const win = window.open(url, '_blank');
             if (!win || win.closed || typeof win.closed == 'undefined') {
@@ -508,78 +747,100 @@
             try { return JSON.parse(value || ''); } catch (e) { return fallback; }
         }
 
+        window.openImagePreview = function (src) {
+            if (!src) return;
+            const m = document.getElementById('image-preview-modal');
+            const img = document.getElementById('image-preview-img');
+            if (!m || !img) return;
+            img.src = src;
+            m.style.display = 'flex';
+            m.onclick = (e) => {
+                if (e.target === m) window.closeImagePreview();
+            };
+            window.addEventListener('keydown', window.__imgPrevEsc || (window.__imgPrevEsc = (ev) => {
+                if (ev.key === 'Escape') window.closeImagePreview();
+            }));
+        };
+
+        window.closeImagePreview = function () {
+            const m = document.getElementById('image-preview-modal');
+            const img = document.getElementById('image-preview-img');
+            if (img) img.src = '';
+            if (m) m.style.display = 'none';
+        };
+
         const defaultMenuData = [
             // BEEF (Pure Beef Steaks)
-            { id: 'INV-B1', title: 'Fillet Mignon',                category: 'Beef', price: 935, stock: 50 },
-            { id: 'INV-B2', title: 'Tenderloin Steak (200g)',       category: 'Beef', price: 740, stock: 50 },
-            { id: 'INV-B3', title: 'Tenderloin Tips (200g)',        category: 'Beef', price: 740, stock: 50 },
-            { id: 'INV-B4', title: 'Rib Eye Steak (200-350g)',      category: 'Beef', price: 675, stock: 50 },
-            { id: 'INV-B5', title: 'Hamburger Steak (204g)',        category: 'Beef', price: 505, stock: 50 },
+            { id: 'INV-B1', title: 'Fillet Mignon', category: 'Beef', price: 935, stock: 50 },
+            { id: 'INV-B2', title: 'Tenderloin Steak (200g)', category: 'Beef', price: 740, stock: 50 },
+            { id: 'INV-B3', title: 'Tenderloin Tips (200g)', category: 'Beef', price: 740, stock: 50 },
+            { id: 'INV-B4', title: 'Rib Eye Steak (200-350g)', category: 'Beef', price: 675, stock: 50 },
+            { id: 'INV-B5', title: 'Hamburger Steak (204g)', category: 'Beef', price: 505, stock: 50 },
             // T-BONE
-            { id: 'INV-T1', title: 'T-Bone Medium (250-400g)',      category: 'T-Bone', price: 715, stock: 50 },
-            { id: 'INV-T2', title: 'T-Bone Large (450-500g)',       category: 'T-Bone', price: 790, stock: 50 },
+            { id: 'INV-T1', title: 'T-Bone Medium (250-400g)', category: 'T-Bone', price: 715, stock: 50 },
+            { id: 'INV-T2', title: 'T-Bone Large (450-500g)', category: 'T-Bone', price: 790, stock: 50 },
             { id: 'INV-T3', title: 'T-Bone Extra Large (551-500g)', category: 'T-Bone', price: 865, stock: 50 },
-            { id: 'INV-T4', title: 'T-Bone XX Large (551-500g)',    category: 'T-Bone', price: 940, stock: 50 },
-            { id: 'INV-T5', title: 'Porter House (551-600g)',       category: 'T-Bone', price: 1015, stock: 50 },
+            { id: 'INV-T4', title: 'T-Bone XX Large (551-500g)', category: 'T-Bone', price: 940, stock: 50 },
+            { id: 'INV-T5', title: 'Porter House (551-600g)', category: 'T-Bone', price: 1015, stock: 50 },
             // SIRLOIN STEAK
-            { id: 'INV-S1', title: 'Sirloin Mini (250-300g)',        category: 'Sirloin Steak', price: 485, stock: 50 },
-            { id: 'INV-S2', title: 'Sirloin Small (251-350g)',       category: 'Sirloin Steak', price: 545, stock: 50 },
-            { id: 'INV-S3', title: 'Sirloin Mid Size (351-450g)',    category: 'Sirloin Steak', price: 605, stock: 50 },
-            { id: 'INV-S4', title: 'Sirloin Big Size (401-450g)',    category: 'Sirloin Steak', price: 670, stock: 50 },
+            { id: 'INV-S1', title: 'Sirloin Mini (250-300g)', category: 'Sirloin Steak', price: 485, stock: 50 },
+            { id: 'INV-S2', title: 'Sirloin Small (251-350g)', category: 'Sirloin Steak', price: 545, stock: 50 },
+            { id: 'INV-S3', title: 'Sirloin Mid Size (351-450g)', category: 'Sirloin Steak', price: 605, stock: 50 },
+            { id: 'INV-S4', title: 'Sirloin Big Size (401-450g)', category: 'Sirloin Steak', price: 670, stock: 50 },
             // CHICKEN & FISH
-            { id: 'INV-CF1', title: 'Whole Chicken',                 category: 'Chicken & Fish', price: 660, stock: 50 },
-            { id: 'INV-CF2', title: 'Half Chicken',                  category: 'Chicken & Fish', price: 335, stock: 50 },
-            { id: 'INV-CF3', title: 'Fish Steak (Tanigue)',          category: 'Chicken & Fish', price: 495, stock: 50 },
-            { id: 'INV-CF4', title: 'Bangus Steak',                  category: 'Chicken & Fish', price: 510, stock: 50 },
+            { id: 'INV-CF1', title: 'Whole Chicken', category: 'Chicken & Fish', price: 660, stock: 50 },
+            { id: 'INV-CF2', title: 'Half Chicken', category: 'Chicken & Fish', price: 335, stock: 50 },
+            { id: 'INV-CF3', title: 'Fish Steak (Tanigue)', category: 'Chicken & Fish', price: 495, stock: 50 },
+            { id: 'INV-CF4', title: 'Bangus Steak', category: 'Chicken & Fish', price: 510, stock: 50 },
             // SANDWICH
-            { id: 'INV-SW1', title: 'Big Sunny Burger with Fries',  category: 'Sandwich', price: 430, stock: 50 },
+            { id: 'INV-SW1', title: 'Big Sunny Burger with Fries', category: 'Sandwich', price: 430, stock: 50 },
             { id: 'INV-SW2', title: 'Big Sunny Steak Sandwich with Fries', category: 'Sandwich', price: 400, stock: 50 },
-            { id: 'INV-SW3', title: 'Steak Sandwich',               category: 'Sandwich', price: 165, stock: 50 },
-            { id: 'INV-SW4', title: 'Cheeseburger',                 category: 'Sandwich', price: 170, stock: 50 },
-            { id: 'INV-SW5', title: 'Hamburger',                    category: 'Sandwich', price: 160, stock: 50 },
+            { id: 'INV-SW3', title: 'Steak Sandwich', category: 'Sandwich', price: 165, stock: 50 },
+            { id: 'INV-SW4', title: 'Cheeseburger', category: 'Sandwich', price: 170, stock: 50 },
+            { id: 'INV-SW5', title: 'Hamburger', category: 'Sandwich', price: 160, stock: 50 },
             // SIDE ORDERS
-            { id: 'INV-SO1', title: 'Cream of Mushroom Soup',       category: 'Side Orders', price: 80, stock: 50 },
-            { id: 'INV-SO2', title: 'Cream of Chicken Soup',        category: 'Side Orders', price: 80, stock: 50 },
-            { id: 'INV-SO3', title: 'Potato Salad',                 category: 'Side Orders', price: 155, stock: 50 },
-            { id: 'INV-SO4', title: 'French Fries',                  category: 'Side Orders', price: 155, stock: 50 },
-            { id: 'INV-SO5', title: 'Mashed Potato',                category: 'Side Orders', price: 90, stock: 50 },
-            { id: 'INV-SO6', title: 'Garlic Rice',                  category: 'Side Orders', price: 55, stock: 50 },
-            { id: 'INV-SO7', title: 'Plain Rice',                   category: 'Side Orders', price: 40, stock: 50 },
-            { id: 'INV-SO8', title: 'Garlic Bread',                 category: 'Side Orders', price: 45, stock: 50 },
+            { id: 'INV-SO1', title: 'Cream of Mushroom Soup', category: 'Side Orders', price: 80, stock: 50 },
+            { id: 'INV-SO2', title: 'Cream of Chicken Soup', category: 'Side Orders', price: 80, stock: 50 },
+            { id: 'INV-SO3', title: 'Potato Salad', category: 'Side Orders', price: 155, stock: 50 },
+            { id: 'INV-SO4', title: 'French Fries', category: 'Side Orders', price: 155, stock: 50 },
+            { id: 'INV-SO5', title: 'Mashed Potato', category: 'Side Orders', price: 90, stock: 50 },
+            { id: 'INV-SO6', title: 'Garlic Rice', category: 'Side Orders', price: 55, stock: 50 },
+            { id: 'INV-SO7', title: 'Plain Rice', category: 'Side Orders', price: 40, stock: 50 },
+            { id: 'INV-SO8', title: 'Garlic Bread', category: 'Side Orders', price: 45, stock: 50 },
             // DRINKS
-            { id: 'INV-D1', title: 'Mango Juice',                   category: 'Drinks', price: 135, stock: 50 },
-            { id: 'INV-D2', title: 'Pineapple Juice',               category: 'Drinks', price: 95, stock: 50 },
-            { id: 'INV-D3', title: 'Four Seasons',                   category: 'Drinks', price: 95, stock: 50 },
-            { id: 'INV-D4', title: 'Iced Tea',                       category: 'Drinks', price: 85, stock: 50 },
-            { id: 'INV-D5', title: 'Blue Lemonade',                  category: 'Drinks', price: 95, stock: 50 },
-            { id: 'INV-D6', title: 'Cucumber Juice',                 category: 'Drinks', price: 90, stock: 50 },
-            { id: 'INV-D7', title: 'Pine-Orange Juice',              category: 'Drinks', price: 90, stock: 50 },
-            { id: 'INV-D8', title: 'Calamansi Juice (Hot/Cold)',     category: 'Drinks', price: 70, stock: 50 },
-            { id: 'INV-D9', title: 'Coke in Can',                    category: 'Drinks', price: 95, stock: 50 },
-            { id: 'INV-D10', title: 'Sprite | Royal in Can',        category: 'Drinks', price: 95, stock: 50 },
-            { id: 'INV-D11', title: 'San Miguel Pale Pilsen',           category: 'Drinks', price: 85, stock: 50 },
-            { id: 'INV-D12', title: 'San Mig Light',                 category: 'Drinks', price: 95, stock: 50 },
-            { id: 'INV-D13', title: 'Hot Tea',                       category: 'Drinks', price: 70, stock: 50 },
-            { id: 'INV-D14', title: 'Drip Coffee',                   category: 'Drinks', price: 85, stock: 50 },
-            { id: 'INV-D15', title: 'Coffee with Cream',             category: 'Drinks', price: 55, stock: 50 },
-            { id: 'INV-D16', title: 'Bottled Water (500ml)',         category: 'Drinks', price: 35, stock: 50 },
+            { id: 'INV-D1', title: 'Mango Juice', category: 'Drinks', price: 135, stock: 50 },
+            { id: 'INV-D2', title: 'Pineapple Juice', category: 'Drinks', price: 95, stock: 50 },
+            { id: 'INV-D3', title: 'Four Seasons', category: 'Drinks', price: 95, stock: 50 },
+            { id: 'INV-D4', title: 'Iced Tea', category: 'Drinks', price: 85, stock: 50 },
+            { id: 'INV-D5', title: 'Blue Lemonade', category: 'Drinks', price: 95, stock: 50 },
+            { id: 'INV-D6', title: 'Cucumber Juice', category: 'Drinks', price: 90, stock: 50 },
+            { id: 'INV-D7', title: 'Pine-Orange Juice', category: 'Drinks', price: 90, stock: 50 },
+            { id: 'INV-D8', title: 'Calamansi Juice (Hot/Cold)', category: 'Drinks', price: 70, stock: 50 },
+            { id: 'INV-D9', title: 'Coke in Can', category: 'Drinks', price: 95, stock: 50 },
+            { id: 'INV-D10', title: 'Sprite | Royal in Can', category: 'Drinks', price: 95, stock: 50 },
+            { id: 'INV-D11', title: 'San Miguel Pale Pilsen', category: 'Drinks', price: 85, stock: 50 },
+            { id: 'INV-D12', title: 'San Mig Light', category: 'Drinks', price: 95, stock: 50 },
+            { id: 'INV-D13', title: 'Hot Tea', category: 'Drinks', price: 70, stock: 50 },
+            { id: 'INV-D14', title: 'Drip Coffee', category: 'Drinks', price: 85, stock: 50 },
+            { id: 'INV-D15', title: 'Coffee with Cream', category: 'Drinks', price: 55, stock: 50 },
+            { id: 'INV-D16', title: 'Bottled Water (500ml)', category: 'Drinks', price: 35, stock: 50 },
             // WINES
-            { id: 'INV-W1', title: 'Carlo Rossi (Red)',             category: 'Wines', price: 700, stock: 50 },
-            { id: 'INV-W2', title: 'Carlo Rossi (White)',           category: 'Wines', price: 700, stock: 50 },
-            { id: 'INV-W3', title: 'Adega De Pegões',               category: 'Wines', price: 600, stock: 50 }
+            { id: 'INV-W1', title: 'Carlo Rossi (Red)', category: 'Wines', price: 700, stock: 50 },
+            { id: 'INV-W2', title: 'Carlo Rossi (White)', category: 'Wines', price: 700, stock: 50 },
+            { id: 'INV-W3', title: 'Adega De Pegões', category: 'Wines', price: 600, stock: 50 }
         ];
 
         const CATEGORIES = [
-            { key: 'Beef',              label: '🥩 Beef Steaks' },
-            { id:  'T-Bone', key: 'T-Bone', label: '🦴 T-Bone' },
-            { key: 'Sirloin Steak',     label: '🥩 Sirloin Steak' },
-            { key: 'Chicken & Fish',    label: '🍗 Chicken & Fish' },
-            { key: 'Sandwich',          label: '🍔 Sandwich' },
-            { key: 'Side Orders',       label: '🍟 Side Orders' },
-            { key: 'Drinks',            label: '🍹 Drinks' },
-            { key: 'Wines',             label: '🍷 Wines' },
-            { key: 'Supplies',          label: '🧺 Supplies' },
-            { key: 'Others',            label: '📦 Others' }
+            { key: 'Beef', label: '🥩 Beef Steaks' },
+            { id: 'T-Bone', key: 'T-Bone', label: '🦴 T-Bone' },
+            { key: 'Sirloin Steak', label: '🥩 Sirloin Steak' },
+            { key: 'Chicken & Fish', label: '🍗 Chicken & Fish' },
+            { key: 'Sandwich', label: '🍔 Sandwich' },
+            { key: 'Side Orders', label: '🍟 Side Orders' },
+            { key: 'Drinks', label: '🍹 Drinks' },
+            { key: 'Wines', label: '🍷 Wines' },
+            { key: 'Supplies', label: '🧺 Supplies' },
+            { key: 'Others', label: '📦 Others' }
         ];
 
         function getInventory() {
@@ -589,14 +850,14 @@
 
                 // Legacy ID Migration
                 const legacyMap = {
-                    'm5':'INV-B1','m6':'INV-B2','m7':'INV-B3','m8':'INV-B4','m9':'INV-B5',
-                    't1':'INV-T1','t2':'INV-T2','t3':'INV-T3','t4':'INV-T4','t5':'INV-T5',
-                    's1':'INV-S1','s2':'INV-S2','s3':'INV-S3','s4':'INV-S4',
-                    'm1':'INV-CF1','m2':'INV-CF2','m3':'INV-CF3','m4':'INV-CF4',
-                    'sw1':'INV-SW1','sw2':'INV-SW2','sw3':'INV-SW3','sw4':'INV-SW4','sw5':'INV-SW5',
-                    'sd1':'INV-SO1','sd2':'INV-SO2','sd3':'INV-SO3','sd4':'INV-SO4','sd5':'INV-SO5','sd6':'INV-SO6','sd7':'INV-SO7','sd8':'INV-SO8',
-                    'd1':'INV-D1','d2':'INV-D2','d3':'INV-D3','d4':'INV-D4','d5':'INV-D5','d6':'INV-D6','d7':'INV-D7','d8':'INV-D8','d9':'INV-D9','d10':'INV-D10','d11':'INV-D11','d12':'INV-D12','d13':'INV-D13','d14':'INV-D14','d15':'INV-D15','d16':'INV-D16',
-                    'w1':'INV-W1','w2':'INV-W2','w3':'INV-W3'
+                    'm5': 'INV-B1', 'm6': 'INV-B2', 'm7': 'INV-B3', 'm8': 'INV-B4', 'm9': 'INV-B5',
+                    't1': 'INV-T1', 't2': 'INV-T2', 't3': 'INV-T3', 't4': 'INV-T4', 't5': 'INV-T5',
+                    's1': 'INV-S1', 's2': 'INV-S2', 's3': 'INV-S3', 's4': 'INV-S4',
+                    'm1': 'INV-CF1', 'm2': 'INV-CF2', 'm3': 'INV-CF3', 'm4': 'INV-CF4',
+                    'sw1': 'INV-SW1', 'sw2': 'INV-SW2', 'sw3': 'INV-SW3', 'sw4': 'INV-SW4', 'sw5': 'INV-SW5',
+                    'sd1': 'INV-SO1', 'sd2': 'INV-SO2', 'sd3': 'INV-SO3', 'sd4': 'INV-SO4', 'sd5': 'INV-SO5', 'sd6': 'INV-SO6', 'sd7': 'INV-SO7', 'sd8': 'INV-SO8',
+                    'd1': 'INV-D1', 'd2': 'INV-D2', 'd3': 'INV-D3', 'd4': 'INV-D4', 'd5': 'INV-D5', 'd6': 'INV-D6', 'd7': 'INV-D7', 'd8': 'INV-D8', 'd9': 'INV-D9', 'd10': 'INV-D10', 'd11': 'INV-D11', 'd12': 'INV-D12', 'd13': 'INV-D13', 'd14': 'INV-D14', 'd15': 'INV-D15', 'd16': 'INV-D16',
+                    'w1': 'INV-W1', 'w2': 'INV-W2', 'w3': 'INV-W3'
                 };
                 let migrated = false;
                 savedItems.forEach(i => {
@@ -621,7 +882,7 @@
                 }
 
                 const savedMap = {};
-                savedItems.forEach(i => { if(i.id) savedMap[i.id] = i; });
+                savedItems.forEach(i => { if (i.id) savedMap[i.id] = i; });
 
                 const mainCats = CATEGORIES.map(c => c.key);
                 let mutated = false;
@@ -630,7 +891,7 @@
                 const merged = defaultMenuData.map(def => {
                     const saved = savedMap[def.id] || {};
                     const combined = { ...def, ...saved };
-                    
+
                     // Category normalization - FORCE update if it's 'Others', 'Supplies', or unknown
                     if (!mainCats.includes(combined.category) || combined.category === 'Others' || combined.category === 'Supplies') {
                         const n = (combined.title || combined.name || '').toLowerCase();
@@ -644,7 +905,7 @@
                         else if (n.match(/rice|fries|salad|soup|bread|garlic|potato|mash/)) foundCat = 'Side Orders';
                         else if (n.match(/wine|carlo rossi|adega|pegoes|rossi/)) foundCat = 'Wines';
                         else if (n.match(/juice|tea|coffee|coke|sprite|water|royal|pilsen|lemonade|calamansi|beer|san mig|light|drip|cucumber|four seasons/)) foundCat = 'Drinks';
-                        
+
                         if (combined.category !== foundCat) {
                             combined.category = foundCat;
                             mutated = true;
@@ -789,11 +1050,11 @@
 
                 rows.forEach(r => {
                     const tr = document.createElement('tr');
-                    
+
                     // NEW HIGHLIGHT LOGIC: Less than 1 minute old
                     const createdTime = r.completedAt ? new Date(r.completedAt).getTime() : 0;
                     const isNew = createdTime && (Date.now() - createdTime < 60000);
-                    
+
                     if (isNew) {
                         tr.classList.add('new-order-row');
                     }
@@ -823,7 +1084,28 @@
                     tdType.appendChild(createTypePill(r.reservationType));
 
                     const tdFoods = document.createElement('td');
-                    tdFoods.textContent = foods;
+                    const foodWrapper = document.createElement('div');
+                    foodWrapper.textContent = foods;
+                    tdFoods.appendChild(foodWrapper);
+
+                    if (r.kdsStatus) {
+                        const kdsBadge = document.createElement('div');
+                        kdsBadge.style.cssText = "font-size:10px; font-weight:800; padding:3px 6px; border-radius:4px; display:inline-block; margin-top:6px;";
+                        if (r.kdsStatus === 'cooking') {
+                            kdsBadge.style.color = '#c2410c'; kdsBadge.style.background = '#ffedd5';
+                            kdsBadge.textContent = '👨‍🍳 COOKING';
+                        } else if (r.kdsStatus === 'ready') {
+                            kdsBadge.style.color = '#15803d'; kdsBadge.style.background = '#dcfce7';
+                            kdsBadge.textContent = '✅ MARKED AS COOKED';
+                        } else if (r.kdsStatus === 'served') {
+                            kdsBadge.style.color = '#4338ca'; kdsBadge.style.background = '#e0e7ff';
+                            kdsBadge.textContent = '🍽️ DONE / SERVED';
+                        } else if (r.kdsStatus === 'cancelled') {
+                            kdsBadge.style.color = '#991b1b'; kdsBadge.style.background = '#fee2e2';
+                            kdsBadge.textContent = '🚫 CANCELLED';
+                        }
+                        if (kdsBadge.textContent) tdFoods.appendChild(kdsBadge);
+                    }
 
                     const tdPaid = document.createElement('td');
                     let methodBadge = '';
@@ -837,7 +1119,7 @@
 
                     let statusBadge = '';
                     const s = (r.paymentStatus || '').toLowerCase();
-                    
+
                     if (s === 'paid' || s === 'verified') {
                         statusBadge = `<div style="font-size:10px; color:#15803d; font-weight:800; display:block; margin-top:2px;">✅ ${s === 'verified' ? 'VERIFIED' : 'PAID'}</div>`;
                     } else if (s === 'pending_paymongo' || s === 'rejected') {
@@ -850,8 +1132,14 @@
                         statusBadge = '<div style="font-size:10px; color:#64748b; font-weight:800; display:block; margin-top:2px;">— NONE / COD —</div>';
                     }
 
-                    tdPaid.innerHTML = `<div style="font-weight:800; color:#1e293b; font-size:14px;">₱${Number(r.paymentAmount || 0).toLocaleString()}</div>${methodBadge}${statusBadge}`;
-                    
+                    let discountBadge = '';
+                    if (r.discountType && r.discountType !== 'none') {
+                        const typeText = r.discountType === 'pwd' ? 'PWD' : 'SENIOR';
+                        discountBadge = `<div style="font-size:10px; color:#c2410c; font-weight:800; background:#ffedd5; padding:2px 6px; border-radius:4px; display:inline-block; margin-top:4px;">🏷️ ${typeText} DISC (-₱${Number(r.discountAmount || 0).toLocaleString()})</div>`;
+                    }
+
+                    tdPaid.innerHTML = `<div style="font-weight:800; color:#1e293b; font-size:14px;">₱${Number(r.paymentAmount || 0).toLocaleString()}</div>${methodBadge}${statusBadge}${discountBadge}`;
+
                     if (r.paymentProof || r.paymentRef) {
                         const proofBtn = document.createElement('button');
                         proofBtn.textContent = '🧾 View Proof';
@@ -861,9 +1149,29 @@
                     }
 
                     const tdActions = document.createElement('td');
+                    let approvalBtns = '';
+                    const aStatus = r.approvalStatus || 'pending';
+                    if (aStatus === 'pending') {
+                        approvalBtns = `
+                            <button type="button" style="background:#16a34a; color:white; padding: 6px 10px; font-size: 12px; border:none; border-radius:4px; margin-top:4px; width:100%; cursor:pointer; font-weight:bold;" onclick="window.approveReservation('${r.reservationNumber}')">Approve</button>
+                            <button type="button" style="background:#ef4444; color:white; padding: 6px 10px; font-size: 12px; border:none; border-radius:4px; margin-top:4px; width:100%; cursor:pointer; font-weight:bold;" onclick="window.rejectReservation('${r.reservationNumber}')">Reject</button>
+                        `;
+                    } else if (aStatus === 'approved') {
+                        approvalBtns = `
+                            <button type="button" style="background:#f59e0b; color:white; padding: 6px 10px; font-size: 12px; border:none; border-radius:4px; margin-top:4px; width:100%; cursor:pointer; font-weight:bold;" onclick="window.markSeated('${r.reservationNumber}')">Mark Seated</button>
+                        `;
+                    } else if (aStatus === 'seated') {
+                        approvalBtns = `<div style="font-size:11px; color:#1b5e20; font-weight:bold; margin-top:4px; text-align:center;">Seated</div>`;
+                    } else if (aStatus === 'rejected') {
+                        approvalBtns = `<div style="font-size:11px; color:#991b1b; font-weight:bold; margin-top:4px; text-align:center;">Rejected</div>`;
+                    }
+
                     tdActions.innerHTML = `
-                        <button type="button" class="secondary" style="padding: 6px 10px; font-size: 12px; margin-right: 5px;" onclick="window.openEdit('${r.reservationNumber}')">Edit</button>
-                        <button type="button" class="danger" style="padding: 6px 10px; font-size: 12px;" onclick="window.deleteItem('${r.reservationNumber}')">Delete</button>
+                        <div style="display:flex; gap:4px; margin-bottom:4px;">
+                            <button type="button" class="secondary" style="flex:1; padding: 6px; font-size: 11px;" onclick="window.openEdit('${r.reservationNumber}')">Edit</button>
+                            <button type="button" class="danger" style="flex:1; padding: 6px; font-size: 11px;" onclick="window.deleteItem('${r.reservationNumber}')">Del</button>
+                        </div>
+                        ${approvalBtns}
                     `;
 
                     tr.appendChild(tdReservation);
@@ -879,27 +1187,27 @@
             }
 
             // Expose Edit Functions to Global Scope so buttons can call them
-            window.openEdit = function(resObjNum) {
+            window.openEdit = function (resObjNum) {
                 const hist = getReservationHistory();
                 const idx = hist.findIndex(h => h.reservationNumber === resObjNum);
-                if(idx === -1) return;
+                if (idx === -1) return;
                 const r = hist[idx];
-                
+
                 document.getElementById('edit-index').value = idx;
                 document.getElementById('edit-customer').value = r.customerName || '';
                 document.getElementById('edit-date').value = r.arrivalDate || '';
                 document.getElementById('edit-time').value = r.arrivalTime || '';
-                
+
                 // Extract table number simply if it's full string like 'Table 1'
                 const tSelect = document.getElementById('edit-table');
-                if(r.bookedTable) {
-                    for(let i=0; i<tSelect.options.length; i++) {
-                        if(tSelect.options[i].value === r.bookedTable) tSelect.selectedIndex = i;
+                if (r.bookedTable) {
+                    for (let i = 0; i < tSelect.options.length; i++) {
+                        if (tSelect.options[i].value === r.bookedTable) tSelect.selectedIndex = i;
                     }
                 }
-                
+
                 const foodContainer = document.getElementById('edit-foods-container');
-                if(r.reservationType === 'priority') {
+                if (r.reservationType === 'priority') {
                     foodContainer.style.display = 'block';
                     const arr = r.foods || [];
                     document.getElementById('edit-foods').value = arr.join(', ');
@@ -913,8 +1221,109 @@
                 document.getElementById('edit-modal').classList.remove('hidden');
             };
 
-            window.closeEditModal = function() {
+            window.closeEditModal = function () {
                 document.getElementById('edit-modal').classList.add('hidden');
+            };
+
+            window.approveReservation = async function (resNum) {
+                const hist = getReservationHistory();
+                const idx = hist.findIndex(h => h.reservationNumber === resNum);
+                if (idx === -1) return;
+                const r = hist[idx];
+
+                // 1. Validation for stock
+                const inv = getInventory();
+                let stockOut = false;
+                if (r.foods && r.foods.length > 0) {
+                    for (const f of r.foods) {
+                        const item = inv.find(i => i.title === f || i.name === f);
+                        if (item && item.stock <= 0) {
+                            stockOut = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (stockOut) {
+                    if (typeof superModal === 'function') {
+                        superModal({ title: 'Stock Validation Failed ❌', message: 'Cannot approve this reservation because one or more pre-ordered items have dropped to zero stock since the time of booking.' });
+                    } else {
+                        alert('Cannot approve this reservation because one or more pre-ordered items have dropped to zero stock since the time of booking.');
+                    }
+                    return;
+                }
+
+                // 2. AJAX Fetch to /api/reservations/update-status
+                try {
+                    await fetch('/api/reservations/update-status', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id: r.reservationNumber, status: 'approved' })
+                    });
+                } catch (e) {
+                    console.error('Failed to sync approval state to Supabase', e);
+                }
+
+                // 3. Update local state
+                r.approvalStatus = 'approved';
+                localStorage.setItem('reservationHistory', JSON.stringify(hist));
+                renderDashboard();
+                if (typeof renderFloorPlan === 'function') renderFloorPlan();
+            };
+
+            window.rejectReservation = async function (resNum) {
+                const hist = getReservationHistory();
+                const idx = hist.findIndex(h => h.reservationNumber === resNum);
+                if (idx === -1) return;
+                const r = hist[idx];
+
+                try {
+                    await fetch('/api/reservations/update-status', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id: r.reservationNumber, status: 'rejected' })
+                    });
+                } catch (e) { }
+
+                r.approvalStatus = 'rejected';
+                localStorage.setItem('reservationHistory', JSON.stringify(hist));
+
+                // Release table
+                if (r.bookedTable) {
+                    const overrides = safeJsonParse(localStorage.getItem('tableOverrides'), {});
+                    overrides[r.bookedTable] = 'available';
+                    localStorage.setItem('tableOverrides', JSON.stringify(overrides));
+                }
+
+                renderDashboard();
+                if (typeof renderFloorPlan === 'function') renderFloorPlan();
+            };
+
+            window.markSeated = async function (resNum) {
+                const hist = getReservationHistory();
+                const idx = hist.findIndex(h => h.reservationNumber === resNum);
+                if (idx === -1) return;
+                const r = hist[idx];
+
+                try {
+                    await fetch('/api/reservations/update-status', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id: r.reservationNumber, status: 'seated' })
+                    });
+                } catch (e) { }
+
+                r.approvalStatus = 'seated';
+                localStorage.setItem('reservationHistory', JSON.stringify(hist));
+
+                if (r.bookedTable) {
+                    const overrides = safeJsonParse(localStorage.getItem('tableOverrides'), {});
+                    overrides[r.bookedTable] = 'seated'; // We'll update the floor plan cycle as well
+                    localStorage.setItem('tableOverrides', JSON.stringify(overrides));
+                }
+
+                renderDashboard();
+                if (typeof renderFloorPlan === 'function') renderFloorPlan();
             };
 
             // 12AM RESET LOGIC
@@ -922,18 +1331,18 @@
                 const now = new Date();
                 const today = now.toDateString();
                 const lastReset = localStorage.getItem('lastFloorReset');
-                
+
                 if (lastReset !== today) {
                     console.log('🏛️ Roland\'s System: Midnight Refresh. Clearing floor overrides...');
                     localStorage.removeItem('tableOverrides');
                     localStorage.setItem('lastFloorReset', today);
-                    if(typeof renderFloorPlan === 'function') renderFloorPlan();
+                    if (typeof renderFloorPlan === 'function') renderFloorPlan();
                 }
             }
             checkMidnightReset();
             setInterval(checkMidnightReset, 60000); // Check every minute
 
-            window.openProofModal = function(r) {
+            window.openProofModal = function (r) {
                 const modal = document.getElementById('proof-modal');
                 const img = document.getElementById('proof-modal-img');
                 const noImg = document.getElementById('proof-modal-noimg');
@@ -966,10 +1375,10 @@
                 modal.style.display = 'flex';
             };
 
-            window.saveEditModal = function() {
+            window.saveEditModal = function () {
                 const idx = parseInt(document.getElementById('edit-index').value);
                 const hist = getReservationHistory();
-                if(idx >= 0 && idx < hist.length) {
+                if (idx >= 0 && idx < hist.length) {
                     hist[idx].customerName = document.getElementById('edit-customer').value;
                     hist[idx].arrivalDate = document.getElementById('edit-date').value;
                     hist[idx].arrivalTime = document.getElementById('edit-time').value;
@@ -988,7 +1397,7 @@
                         weekday: 'short', month: 'short', day: 'numeric',
                         hour: '2-digit', minute: '2-digit', hour12: false
                     });
-                    
+
                     localStorage.setItem('reservationHistory', JSON.stringify(hist));
                     // re-render UI
                     renderDashboard(); // Re-render the whole dashboard state!
@@ -996,17 +1405,303 @@
                 window.closeEditModal();
             };
 
-            window.switchAdminTab = function(tabId, btnElement) {
+            window.switchAdminTab = function (tabId, btnElement) {
                 document.querySelectorAll('.admin-tab-content').forEach(el => el.classList.add('hidden'));
                 document.getElementById('tab-' + tabId).classList.remove('hidden');
-                
+
                 document.querySelectorAll('.tab-link').forEach(el => el.classList.remove('active'));
-                if(btnElement) btnElement.classList.add('active');
+                if (btnElement) btnElement.classList.add('active');
             };
 
             // Hostess Logic
-            const ALL_TABLES = ["Table 1", "Table 2", "Table 3", "Table 4", "Table 5", "Table 6", "Table 7", "Table 8", "Table 9", "Table 10", "VIP Room"];
+            function getFloorPlanConfig() {
+                try {
+                    const saved = localStorage.getItem('floorPlanConfig');
+                    if (saved) return JSON.parse(saved);
+                } catch (e) { }
+                return [
+                    { id: "Table 1", name: "Table 1", image: "images/T1.jpg" },
+                    { id: "Table 2", name: "Table 2", image: "images/T2.jpg" },
+                    { id: "Table 3", name: "Table 3", image: "images/T3.jpg" },
+                    { id: "Table 4", name: "Table 4", image: "images/T4.jpg" },
+                    { id: "Table 5", name: "Table 5", image: "images/T5.jpg" },
+                    { id: "Table 6", name: "Table 6", image: "images/T6.jpg" },
+                    { id: "Table 7", name: "Table 7", image: "images/T7.jpg" },
+                    { id: "Table 8", name: "Table 8", image: "images/T8.jpg" },
+                    { id: "Table 9", name: "Table 9", image: "images/T9.jpg" },
+                    { id: "Table 10", name: "Table 10", image: "images/T10.jpg" },
+                    { id: "VIP Room", name: "VIP Room", image: "images/VIP1.jpg", isVip: true }
+                ];
+            }
+
+            let currentFloorConfig = [];
+            let floorEditorSelectedId = null;
+            let floorEditorDraggedId = null;
+
+            window.openFloorPlanEditor = function () {
+                currentFloorConfig = getFloorPlanConfig();
+                floorEditorSelectedId = currentFloorConfig[0]?.id || null;
+                renderFloorEditorCanvas();
+                renderFloorEditorProps();
+                document.getElementById('floor-editor-modal').style.display = 'flex';
+            };
+
+            function getSelectedTable() {
+                return currentFloorConfig.find(t => t.id === floorEditorSelectedId) || null;
+            }
+
+            function selectFloorTable(id) {
+                floorEditorSelectedId = id;
+                renderFloorEditorCanvas();
+                renderFloorEditorProps();
+            }
+
+            function renderFloorEditorCanvas() {
+                const canvas = document.getElementById('floor-editor-canvas');
+                if (!canvas) return;
+
+                canvas.innerHTML = '';
+                canvas.classList.add('floor-editor-grid');
+                canvas.classList.remove('floor-editor-canvas');
+
+                const makeNode = (t) => {
+                    const node = document.createElement('div');
+                    node.className = 'floor-editor-tile';
+                    if (t.id === floorEditorSelectedId) node.classList.add('selected');
+                    node.setAttribute('data-table-id', t.id);
+                    node.setAttribute('draggable', 'true');
+
+                    const seatLine = t.description ? `🪑 ${t.description}` : '';
+                    const bg = t.image ? `style="background-image:url('${String(t.image).replace(/'/g, "\\'")}')"` : '';
+                    node.innerHTML = `
+                        <div class="tile-img" ${bg}></div>
+                        <div class="tile-main">
+                            <div class="tile-title">${(t.name || t.id || '').toString()}</div>
+                            <div class="tile-sub">${seatLine}</div>
+                        </div>
+                        <div class="tile-badge">${t.isVip ? 'VIP' : ''}</div>
+                    `;
+
+                    node.addEventListener('click', () => selectFloorTable(t.id));
+                    node.addEventListener('dragstart', (e) => {
+                        floorEditorDraggedId = t.id;
+                        e.dataTransfer.setData('text/plain', t.id);
+                        node.classList.add('dragging');
+                    });
+                    node.addEventListener('dragend', () => {
+                        floorEditorDraggedId = null;
+                        node.classList.remove('dragging');
+                    });
+                    node.addEventListener('dragover', (e) => e.preventDefault());
+                    node.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        const draggedId = e.dataTransfer.getData('text/plain') || floorEditorDraggedId;
+                        const targetId = t.id;
+                        if (!draggedId || draggedId === targetId) return;
+                        const draggedIdx = currentFloorConfig.findIndex(x => x.id === draggedId);
+                        const targetIdx = currentFloorConfig.findIndex(x => x.id === targetId);
+                        if (draggedIdx === -1 || targetIdx === -1) return;
+                        const temp = currentFloorConfig[draggedIdx];
+                        currentFloorConfig[draggedIdx] = currentFloorConfig[targetIdx];
+                        currentFloorConfig[targetIdx] = temp;
+                        renderFloorEditorCanvas();
+                    });
+
+                    return node;
+                };
+
+                currentFloorConfig.forEach(t => canvas.appendChild(makeNode(t)));
+            }
+
+            function renderFloorEditorProps() {
+                const sub = document.getElementById('floor-props-sub');
+                const body = document.getElementById('floor-props-body');
+                if (!body) return;
+
+                const t = getSelectedTable();
+                if (!t) {
+                    if (sub) sub.textContent = 'Select a table';
+                    body.innerHTML = `<div style="color:#94a3b8; font-weight:700; font-size:13px;">Click any table on the canvas.</div>`;
+                    return;
+                }
+
+                if (sub) sub.textContent = t.id;
+                const idx = currentFloorConfig.findIndex(x => x.id === t.id);
+                const imgPreview = t.image
+                    ? `<img src="${t.image}" onclick="window.openImagePreview('${String(t.image).replace(/'/g, "\\'")}')" title="Click to enlarge"
+                        style="width:100%; height:140px; object-fit:cover; border-radius:10px; border:1px solid #e2e8f0; background:#f8fafc; cursor: zoom-in;">`
+                    : `<div style="width:100%; height:120px; border-radius:10px; border:1px dashed #cbd5e1; background:#f8fafc; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-weight:900;">No image</div>`;
+
+                body.innerHTML = `
+                    <div style="display:flex; flex-direction:column; gap:12px;">
+                        <div>${imgPreview}</div>
+                        <label style="font-size:11px; font-weight:900; color:#64748b; text-transform:uppercase; letter-spacing:0.4px;">
+                            Name / ID
+                            <input id="fp-prop-name" type="text" value="${(t.name || t.id || '').toString().replace(/"/g, '&quot;')}"
+                                ${t.isVip ? 'readonly' : ''} 
+                                style="margin-top:6px; width:100%; padding:10px 10px; border:1px solid #cbd5e1; border-radius:10px; font-weight:800; font-size:14px; box-sizing:border-box;">
+                        </label>
+                        <label style="font-size:11px; font-weight:900; color:#64748b; text-transform:uppercase; letter-spacing:0.4px;">
+                            Seats / Description
+                            <input id="fp-prop-desc" type="text" value="${(t.description || '').toString().replace(/"/g, '&quot;')}"
+                                placeholder="e.g. 4 Seats"
+                                style="margin-top:6px; width:100%; padding:10px 10px; border:1px solid #cbd5e1; border-radius:10px; font-weight:800; font-size:14px; box-sizing:border-box;">
+                        </label>
+                        <label style="display:block; background:#e2e8f0; color:#334155; text-align:center; padding:10px; border-radius:10px; cursor:pointer; font-size:12px; font-weight:900;">
+                            Upload picture
+                            <input type="file" style="display:none;" accept="image/*" onchange="window.handleTableImageUpload(event, ${idx})">
+                        </label>
+                        ${!t.isVip ? `<button type="button" onclick="window.removeTable(${idx})" style="background:#fee2e2; color:#ef4444; border:none; border-radius:10px; padding:10px 12px; cursor:pointer; font-weight:900;">Delete table</button>` : ''}
+                    </div>
+                `;
+
+                const nameEl = document.getElementById('fp-prop-name');
+                const descEl = document.getElementById('fp-prop-desc');
+
+                if (nameEl && !t.isVip) {
+                    nameEl.addEventListener('change', () => {
+                        const newName = (nameEl.value || '').toString().trim();
+                        if (!newName) {
+                            nameEl.value = t.name || t.id;
+                            return;
+                        }
+                        if (newName !== t.id) {
+                            // Track rename so we can migrate dependent data on save.
+                            t._renamedFrom = t._renamedFrom || t.id;
+                            t.id = newName;
+                            t.name = newName;
+                            floorEditorSelectedId = newName;
+                            renderFloorEditorCanvas();
+                            renderFloorEditorProps();
+                        }
+                    });
+                }
+                if (descEl) {
+                    descEl.addEventListener('change', () => {
+                        t.description = (descEl.value || '').toString();
+                        renderFloorEditorCanvas();
+                    });
+                }
+            }
+
+            window.addNewTable = function () {
+                const count = currentFloorConfig.length + 1;
+                const id = `New Table ${count}`;
+                currentFloorConfig.push({ id, name: id, image: '', description: '' });
+                floorEditorSelectedId = id;
+                renderFloorEditorCanvas();
+                renderFloorEditorProps();
+            };
+
+            window.removeTable = function (idx) {
+                if (confirm('Delete this table?')) {
+                    currentFloorConfig.splice(idx, 1);
+                    floorEditorSelectedId = currentFloorConfig[0]?.id || null;
+                    ensureFloorLayoutDefaults();
+                    renderFloorEditorCanvas();
+                    renderFloorEditorProps();
+                }
+            };
+
+            window.handleTableImageUpload = function (event, idx) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = new Image();
+                    img.onload = function () {
+                        const canvas = document.createElement('canvas');
+                        // Keep thumbnails light so dragging doesn't lag
+                        const MAX_WIDTH = 320;
+                        const MAX_HEIGHT = 180;
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > height) {
+                            if (width > MAX_WIDTH) {
+                                height *= MAX_WIDTH / width;
+                                width = MAX_WIDTH;
+                            }
+                        } else {
+                            if (height > MAX_HEIGHT) {
+                                width *= MAX_HEIGHT / height;
+                                height = MAX_HEIGHT;
+                            }
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+                        currentFloorConfig[idx].image = dataUrl;
+                        renderFloorEditorCanvas();
+                        renderFloorEditorProps();
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            };
+
+            window.saveFloorPlanConfig = function () {
+                // Migrate dependent data for any table renames
+                try {
+                    const overrides = safeJsonParse(localStorage.getItem('tableOverrides'), {});
+                    let hist = safeJsonParse(localStorage.getItem('reservationHistory'), []);
+
+                    currentFloorConfig.forEach(t => {
+                        if (t._renamedFrom && t._renamedFrom !== t.id) {
+                            if (overrides[t._renamedFrom] !== undefined && overrides[t.id] === undefined) {
+                                overrides[t.id] = overrides[t._renamedFrom];
+                            }
+                            delete overrides[t._renamedFrom];
+                            hist = hist.map(r => (r && r.bookedTable === t._renamedFrom) ? ({ ...r, bookedTable: t.id }) : r);
+                            delete t._renamedFrom;
+                        }
+                    });
+
+                    localStorage.setItem('tableOverrides', JSON.stringify(overrides));
+                    localStorage.setItem('reservationHistory', JSON.stringify(hist));
+                } catch (e) { }
+
+                localStorage.setItem('floorPlanConfig', JSON.stringify(currentFloorConfig));
+                document.getElementById('floor-editor-modal').style.display = 'none';
+                renderFloorPlan();
+                if (typeof showNotification === 'function') showNotification('Floor plan updated successfully', 'success', 'Saved');
+            };
+
             const cycleStatus = { 'available': 'reserved', 'reserved': 'seated', 'seated': 'cleaning', 'cleaning': 'available' };
+
+            window.fullyBookFloor = async function () {
+                const confirmed = await superModal({
+                    title: 'Full Event Booking? 🔒',
+                    message: 'This will mark ALL tables as unavailable and block any new online reservations. Continue?',
+                    type: 'confirm'
+                });
+                if (!confirmed) return;
+
+                const overrides = safeJsonParse(localStorage.getItem('tableOverrides'), {});
+                const floorConfig = getFloorPlanConfig();
+                floorConfig.forEach(t => overrides[t.id] = 'unavailable');
+                localStorage.setItem('tableOverrides', JSON.stringify(overrides));
+                renderFloorPlan();
+                if (typeof showNotification === 'function') showNotification('All tables marked unavailable.', 'success', 'Full Booking Applied');
+            };
+
+            window.resetFloor = async function () {
+                const confirmed = await superModal({
+                    title: 'Reset Floor Plan? 🔓',
+                    message: 'This will reset all tables back to available. Continue?',
+                    type: 'confirm'
+                });
+                if (!confirmed) return;
+
+                localStorage.removeItem('tableOverrides');
+                renderFloorPlan();
+                if (typeof showNotification === 'function') showNotification('All tables are now available.', 'success', 'Floor Plan Reset');
+            };
 
             function renderFloorPlan() {
                 const overrides = safeJsonParse(localStorage.getItem('tableOverrides'), {});
@@ -1014,8 +1709,15 @@
                 const fp = document.getElementById('hostess-grid');
                 if (!fp) return;
                 fp.innerHTML = '';
+                const floorConfig = getFloorPlanConfig();
+                // Keep this view simple for staff: always a clean responsive grid.
+                fp.style.position = '';
+                fp.style.minHeight = '';
+                fp.style.display = '';
+                fp.style.gridTemplateColumns = '';
 
-                ALL_TABLES.forEach(tId => {
+                floorConfig.forEach(t => {
+                    const tId = t.id;
                     const status = overrides[tId] || 'available';
 
                     const tableReservations = hist.filter(r => r.bookedTable === tId);
@@ -1025,10 +1727,38 @@
                     const card = document.createElement('div');
                     card.className = `table-card card-${status}`;
                     card.style.cursor = 'pointer';
+                    card.setAttribute('draggable', 'true');
+
+                    // Optional: allow re-ordering tables in staff view (lightweight).
+                    card.addEventListener('dragstart', (e) => {
+                        e.dataTransfer.setData('text/plain', tId);
+                        card.style.opacity = '0.6';
+                    });
+                    card.addEventListener('dragend', () => {
+                        card.style.opacity = '1';
+                    });
+                    card.addEventListener('dragover', (e) => e.preventDefault());
+                    card.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        const draggedId = e.dataTransfer.getData('text/plain');
+                        const targetId = tId;
+                        if (!draggedId || draggedId === targetId) return;
+                        const config = getFloorPlanConfig();
+                        const draggedIdx = config.findIndex(x => x.id === draggedId);
+                        const targetIdx = config.findIndex(x => x.id === targetId);
+                        if (draggedIdx === -1 || targetIdx === -1) return;
+                        const temp = config[draggedIdx];
+                        config[draggedIdx] = config[targetIdx];
+                        config[targetIdx] = temp;
+                        localStorage.setItem('floorPlanConfig', JSON.stringify(config));
+                        renderFloorPlan();
+                    });
 
                     card.innerHTML = `
+                        ${t.image ? `<div class="floor-table-photo" style="background-image:url('${String(t.image).replace(/'/g, "\\'")}')"></div>` : ''}
                         <div class="table-name">${tId}</div>
                         <div class="table-status">${status}</div>
+                        <div style="font-size:11px; color:#475569; margin-top:2px;">${t.description ? `🪑 ${t.description}` : ''}</div>
                         <div class="table-meta" style="font-size:11px; color:#666; margin-top:4px;">${status === 'reserved' && metaText ? metaText : ''}</div>
                         <div style="font-size:11px; color:#2e7d32; margin-top:2px;">${tableReservations.length > 0 ? `📋 ${tableReservations.length} Reservation${tableReservations.length > 1 ? 's' : ''}` : ''}</div>
                     `;
@@ -1043,14 +1773,16 @@
             }
 
             // Open toast showing reservations for a table + status cycler
-            window.openFloorToast = function(tId, hist, overrides) {
+            window.openFloorToast = function (tId, hist, overrides) {
                 const toast = document.getElementById('floor-toast');
                 const titleEl = document.getElementById('toast-table-title');
                 const listEl = document.getElementById('toast-reservations-list');
                 const noResEl = document.getElementById('toast-no-res');
+                const footerEl = document.getElementById('toast-footer');
 
                 titleEl.textContent = tId;
                 listEl.innerHTML = '';
+                footerEl.innerHTML = '';
 
                 const tableRes = hist.filter(r => r.bookedTable === tId);
 
@@ -1063,25 +1795,29 @@
                         const card = document.createElement('div');
                         card.className = 'toast-res-card';
                         card.innerHTML = `
-                            <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:8px;">
+                            <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:12px; align-items:center;">
                                 <div>
-                                    <strong>${res.reservationNumber || 'RES'}</strong>
-                                    <span style="margin-left:10px; font-size:13px; color:#555;">${res.customerName || 'Guest'}</span>
+                                    <strong style="font-size:16px; color:#1e293b;">${res.reservationNumber || 'RES'}</strong>
+                                    <span style="margin-left:8px; font-size:14px; font-weight:500; color:#475569;">${res.customerName || 'Guest'}</span>
                                 </div>
-                                <span style="background:${res.reservationType === 'priority' ? '#fef9c3' : '#e0f2fe'}; color:${res.reservationType === 'priority' ? '#92400e' : '#0369a1'}; font-size:12px; font-weight:700; padding:2px 8px; border-radius:20px;">
+                                <span style="background:${res.reservationType === 'priority' ? '#fef08a' : '#e0f2fe'}; color:${res.reservationType === 'priority' ? '#854d0e' : '#0369a1'}; font-size:11px; font-weight:800; padding:4px 10px; border-radius:12px; text-transform:uppercase; letter-spacing:0.5px;">
                                     ${res.reservationType || 'standard'}
                                 </span>
                             </div>
-                            <div style="font-size:13px; color:#444; margin-bottom:10px;">
-                                📅 ${res.arrivalDate || '—'} &nbsp;⏰ ${res.arrivalTime || '—'}
-                            </div>
-                                <div>
-                                    <label>Date</label>
-                                    <input type="date" id="toast-date-${resIdx}" value="${res.arrivalDate || ''}" onchange="saveFloorToastEdit(${resIdx})">
+                            
+                            <div style="background: white; border-radius: 8px; padding: 12px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 8px;">
+                                <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; display: flex; align-items: center; gap: 6px;">
+                                    <span>🗓️ ARRIVAL SCHEDULE</span>
                                 </div>
-                                <div>
-                                    <label>Time</label>
-                                    <input type="time" id="toast-time-${resIdx}" value="${res.arrivalTime || ''}" min="10:30" max="21:00" onchange="saveFloorToastEdit(${resIdx})">
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div>
+                                        <label style="display: block; font-size: 11px; color: #94a3b8; margin-bottom: 4px; font-weight: 600;">Date</label>
+                                        <input type="date" id="toast-date-${resIdx}" value="${res.arrivalDate || ''}" onchange="saveFloorToastEdit(${resIdx})" style="width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 13px; color: #334155; transition: 0.2s; background: #f8fafc;" onfocus="this.style.borderColor='#2e7d32'; this.style.background='white';" onblur="this.style.borderColor='#cbd5e1'; this.style.background='#f8fafc';">
+                                    </div>
+                                    <div>
+                                        <label style="display: block; font-size: 11px; color: #94a3b8; margin-bottom: 4px; font-weight: 600;">Time</label>
+                                        <input type="time" id="toast-time-${resIdx}" value="${res.arrivalTime || ''}" min="10:30" max="21:00" onchange="saveFloorToastEdit(${resIdx})" style="width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 13px; color: #334155; transition: 0.2s; background: #f8fafc;" onfocus="this.style.borderColor='#2e7d32'; this.style.background='white';" onblur="this.style.borderColor='#cbd5e1'; this.style.background='#f8fafc';">
+                                    </div>
                                 </div>
                             </div>
                         `;
@@ -1097,11 +1833,13 @@
                 const btnRow = document.createElement('div');
                 btnRow.style.display = 'flex';
                 btnRow.style.gap = '10px';
-                btnRow.style.marginTop = '14px';
+                btnRow.style.marginTop = '20px';
 
                 const cycleBtn = document.createElement('button');
-                cycleBtn.textContent = `Set to: ${nextStatus.charAt(0).toUpperCase() + nextStatus.slice(1)}`;
-                cycleBtn.style.cssText = 'flex:1; background:#f1f5f9; border:1px solid #cbd5e1; color:#333; padding:9px 18px; border-radius:6px; cursor:pointer; font-weight:600; font-size:14px;';
+                cycleBtn.innerHTML = `Set Status: <span style="font-weight: 800; color: #1e293b;">${nextStatus.toUpperCase()}</span>`;
+                cycleBtn.style.cssText = 'flex:1; background:white; border:2px solid #cbd5e1; color:#475569; padding:12px; border-radius:8px; cursor:pointer; font-size:14px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); transition: 0.2s;';
+                cycleBtn.onmouseover = () => cycleBtn.style.borderColor = '#94a3b8';
+                cycleBtn.onmouseout = () => cycleBtn.style.borderColor = '#cbd5e1';
                 cycleBtn.onclick = () => {
                     overrides[tId] = nextStatus;
                     localStorage.setItem('tableOverrides', JSON.stringify(overrides));
@@ -1111,8 +1849,8 @@
 
                 const overrideBtn = document.createElement('button');
                 const isUnavailable = currentStatus === 'unavailable';
-                overrideBtn.textContent = isUnavailable ? 'Make Available' : 'Mark Unavailable';
-                overrideBtn.style.cssText = `flex:1; background:${isUnavailable ? '#16a34a' : '#ef4444'}; color:white; border:none; padding:9px 18px; border-radius:6px; cursor:pointer; font-weight:700; font-size:14px;`;
+                overrideBtn.innerHTML = isUnavailable ? '🔓 Make Available' : '🔒 Mark Unavailable';
+                overrideBtn.style.cssText = `flex:1; background:${isUnavailable ? '#16a34a' : '#ef4444'}; color:white; border:none; padding:12px; border-radius:8px; cursor:pointer; font-weight:700; font-size:14px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);`;
                 overrideBtn.onclick = () => {
                     overrides[tId] = isUnavailable ? 'available' : 'unavailable';
                     localStorage.setItem('tableOverrides', JSON.stringify(overrides));
@@ -1122,16 +1860,16 @@
 
                 btnRow.appendChild(cycleBtn);
                 btnRow.appendChild(overrideBtn);
-                listEl.appendChild(btnRow);
+                footerEl.appendChild(btnRow);
 
-                toast.style.display = 'block';
+                toast.style.display = 'flex';
                 // Re-run animation
                 toast.style.animation = 'none';
                 toast.offsetHeight; // reflow
                 toast.style.animation = 'slideUp 0.3s ease';
             };
 
-            window.saveFloorToastEdit = function(idx) {
+            window.saveFloorToastEdit = function (idx) {
                 const hist = getReservationHistory();
                 if (idx >= 0 && idx < hist.length) {
                     const newDate = document.getElementById(`toast-date-${idx}`)?.value || hist[idx].arrivalDate;
@@ -1159,12 +1897,12 @@
 
             // Live chat admin logic
             window.currentActiveChat = null;
-            
-            window.renderAdminChats = function(forceScroll = false) {
+
+            window.renderAdminChats = function (forceScroll = false) {
                 const allChats = safeJsonParse(localStorage.getItem('liveChats'), {});
                 const listEl = document.getElementById('adminChatList');
-                if(!listEl) return;
-                
+                if (!listEl) return;
+
                 const sessions = Object.keys(allChats);
                 if (sessions.length === 0) {
                     listEl.innerHTML = '<div style="padding: 15px; color:#666; font-size:14px; text-align:center;">No active chats.</div>';
@@ -1175,14 +1913,14 @@
                 sessions.forEach(sId => {
                     const msgs = allChats[sId];
                     if (msgs.length === 0) return;
-                    
+
                     const lastMsg = msgs[msgs.length - 1];
                     let cName = 'Guest';
                     const custMsg = msgs.find(m => m.sender === 'customer');
-                    if(custMsg) cName = custMsg.name;
-                    
+                    if (custMsg) cName = custMsg.name;
+
                     const isActive = sId === window.currentActiveChat;
-                    
+
                     listHtml += `
                         <div class="chat-session-card ${isActive ? 'active' : ''}" onclick="selectAdminChat('${sId}')">
                             <div class="chat-session-title">${cName}</div>
@@ -1190,15 +1928,15 @@
                         </div>
                     `;
                 });
-                
-                if(listEl.innerHTML !== listHtml) {
+
+                if (listEl.innerHTML !== listHtml) {
                     listEl.innerHTML = listHtml;
                 }
 
                 // If currently viewing a chat, refresh only its content via selectAdminChat silently
                 if (window.currentActiveChat) {
                     const mainHasContent = document.getElementById('adminChatBody') !== null;
-                    if(!mainHasContent || forceScroll) {
+                    if (!mainHasContent || forceScroll) {
                         selectAdminChat(window.currentActiveChat, true);
                     } else {
                         // Silent update without re-focusing or ruining input
@@ -1216,9 +1954,9 @@
                         });
                         const b = document.getElementById('adminChatBody');
                         if (b) {
-                             const isAtBottom = b.scrollHeight - b.scrollTop <= b.clientHeight + 50;
-                             b.innerHTML = bodyHtml;
-                             if(isAtBottom) b.scrollTop = b.scrollHeight;
+                            const isAtBottom = b.scrollHeight - b.scrollTop <= b.clientHeight + 50;
+                            b.innerHTML = bodyHtml;
+                            if (isAtBottom) b.scrollTop = b.scrollHeight;
                         }
                     }
                 }
@@ -1237,7 +1975,30 @@
                 const pending = hist.filter(r => r.paymentStatus === 'pending');
                 const completed = hist.filter(r => (r.paymentStatus === 'paid' || r.paymentStatus === 'verified' || r.paymentStatus === 'walk-in')).reverse();
 
-                const activeList = window.paymentFilter === 'pending' ? pending : completed;
+                let activeList = window.paymentFilter === 'pending' ? pending : completed;
+
+                const timeFilter = document.getElementById('payment-time-filter');
+                if (timeFilter && timeFilter.value !== 'all') {
+                    const now = new Date();
+                    activeList = activeList.filter(r => {
+                        let dateStr = r.completedAt || r.arrivalDate || r.createdAt;
+                        if (!dateStr) return true;
+                        const rDate = new Date(dateStr);
+                        if (isNaN(rDate.getTime())) return true;
+                        
+                        if (timeFilter.value === 'day') {
+                            return rDate.toDateString() === now.toDateString();
+                        } else if (timeFilter.value === 'week') {
+                            const diff = now - rDate;
+                            return diff >= -86400000 && diff <= 7 * 24 * 60 * 60 * 1000;
+                        } else if (timeFilter.value === 'month') {
+                            return rDate.getMonth() === now.getMonth() && rDate.getFullYear() === now.getFullYear();
+                        } else if (timeFilter.value === 'year') {
+                            return rDate.getFullYear() === now.getFullYear();
+                        }
+                        return true;
+                    });
+                }
 
                 if (activeList.length === 0) {
                     listEl.innerHTML = '';
@@ -1248,18 +2009,21 @@
 
                 emptyEl.style.display = 'none';
                 let html = '';
-                
+
+                const histMap = new Map();
+                hist.forEach((hr, i) => histMap.set(hr.reservationNumber, i));
+
                 activeList.forEach(r => {
-                    const rIdx = hist.findIndex(hr => hr.reservationNumber === r.reservationNumber);
+                    const rIdx = histMap.get(r.reservationNumber);
                     const amount = `₱${Number(r.paymentAmount || 0).toLocaleString()}`;
                     const isManual = r.paymentMethod === 'manual';
                     const isPaymongo = r.paymentMethod === 'paymongo';
                     const isWalkin = r.paymentStatus === 'walk-in';
-                    
+
                     const statusColor = (r.paymentStatus === 'paid' || r.paymentStatus === 'verified' || r.paymentStatus === 'walk-in') ? '#16a34a' : '#f59e0b';
-                    
+
                     html += `
-                        <div class="card" style="border-left: 4px solid ${statusColor}; padding: 20px; transition: transform 0.2s;">
+                        <div class="card payment-card-anim" style="border-left: 4px solid ${statusColor}; padding: 20px;">
                             <div style="display:flex; justify-content:space-between; margin-bottom:12px; align-items:flex-start;">
                                 <div>
                                     <strong style="font-size:18px; color:#1e293b; display:block;">${r.reservationNumber}</strong>
@@ -1278,6 +2042,11 @@
                                     <span>Method:</span> 
                                     <strong style="color:#1e293b;">${isPaymongo ? '💳 PAYMONGO' : (isManual ? '🏦 MANUAL' : '💵 WALK-IN')}</strong>
                                 </div>
+                                ${r.discountType && r.discountType !== 'none' ? `
+                                <div style="font-size:14px; color:#c2410c; margin-bottom:6px; display:flex; justify-content:space-between; font-weight:700;">
+                                    <span>Discount (${r.discountType === 'pwd' ? 'PWD' : 'Senior'}):</span> 
+                                    <span>-₱${Number(r.discountAmount || 0).toLocaleString()}</span>
+                                </div>` : ''}
                                 <div style="font-size:16px; color:#1e293b; margin-top:8px; padding-top:8px; border-top:1px solid #e2e8f0; display:flex; justify-content:space-between; font-weight:800;">
                                     <span>Amount:</span> <span style="color:#16a34a;">${amount}</span>
                                 </div>
@@ -1301,26 +2070,26 @@
                         </div>
                     `;
                 });
-                
+
                 listEl.innerHTML = html;
             }
 
-            window.switchPaymentFilter = function(filter, btn) {
+            window.switchPaymentFilter = function (filter, btn) {
                 window.paymentFilter = filter;
                 document.querySelectorAll('.payment-sub-tab').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 renderPayments();
             };
 
-            window.verifyPayment = async function(idx) {
+            window.verifyPayment = async function (idx) {
                 const confirmed = await superModal({
                     title: 'Approve Payment? ✅',
                     message: 'Are you sure you want to verify and approve this payment?',
                     type: 'confirm'
                 });
-                if(!confirmed) return;
+                if (!confirmed) return;
                 const hist = getReservationHistory();
-                if(hist[idx]) {
+                if (hist[idx]) {
                     hist[idx].paymentStatus = 'verified';
                     localStorage.setItem('reservationHistory', JSON.stringify(hist));
 
@@ -1329,38 +2098,38 @@
                 }
             };
 
-            window.rejectPayment = async function(idx) {
+            window.rejectPayment = async function (idx) {
                 const confirmed = await superModal({
                     title: 'Reject Payment? ❌',
                     message: 'Are you sure you want to reject this payment? The reservation will be kept but moved back to pending status.',
                     type: 'confirm'
                 });
-                if(!confirmed) return;
+                if (!confirmed) return;
                 const hist = getReservationHistory();
-                if(hist[idx]) {
+                if (hist[idx]) {
                     // Reset payment fields so it effectively goes back to "Unpaid/Pre-order" status
                     hist[idx].paymentStatus = 'rejected';
                     hist[idx].paymentProof = null;
                     hist[idx].paymentRef = '';
                     hist[idx].rejectionAcknowledged = false;
-                    
+
                     localStorage.setItem('reservationHistory', JSON.stringify(hist));
                     renderPayments();
                     renderDashboard(); // Refresh full history table
                 }
             };
 
-            window.selectAdminChat = function(sId, isSilent = false) {
+            window.selectAdminChat = function (sId, isSilent = false) {
                 window.currentActiveChat = sId;
                 const allChats = safeJsonParse(localStorage.getItem('liveChats'), {});
                 const msgs = allChats[sId] || [];
-                
+
                 let cName = 'Guest';
                 const custMsg = msgs.find(m => m.sender === 'customer');
-                if(custMsg) cName = custMsg.name;
-                
+                if (custMsg) cName = custMsg.name;
+
                 const mainEl = document.getElementById('adminChatMain');
-                
+
                 let bodyHtml = '';
                 msgs.forEach(m => {
                     const isStaff = m.sender === 'staff';
@@ -1371,8 +2140,8 @@
                         </div>
                     `;
                 });
-                
-                if(!isSilent) {
+
+                if (!isSilent) {
                     mainEl.innerHTML = `
                         <div class="chat-main-header">
                             Chatting with: ${cName}
@@ -1388,54 +2157,54 @@
                         </div>
                     `;
                     const body = document.getElementById('adminChatBody');
-                    if(body) body.scrollTop = body.scrollHeight;
+                    if (body) body.scrollTop = body.scrollHeight;
                 }
-                
+
                 const listEl = document.getElementById('adminChatList');
                 if (listEl) {
                     // Chat list will be re-rendered on next poll
                 }
             };
 
-            window.sendAdminReply = function() {
+            window.sendAdminReply = function () {
                 if (!window.currentActiveChat) return;
                 const input = document.getElementById('adminChatInput');
                 if (!input) return;
                 const txt = input.value.trim();
                 if (!txt) return;
-                
+
                 const allChats = safeJsonParse(localStorage.getItem('liveChats'), {});
                 if (!allChats[window.currentActiveChat]) return;
-                
+
                 allChats[window.currentActiveChat].push({
                     sender: 'staff',
                     text: txt,
-                    time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                 });
-                
+
                 localStorage.setItem('liveChats', JSON.stringify(allChats));
                 input.value = '';
                 selectAdminChat(window.currentActiveChat, false);
             };
 
-            window.sendAdminPhoto = function(input) {
+            window.sendAdminPhoto = function (input) {
                 if (!window.currentActiveChat) return;
                 const file = input.files[0];
                 if (!file) return;
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                     const b64 = e.target.result;
                     const txt = `<img src="${b64}" style="max-width:100%; border-radius:8px; margin-top:5px; cursor:pointer;" onclick="window.open('${b64}')">`;
-                    
+
                     const allChats = safeJsonParse(localStorage.getItem('liveChats'), {});
                     if (!allChats[window.currentActiveChat]) return;
-                    
+
                     allChats[window.currentActiveChat].push({
                         sender: 'staff',
                         text: txt,
-                        time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                     });
-                    
+
                     localStorage.setItem('liveChats', JSON.stringify(allChats));
                     input.value = '';
                     selectAdminChat(window.currentActiveChat, false);
@@ -1443,7 +2212,7 @@
                 reader.readAsDataURL(file);
             };
 
-            window.showNotification = function(text, type = 'success', title = 'System Update') {
+            window.showNotification = function (text, type = 'success', title = 'System Update') {
                 const container = document.getElementById('notification-container');
                 if (!container) return;
 
@@ -1451,7 +2220,7 @@
                 const div = document.createElement('div');
                 div.className = `custom-notification ${type === 'error' ? 'error-mode' : 'success-mode'}`;
                 div.id = id;
-                
+
                 div.innerHTML = `
                     <div class="notification-content">
                         <div class="notification-title">${title}</div>
@@ -1459,9 +2228,9 @@
                     </div>
                     <button class="notification-close" onclick="this.parentElement.remove()">✕</button>
                 `;
-                
+
                 container.appendChild(div);
-                
+
                 // Auto remove after 5 seconds
                 setTimeout(() => {
                     const el = document.getElementById(id);
@@ -1475,12 +2244,12 @@
 
             // Promotions logic
             window.promoBase64 = '';
-            
-            window.previewPromoImage = function(input) {
+
+            window.previewPromoImage = function (input) {
                 const file = input.files[0];
                 if (!file) return;
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                     window.promoBase64 = e.target.result;
                     const img = document.getElementById('promo-preview-img');
                     img.src = window.promoBase64;
@@ -1489,10 +2258,10 @@
                 reader.readAsDataURL(file);
             };
 
-            window.addPromo = function() {
+            window.addPromo = function () {
                 const title = document.getElementById('promo-title').value.trim();
                 const desc = document.getElementById('promo-desc').value.trim();
-                
+
                 if (!title || !desc || !window.promoBase64) {
                     showNotification('Please provide a title, description, and upload an image.', 'error', 'Action Required');
                     return;
@@ -1506,9 +2275,9 @@
                     image: window.promoBase64,
                     publishedAt: new Date().toLocaleDateString()
                 });
-                
+
                 localStorage.setItem('activePromos', JSON.stringify(promos));
-                
+
                 // Clear form
                 document.getElementById('promo-title').value = '';
                 document.getElementById('promo-desc').value = '';
@@ -1516,18 +2285,18 @@
                 document.getElementById('promo-preview-img').src = '';
                 window.promoBase64 = '';
                 document.getElementById('promo-upload-input').value = '';
-                
+
                 showNotification('Your promotion is now live on the homepage!', 'success', 'Promo Published');
                 renderPromosAdmin();
             };
 
-            window.deletePromo = function(id) {
+            window.deletePromo = function (id) {
                 superModal({
                     title: 'Delete Promotion? 🗑️',
                     message: 'Are you sure you want to remove this promotion?',
                     type: 'confirm'
                 }).then(confirmed => {
-                    if(confirmed) {
+                    if (confirmed) {
                         let promos = safeJsonParse(localStorage.getItem('activePromos'), []);
                         promos = promos.filter(p => p.id !== id);
                         localStorage.setItem('activePromos', JSON.stringify(promos));
@@ -1537,11 +2306,11 @@
                 });
             };
 
-            window.renderPromosAdmin = function() {
+            window.renderPromosAdmin = function () {
                 const promos = safeJsonParse(localStorage.getItem('activePromos'), []);
                 const listEl = document.getElementById('promo-list');
                 const emptyEl = document.getElementById('promo-empty');
-                
+
                 if (!listEl) return;
 
                 if (promos.length === 0) {
@@ -1549,7 +2318,7 @@
                     emptyEl.style.display = 'block';
                     return;
                 }
-                
+
                 emptyEl.style.display = 'none';
                 let html = '';
                 promos.forEach(p => {
@@ -1566,7 +2335,7 @@
             };
 
             // Bind pollers
-            if(!window.isPollingActive) {
+            if (!window.isPollingActive) {
                 setInterval(() => {
                     renderFloorPlan();
                     renderAdminChats();
@@ -1580,29 +2349,41 @@
             renderPromosAdmin();
 
             // Reservation History Alarm Logic
+            let storageDebounceTimer = null;
             window.addEventListener('storage', (e) => {
                 if (e.key === 'reservationHistory') {
-                    const oldVal = safeJsonParse(e.oldValue, []);
-                    const newVal = safeJsonParse(e.newValue, []);
-                    
-                    // Detect if any order was marked 'ready' (Kitchen)
-                    const newlyReady = newVal.find(res => {
-                        const prev = oldVal.find(p => p.reservationNumber === res.reservationNumber);
-                        return res.kdsStatus === 'ready' && (!prev || prev.kdsStatus !== 'ready');
-                    });
-                    if (newlyReady) playKitchenAlarm(newlyReady.bookedTable);
+                    if (storageDebounceTimer) clearTimeout(storageDebounceTimer);
+                    storageDebounceTimer = setTimeout(() => {
+                        const oldVal = safeJsonParse(e.oldValue, []);
+                        const newVal = safeJsonParse(e.newValue, []);
 
-                    // Detect NEW paid reservations (PayMongo)
-                    const newPaid = newVal.find(res => {
-                        const prev = oldVal.find(p => p.reservationNumber === res.reservationNumber);
-                        return (res.paymentStatus === 'paid' || res.paymentStatus === 'verified') && !prev;
-                    });
-                    if (newPaid) {
-                        playPaymentAlarm(newPaid.customerName, newPaid.paymentAmount);
+                        // Detect if any order was marked 'ready' (Kitchen)
+                        const newlyReady = newVal.find(res => {
+                            const prev = oldVal.find(p => p.reservationNumber === res.reservationNumber);
+                            return res.kdsStatus === 'ready' && (!prev || prev.kdsStatus !== 'ready');
+                        });
+                        if (newlyReady) {
+                            if (Date.now() - (parseInt(localStorage.getItem('lastKitchenAlarm') || '0')) > 2000) {
+                                localStorage.setItem('lastKitchenAlarm', Date.now().toString());
+                                playKitchenAlarm(newlyReady.bookedTable);
+                            }
+                        }
+
+                        // Detect NEW paid reservations (PayMongo)
+                        const newPaid = newVal.find(res => {
+                            const prev = oldVal.find(p => p.reservationNumber === res.reservationNumber);
+                            return (res.paymentStatus === 'paid' || res.paymentStatus === 'verified') && !prev;
+                        });
+                        if (newPaid) {
+                            if (Date.now() - (parseInt(localStorage.getItem('lastPaymentAlarm') || '0')) > 2000) {
+                                localStorage.setItem('lastPaymentAlarm', Date.now().toString());
+                                playPaymentAlarm(newPaid.customerName, newPaid.paymentAmount);
+                            }
+                            renderDashboard();
+                        }
+
                         renderDashboard();
-                    }
-                    
-                    renderDashboard();
+                    }, 150);
                 }
             });
 
@@ -1620,7 +2401,7 @@
                     gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
                     oscillator.start();
                     oscillator.stop(audioCtx.currentTime + 0.5);
-                } catch(e) {}
+                } catch (e) { }
 
                 showNotification(`💰 New Payment: ₱${amount} from ${name}`, 'success', 'New Reservation');
             }
@@ -1643,7 +2424,7 @@
 
                     oscillator.start();
                     oscillator.stop(audioCtx.currentTime + 0.3);
-                } catch(e) { console.warn("Audio alarm blocked"); }
+                } catch (e) { console.warn("Audio alarm blocked"); }
 
                 // Breadcrumb/Notification
                 const notify = document.createElement('div');
@@ -1662,26 +2443,26 @@
                 }, 5000);
             }
 
-            window.deleteReservation = async function(idx) {
+            window.deleteReservation = async function (idx) {
                 const confirmed = await superModal({
                     title: 'Delete Reservation? 🗑️',
                     message: 'Are you sure you want to delete this reservation? This action cannot be undone.',
                     type: 'confirm'
                 });
-                if(!confirmed) return;
+                if (!confirmed) return;
                 const hist = getReservationHistory();
                 hist.splice(idx, 1);
                 localStorage.setItem('reservationHistory', JSON.stringify(hist));
                 renderDashboard();
             };
 
-            window.deleteItem = async function(resObjNum) {
+            window.deleteItem = async function (resObjNum) {
                 const confirmed = await superModal({
                     title: 'Delete Reservation? 🗑️',
                     message: 'Are you sure you want to delete this reservation? This action cannot be undone.',
                     type: 'confirm'
                 });
-                if(confirmed) {
+                if (confirmed) {
                     const hist = getReservationHistory();
                     const filtered = hist.filter(h => h.reservationNumber !== resObjNum);
                     localStorage.setItem('reservationHistory', JSON.stringify(filtered));
@@ -1694,14 +2475,14 @@
             document.querySelectorAll('.status-filter').forEach(b => b.classList.remove('active'));
             document.getElementById('filter-' + window.currentPaymentFilter)?.classList.add('active');
 
-            window.setResFilter = function(filterValue) {
+            window.setResFilter = function (filterValue) {
                 window.currentPaymentFilter = filterValue;
                 document.querySelectorAll('.status-filter').forEach(b => b.classList.remove('active'));
                 document.getElementById('filter-' + filterValue).classList.add('active');
                 applySearch();
             };
 
-            window.applySearch = function() {
+            window.applySearch = function () {
                 const q = normalizeText(searchInput.value);
                 const history = getReservationHistory().sort((a, b) => {
                     const ta = a.completedAt ? new Date(a.completedAt).getTime() : 0;
@@ -1725,6 +2506,8 @@
                         matchesStatus = (s === 'pending_paymongo' || s === 'rejected');
                     } else if (window.currentPaymentFilter === 'pending') {
                         matchesStatus = (s === 'pending');
+                    } else if (window.currentPaymentFilter === 'discounted') {
+                        matchesStatus = (r.discountType && r.discountType !== 'none');
                     }
 
                     return matchesText && matchesStatus;
@@ -1734,8 +2517,8 @@
                 return filtered;
             };
 
-            applySearch(); 
-            
+            applySearch();
+
             if (!searchInput.dataset.listenerAttached) {
                 searchInput.addEventListener('input', applySearch);
                 searchInput.dataset.listenerAttached = 'true';
@@ -1746,10 +2529,10 @@
             // Live Inventory View using global helpers
             function renderMenuManagement() {
                 const container = document.getElementById('admin-menu-grid');
-                if(!container) return;
+                if (!container) return;
                 container.innerHTML = '';
                 const items = getInventory();
-                
+
                 CATEGORIES.forEach(cat => {
                     const catTitle = document.createElement('h3');
                     catTitle.style.marginTop = '24px';
@@ -1774,13 +2557,13 @@
                         const statusColor = isOut ? '#ef4444' : (isLow ? '#f59e0b' : '#16a34a');
                         const statusLabel = isOut ? 'Sold Out' : (isLow ? 'Low Stock' : 'Available');
 
-                        const imgSrc = item.image ? item.image : `https://placehold.co/400x300/f0fdf4/2e7d32?text=${encodeURIComponent(item.title.substring(0,2))}`;
-                        
+                        const imgSrc = item.image ? item.image : `https://placehold.co/400x300/f0fdf4/2e7d32?text=${encodeURIComponent(item.title.substring(0, 2))}`;
+
                         const el = document.createElement('div');
                         el.className = 'card';
                         el.style.textAlign = 'center';
                         el.style.padding = '14px 10px';
-                        
+
                         el.innerHTML = `
                             <div style="position:relative;">
                                 <img src="${imgSrc}" style="width:100%; height:90px; object-fit:cover; border-radius:4px; margin-bottom:8px;">
@@ -1801,17 +2584,17 @@
 
             renderMenuManagement();
 
-            window.deleteInventoryPhoto = async function(id) {
+            window.deleteInventoryPhoto = async function (id) {
                 const confirmed = await superModal({
                     title: 'Delete Photo? 🖼️',
                     message: "Are you sure you want to delete this item's photo? It will revert to the default placeholder.",
                     type: 'confirm'
                 });
-                if(!confirmed) return;
-                
+                if (!confirmed) return;
+
                 let items = getInventory();
                 const idx = items.findIndex(i => i.id === id);
-                if(idx > -1) {
+                if (idx > -1) {
                     // If it's the first time modifying an item from defaultMenuData, 
                     // it will be saved to inventoryItems in localStorage
                     if (!localStorage.getItem('inventoryItems')) {
@@ -1820,10 +2603,10 @@
                     }
                     items[idx].image = null;
                     localStorage.setItem('inventoryItems', JSON.stringify(items));
-                    
+
                     // Refresh UIs
                     renderMenuManagement();
-                    if(typeof renderWalkinFoodPicker === 'function') renderWalkinFoodPicker(document.getElementById('walkin-food-search')?.value || "");
+                    if (typeof renderWalkinFoodPicker === 'function') renderWalkinFoodPicker(document.getElementById('walkin-food-search')?.value || "");
                 }
             };
 
@@ -1837,37 +2620,47 @@
                 });
 
                 const header = [
-                    'reservationNumber',
-                    'reservationType',
-                    'arrivalDate',
-                    'arrivalTime',
-                    'arrivalDateTimeDisplay',
-                    'customerName',
-                    'bookedTable',
-                    'orderSummary',
-                    'foods',
-                    'paymentAmount',
-                    'completedAt'
+                    'Order Number',
+                    'Order Type',
+                    'Date/Time of Arrival',
+                    'Customer Name',
+                    'Table',
+                    'Items Ordered',
+                    'Total Paid (PHP)',
+                    'Transaction Completed'
                 ];
                 const csvLines = [header.join(',')];
+
                 rows.forEach(r => {
-                    const foods = Array.isArray(r.foods) ? r.foods.join(';') : '';
+                    const foods = Array.isArray(r.foods) ? r.foods.join('; ') : (r.orderSummary || 'None');
+
+                    let arrDate = r.arrivalDateTimeDisplay || (r.arrivalDate ? `${r.arrivalDate} ${r.arrivalTime || ''}` : '');
+                    if (!arrDate || arrDate.trim() === '') arrDate = 'Walk-in / POS';
+
+                    let compDate = '';
+                    if (r.completedAt) {
+                        try {
+                            const d = new Date(r.completedAt);
+                            compDate = d.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+                        } catch (e) { compDate = r.completedAt; }
+                    }
+
+                    let typeStr = r.reservationType || 'Unknown';
+                    if (typeStr === 'standard' && r.bookedBy === 'staff') typeStr = 'POS Order';
+                    else if (typeStr === 'priority') typeStr = 'Priority';
+                    else if (typeStr === 'standard') typeStr = 'Standard';
+
                     const values = [
-                        r.reservationNumber || '',
-                        r.reservationType || '',
-                        r.arrivalDate || '',
-                        r.arrivalTime || '',
-                        r.arrivalDateTimeDisplay || '',
-                        r.customerName || '',
-                        r.bookedTable || '',
-                        r.orderSummary || '',
+                        r.reservationNumber || 'N/A',
+                        typeStr,
+                        arrDate,
+                        r.customerName || 'Walk-in Guest',
+                        r.bookedTable || 'None',
                         foods,
-                        Number(r.paymentAmount || 0),
-                        r.completedAt || ''
-                    ].map(v => {
-                        const s = String(v);
-                        return `"${s.replaceAll('"', '""')}"`;
-                    });
+                        Number(r.paymentAmount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                        compDate || 'Not Completed'
+                    ].map(v => `"${String(v).replaceAll('"', '""')}"`);
+
                     csvLines.push(values.join(','));
                 });
 
@@ -1875,7 +2668,7 @@
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `rolands-reservations-${new Date().toISOString().slice(0, 10)}.csv`;
+                a.download = `Rolands-Sales-Report-${new Date().toISOString().slice(0, 10)}.csv`;
                 document.body.appendChild(a);
                 a.click();
                 a.remove();
@@ -1896,10 +2689,10 @@
             function updateOnlineStatus() {
                 const online = safeJsonParse(localStorage.getItem('onlineCustomers'), {});
                 const now = Date.now();
-                
+
                 const activeNames = [];
                 let count = 0;
-                for(const [custId, data] of Object.entries(online)) {
+                for (const [custId, data] of Object.entries(online)) {
                     if (now - data.time < 15000) {
                         count++;
                         activeNames.push(data.name);
@@ -1908,7 +2701,7 @@
                     }
                 }
                 localStorage.setItem('onlineCustomers', JSON.stringify(online));
-                
+
                 const statOnline = document.getElementById('stat-online');
                 const onlineList = document.getElementById('online-list');
                 if (statOnline) statOnline.textContent = `${count} Active`;
@@ -1921,14 +2714,14 @@
             }
             updateOnlineStatus(); // Initial run
             setInterval(updateOnlineStatus, 5000); // Poll every 5 seconds
-            
+
             // Staff heartbeat
             setInterval(() => {
                 const me = sessionStorage.getItem('adminLoggedInUser');
                 if (me) {
                     const onlineAdmins = safeJsonParse(localStorage.getItem('onlineAdmins'), {});
                     onlineAdmins[me] = Date.now();
-                    
+
                     // Cleanup stale admins
                     for (const a in onlineAdmins) {
                         if (Date.now() - onlineAdmins[a] > 15000) {
@@ -1938,7 +2731,7 @@
                     localStorage.setItem('onlineAdmins', JSON.stringify(onlineAdmins));
                 }
             }, 5000);
-            
+
             // Delete removed cleanly
             window.addEventListener('beforeunload', () => {
                 // Not clearing customer status on admin disconnect
@@ -2072,7 +2865,7 @@
         ──────────────────────────────────── */
         let walkinType = 'priority';
 
-        window.setWalkinType = function(type) {
+        window.setWalkinType = function (type) {
             walkinType = type;
             const pBtn = document.getElementById('walkin-type-priority');
             const sBtn = document.getElementById('walkin-type-standard');
@@ -2093,25 +2886,25 @@
         let tempWalkinOrder = {}; // { id: qty }
         let currentSelection = {}; // Confirmed selection
 
-        window.openWalkinFoodPicker = function() {
+        window.openWalkinFoodPicker = function () {
             document.getElementById('walkin-food-modal').classList.remove('hidden');
             tempWalkinOrder = JSON.parse(JSON.stringify(currentSelection)); // Clone current
             renderWalkinFoodPicker();
             updateWalkinModalTotal();
         };
 
-        window.closeWalkinFoodPicker = function() {
+        window.closeWalkinFoodPicker = function () {
             document.getElementById('walkin-food-modal').classList.add('hidden');
         };
 
-        window.filterWalkinFoods = function(val) {
+        window.filterWalkinFoods = function (val) {
             renderWalkinFoodPicker(val.toLowerCase());
         };
 
         function renderWalkinFoodPicker(filter = "") {
             const container = document.getElementById('walkin-food-content');
             const items = getInventory();
-            
+
             let hasResults = false;
             container.innerHTML = CATEGORIES.map(cat => {
                 const filteredItems = items.filter(item => {
@@ -2127,11 +2920,11 @@
                     <div style="margin-bottom:24px;">
                         <div style="font-size:13px; font-weight:800; color:#1b5e20; text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid #e2e8f0; padding-bottom:6px; margin-bottom:12px;">${cat.label}</div>
                         ${filteredItems.map(item => {
-                            const qty = tempWalkinOrder[item.id] || 0;
-                            const isSoldOut = item.stock <= 0;
-                            return `
+                    const qty = tempWalkinOrder[item.id] || 0;
+                    const isSoldOut = item.stock <= 0;
+                    return `
                                 <div style="display:flex; align-items:center; background:white; padding:10px; border-radius:12px; border:1px solid #f1f5f9; margin-bottom:8px; opacity: ${isSoldOut ? '0.6' : '1'}">
-                                    <img src="${item.image || `https://placehold.co/100x100?text=${encodeURIComponent(item.title.substring(0,3))}`}" style="width:50px; height:50px; object-fit:cover; border-radius:8px; margin-right:12px;">
+                                    <img src="${item.image || `https://placehold.co/100x100?text=${encodeURIComponent(item.title.substring(0, 3))}`}" style="width:50px; height:50px; object-fit:cover; border-radius:8px; margin-right:12px;">
                                     <div style="flex:1;">
                                         <div style="font-weight:700; font-size:14px; color:#1e293b;">${item.title}</div>
                                         <div style="font-size:13px; color:#1b5e20; font-weight:600;">₱${item.price?.toLocaleString()}</div>
@@ -2145,7 +2938,7 @@
                                     `}
                                 </div>
                             `;
-                        }).join('')}
+                }).join('')}
                     </div>
                 `;
             }).join('');
@@ -2155,7 +2948,7 @@
             }
         }
 
-        window.changeWalkinItemQty = function(id, delta) {
+        window.changeWalkinItemQty = function (id, delta) {
             const currentQty = tempWalkinOrder[id] || 0;
             const newQty = Math.max(0, currentQty + delta);
             if (newQty === 0) {
@@ -2177,15 +2970,15 @@
             document.getElementById('walkin-modal-total').textContent = total.toLocaleString();
         }
 
-        window.confirmWalkinFoodSelection = function() {
+        window.confirmWalkinFoodSelection = function () {
             currentSelection = JSON.parse(JSON.stringify(tempWalkinOrder));
             const items = getInventory();
             const summaryEl = document.getElementById('walkin-order-summary');
             const paymentInput = document.getElementById('walkin-payment');
-            
+
             let total = 0;
             let summaryText = [];
-            
+
             for (const id in currentSelection) {
                 const item = items.find(i => i.id === id);
                 if (item) {
@@ -2206,23 +2999,23 @@
             closeWalkinFoodPicker();
         };
 
-        window.submitWalkinReservation = function() {
+        window.submitWalkinReservation = function () {
             const errorEl = document.getElementById('walkin-error');
             errorEl.style.display = 'none';
 
-            const name    = (document.getElementById('walkin-name').value || '').trim();
+            const name = (document.getElementById('walkin-name').value || '').trim();
             const contact = (document.getElementById('walkin-contact').value || '').trim();
-            const date    = document.getElementById('walkin-date').value;
-            const time    = document.getElementById('walkin-time').value;
-            const table   = document.getElementById('walkin-table').value;
-            const guests  = document.getElementById('walkin-guests').value;
+            const date = document.getElementById('walkin-date').value;
+            const time = document.getElementById('walkin-time').value;
+            const table = document.getElementById('walkin-table').value;
+            const guests = document.getElementById('walkin-guests').value;
             const payment = parseFloat(document.getElementById('walkin-payment').value) || 0;
-            const notes   = (document.getElementById('walkin-notes').value || '').trim();
+            const notes = (document.getElementById('walkin-notes').value || '').trim();
 
-            if (!name)  { errorEl.textContent = 'Customer name is required.'; errorEl.style.display = 'block'; return; }
-            if (!date)  { errorEl.textContent = 'Arrival date is required.';  errorEl.style.display = 'block'; return; }
-            if (!time)  { errorEl.textContent = 'Arrival time is required.';  errorEl.style.display = 'block'; return; }
-            if (!table) { errorEl.textContent = 'Please select a table.';     errorEl.style.display = 'block'; return; }
+            if (!name) { errorEl.textContent = 'Customer name is required.'; errorEl.style.display = 'block'; return; }
+            if (!date) { errorEl.textContent = 'Arrival date is required.'; errorEl.style.display = 'block'; return; }
+            if (!time) { errorEl.textContent = 'Arrival time is required.'; errorEl.style.display = 'block'; return; }
+            if (!table) { errorEl.textContent = 'Please select a table.'; errorEl.style.display = 'block'; return; }
 
             const d = new Date(date + 'T' + time);
             const displayDt = isNaN(d) ? date + ' ' + time : d.toLocaleString(undefined, {
@@ -2231,12 +3024,12 @@
             });
 
             const resNo = 'WI-' + Math.floor(100000 + Math.random() * 900000);
-            
+
             // Reconstruct foodArray from currentSelection
             const invItems = getInventory();
             const foodArray = [];
             let orderSummary = "";
-            
+
             for (const id in currentSelection) {
                 const item = invItems.find(i => i.id === id);
                 if (item) {
@@ -2247,23 +3040,23 @@
             orderSummary = foodArray.join(', ');
 
             const reservation = {
-                reservationNumber:      resNo,
-                reservationType:        walkinType,
-                arrivalDate:            date,
-                arrivalTime:            time,
+                reservationNumber: resNo,
+                reservationType: walkinType,
+                arrivalDate: date,
+                arrivalTime: time,
                 arrivalDateTimeDisplay: displayDt,
-                customerName:           name,
-                contactNumber:          contact,
-                bookedTable:            table,
-                guestCount:             guests,
-                foods:                  foodArray,
-                orderSummary:           orderSummary,
-                beefNote:               notes,
-                paymentAmount:          walkinType === 'priority' ? payment : 500,
-                paymentStatus:          'walk-in',
-                bookedBy:               'staff',
-                completedAt:            new Date().toISOString(),
-                cartItems:              currentSelection // Keep structured data too
+                customerName: name,
+                contactNumber: contact,
+                bookedTable: table,
+                guestCount: guests,
+                foods: foodArray,
+                orderSummary: orderSummary,
+                beefNote: notes,
+                paymentAmount: walkinType === 'priority' ? payment : 500,
+                paymentStatus: 'walk-in',
+                bookedBy: 'staff',
+                completedAt: new Date().toISOString(),
+                cartItems: currentSelection // Keep structured data too
             };
 
             const history = JSON.parse(localStorage.getItem('reservationHistory') || '[]');
@@ -2285,7 +3078,7 @@
                     localStorage.setItem('inventoryItems', JSON.stringify(items));
                     renderMenuManagement(); // Refresh inventory tab
                 }
-            } catch(e) { console.error("Stock deduction failed", e); }
+            } catch (e) { console.error("Stock deduction failed", e); }
 
             // Show success toast
             const toast = document.getElementById('walkin-toast');
@@ -2294,15 +3087,15 @@
             setTimeout(() => toast.style.display = 'none', 5000);
 
             // Reset form
-            document.getElementById('walkin-name').value    = '';
+            document.getElementById('walkin-name').value = '';
             document.getElementById('walkin-contact').value = '';
             const now = new Date();
-            document.getElementById('walkin-date').value    = now.toISOString().split('T')[0];
-            document.getElementById('walkin-time').value    = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
-            document.getElementById('walkin-table').value   = '';
-            document.getElementById('walkin-guests').value  = '';
+            document.getElementById('walkin-date').value = now.toISOString().split('T')[0];
+            document.getElementById('walkin-time').value = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+            document.getElementById('walkin-table').value = '';
+            document.getElementById('walkin-guests').value = '';
             document.getElementById('walkin-payment').value = '';
-            document.getElementById('walkin-notes').value   = '';
+            document.getElementById('walkin-notes').value = '';
             document.getElementById('walkin-food-search').value = '';
             document.getElementById('walkin-order-summary').innerHTML = "No items selected yet.";
             currentSelection = {};
@@ -2341,13 +3134,75 @@
             `).join('');
         }
 
+        // --- BRANDING LOGIC ---
+        window.handleBrandLogoUpload = function (event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const img = new Image();
+                img.onload = function () {
+                    const canvas = document.createElement('canvas');
+                    const MAX_DIM = 800;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_DIM) {
+                            height *= MAX_DIM / width;
+                            width = MAX_DIM;
+                        }
+                    } else {
+                        if (height > MAX_DIM) {
+                            width *= MAX_DIM / height;
+                            height = MAX_DIM;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const dataUrl = canvas.toDataURL('image/png');
+                    localStorage.setItem('customLogo', dataUrl);
+
+                    // Update previews
+                    if (document.getElementById('admin-logo-preview-dark')) document.getElementById('admin-logo-preview-dark').src = dataUrl;
+                    if (document.getElementById('admin-logo-preview-light')) document.getElementById('admin-logo-preview-light').src = dataUrl;
+
+                    superModal({
+                        title: 'Brand Updated! ✨',
+                        message: 'Your new logo has been saved and will now appear across the entire website with automatic light/dark adaptation.'
+                    });
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        };
+
+        window.resetBrandLogo = function () {
+            if (confirm('Reset to default brand logo?')) {
+                localStorage.removeItem('customLogo');
+                location.reload();
+            }
+        };
+
         // Update existing switchAdminTab
-        window.switchAdminTab = function(tab, btn) {
+        window.switchAdminTab = function (tab, btn) {
             document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.add('hidden'));
             document.getElementById('tab-' + tab)?.classList.remove('hidden');
             document.querySelectorAll('.tab-link').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            
+
+            if (tab === 'branding') {
+                const savedLogo = localStorage.getItem('customLogo');
+                if (savedLogo) {
+                    if (document.getElementById('admin-logo-preview-dark')) document.getElementById('admin-logo-preview-dark').src = savedLogo;
+                    if (document.getElementById('admin-logo-preview-light')) document.getElementById('admin-logo-preview-light').src = savedLogo;
+                }
+            }
             if (tab === 'walkin') {
                 const dateInput = document.getElementById('walkin-date');
                 const timeInput = document.getElementById('walkin-time');
@@ -2371,5 +3226,5 @@
         document.querySelector('[onclick="switchAdminTab(\'walkin\', this)"]')?.addEventListener('click', renderRecentWalkins);
     </script>
 </body>
-</html>
 
+</html>

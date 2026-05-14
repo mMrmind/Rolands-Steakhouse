@@ -271,13 +271,11 @@
         /* Tabs Navigation */
         .admin-tabs {
             display: flex;
+            flex-wrap: wrap;
             gap: 10px;
             margin-bottom: 24px;
             border-bottom: 2px solid #ddd;
             padding-bottom: 10px;
-            overflow-x: auto;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
         }
 
         .admin-tabs::-webkit-scrollbar {
@@ -503,6 +501,7 @@
             transition: 0.2s;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
             user-select: none;
+            overflow: hidden;
         }
 
         .table-card:hover {
@@ -522,6 +521,18 @@
             font-size: 13px;
             text-transform: uppercase;
             letter-spacing: 1px;
+        }
+
+        /* Floor plan card photo (staff view) */
+        .floor-table-photo {
+            width: 100%;
+            height: 72px;
+            border-radius: 14px;
+            border: 1px solid #e2e8f0;
+            margin: 0 0 12px 0;
+            background: #f8fafc;
+            background-size: cover;
+            background-position: center;
         }
 
         .table-meta {
@@ -967,3 +978,181 @@
         .error-mode {
             border-left-color: #ef4444;
         }
+
+        /* Floor plan editor (admin) */
+        .floor-editor-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        @media (max-width: 560px) {
+            .floor-editor-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .floor-editor-tile {
+            position: relative; /* anchor VIP badge to tile */
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            cursor: grab;
+            user-select: none;
+            transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .floor-editor-tile:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+        }
+
+        .floor-editor-tile.dragging {
+            opacity: 0.7;
+            transform: scale(0.99);
+            box-shadow: none;
+        }
+
+        .floor-editor-tile.selected {
+            border-color: #2e7d32;
+            box-shadow: 0 10px 22px rgba(46, 125, 50, 0.14);
+        }
+
+        .floor-editor-tile .tile-img {
+            height: 78px;
+            background: #f8fafc;
+            background-size: cover;
+            background-position: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .floor-editor-tile .tile-main {
+            padding: 12px 14px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .floor-editor-tile .tile-title {
+            font-weight: 900;
+            font-size: 15px;
+            color: #0f172a;
+        }
+
+        .floor-editor-tile .tile-sub {
+            font-weight: 800;
+            font-size: 13px;
+            color: #64748b;
+            min-height: 16px;
+        }
+
+        .floor-editor-tile .tile-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(15, 23, 42, 0.78);
+            color: white;
+            font-weight: 900;
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 999px;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+            display: none;
+        }
+
+        .floor-editor-tile[data-table-id="VIP Room"] .tile-badge,
+        .floor-editor-tile .tile-badge:not(:empty) {
+            display: inline-block;
+        }
+
+        .floor-table-photo {
+            width: 100%;
+            height: 58px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 10px;
+            background: #f8fafc;
+            background-size: cover;
+            background-position: center;
+        }
+
+/* ─────────────────────────────────────────────────
+   Migrated from admin.html
+───────────────────────────────────────────────── */
+.payment-sub-tab {
+                        background: transparent;
+                        color: #64748b;
+                    }
+
+                    .payment-sub-tab.active {
+                        background: white;
+                        color: #1b5e20;
+                        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+                    }
+                    
+                    .payment-time-filter {
+                        padding: 8px 30px 8px 12px;
+                        border: 2px solid transparent;
+                        border-radius: 8px;
+                        font-weight: 700;
+                        font-family: inherit;
+                        cursor: pointer;
+                        font-size: 13px;
+                        background: #f1f5f9 url('data:image/svg+xml;utf8,<svg fill="%2364748b" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 4px center;
+                        background-size: 16px;
+                        color: #475569;
+                        outline: none;
+                        transition: all 0.3s ease;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                        appearance: none;
+                        -webkit-appearance: none;
+                    }
+                    
+                    .payment-time-filter:hover {
+                        border-color: #2e7d32;
+                        background-color: white;
+                        color: #1b5e20;
+                    }
+                    
+                    .payment-time-filter:focus {
+                        border-color: #2e7d32;
+                        box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.2);
+                        background-color: white;
+                    }
+                    
+                    .payment-card-anim {
+                        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    }
+                    
+                    .payment-card-anim:hover {
+                        transform: translateY(-4px) scale(1.01);
+                        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+                    }
+
+.status-filter {
+                        background: transparent;
+                        border: none;
+                        padding: 6px 14px;
+                        font-size: 13px;
+                        font-weight: 700;
+                        color: #64748b;
+                        cursor: pointer;
+                        border-radius: 6px;
+                        transition: all 0.2s;
+                    }
+
+                    .status-filter.active {
+                        background: white;
+                        color: #1b5e20;
+                        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                    }
+
+                    .status-filter:hover:not(.active) {
+                        background: rgba(0, 0, 0, 0.05);
+                        color: #334155;
+                    }

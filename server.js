@@ -33,7 +33,7 @@ const transporter = nodemailer.createTransport({
 });
 
 app.post('/api/send-receipt', async (req, res) => {
-    const { email, customerName, amount, reservationNumber, paymentMethod } = req.body;
+    const { email, customerName, amount, reservationNumber, paymentMethod, arrivalDateTime, table, orderSummary } = req.body;
 
     if (!email) {
         return res.status(400).json({ error: 'No email provided' });
@@ -44,30 +44,78 @@ app.post('/api/send-receipt', async (req, res) => {
         to: email,
         subject: `Roland's Steak House - Receipt for ${reservationNumber}`,
         html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
-                <div style="background: #1b5e20; padding: 20px; text-align: center; color: white;">
-                    <h2 style="margin: 0;">Roland's Steak House</h2>
-                    <p style="margin: 5px 0 0; opacity: 0.9;">Digital Receipt</p>
+            <div style="font-family: 'Inter', Helvetica, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
+                <!-- Header -->
+                <div style="background: linear-gradient(135deg, #1b5e20 0%, #0d3811 100%); padding: 35px 20px; text-align: center;">
+                    <img src="https://i.imgur.com/your-logo-url-if-hosted.png" alt="Roland's Logo" style="height: 50px; margin-bottom: 15px; display: none;"> <!-- Hidden until hosted image added -->
+                    <h1 style="color: #ffffff; margin: 0; font-size: 28px; letter-spacing: 1px; font-weight: 800;">Roland's Steak House</h1>
+                    <p style="color: #a7f3d0; margin: 8px 0 0; font-size: 14px; text-transform: uppercase; letter-spacing: 2px;">Official E-Receipt</p>
                 </div>
-                <div style="padding: 30px;">
-                    <h3 style="color: #1e293b; margin-top: 0;">Thank you for your payment, ${customerName || 'Guest'}!</h3>
-                    <p style="color: #475569;">We have successfully received your payment via <strong>${paymentMethod || 'PayMongo'}</strong>.</p>
+
+                <!-- Body -->
+                <div style="padding: 40px 30px;">
+                    <h2 style="color: #0f172a; margin-top: 0; font-size: 22px;">Hi ${customerName || 'Guest'},</h2>
+                    <p style="color: #475569; font-size: 15px; line-height: 1.6;">Thank you for securing your table with us. Your priority reservation is officially confirmed and your payment has been processed successfully.</p>
                     
-                    <div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                            <span style="color: #64748b;">Reservation No:</span>
-                            <strong style="color: #1e293b;">${reservationNumber}</strong>
+                    <!-- Details Card -->
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 25px; margin: 30px 0;">
+                        
+                        <div style="margin-bottom: 15px;">
+                            <span style="color: #64748b; font-size: 14px;">Reservation No.</span>
+                            <div style="float: right;">
+                                <strong style="color: #0f172a; font-size: 15px; background: #e2e8f0; padding: 4px 10px; border-radius: 6px;">${reservationNumber}</strong>
+                            </div>
+                            <div style="clear: both;"></div>
                         </div>
-                        <div style="display: flex; justify-content: space-between; padding-top: 10px; border-top: 1px dashed #cbd5e1;">
-                            <span style="color: #64748b;">Total Paid:</span>
-                            <strong style="color: #16a34a; font-size: 18px;">₱${amount}</strong>
+
+                        <div style="margin-bottom: 15px;">
+                            <span style="color: #64748b; font-size: 14px;">Arrival Time</span>
+                            <div style="float: right;">
+                                <strong style="color: #0f172a; font-size: 14px;">${arrivalDateTime || 'N/A'}</strong>
+                            </div>
+                            <div style="clear: both;"></div>
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <span style="color: #64748b; font-size: 14px;">Table Assignment</span>
+                            <div style="float: right;">
+                                <strong style="color: #0f172a; font-size: 14px;">${table || 'Unassigned'}</strong>
+                            </div>
+                            <div style="clear: both;"></div>
+                        </div>
+
+                        <div style="border-top: 1px dashed #cbd5e1; margin: 20px 0;"></div>
+
+                        <div style="margin-bottom: 20px;">
+                            <span style="display: block; color: #64748b; font-size: 14px; margin-bottom: 8px;">Pre-Order Summary</span>
+                            <div style="color: #334155; font-size: 14px; line-height: 1.5; background: #ffffff; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                                ${orderSummary || 'Standard Reservation (No Pre-Orders)'}
+                            </div>
+                        </div>
+
+                        <div style="border-top: 1px dashed #cbd5e1; margin: 20px 0; padding-top: 20px;">
+                            <span style="color: #64748b; font-size: 15px; font-weight: 600;">Total Paid (${paymentMethod || 'Online'})</span>
+                            <div style="float: right;">
+                                <strong style="color: #16a34a; font-size: 24px;">₱${amount}</strong>
+                            </div>
+                            <div style="clear: both;"></div>
                         </div>
                     </div>
-                    
-                    <p style="color: #475569; line-height: 1.5;">Your order is now confirmed. You can show this receipt to our staff upon arrival or check your reservation status via our terminal.</p>
+
+                    <!-- Call to Action -->
+                    <div style="text-align: center; margin-top: 35px;">
+                        <p style="color: #64748b; font-size: 14px; margin-bottom: 20px;">For the fastest check-in, please present your digital QR code to our hostess upon arrival.</p>
+                        <a href="http://localhost:3000/receipt.html?res=${reservationNumber}" 
+                           style="background: #16a34a; color: #ffffff; padding: 16px 36px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 16px; display: inline-block;">
+                           📋 View Digital QR Receipt
+                        </a>
+                    </div>
                 </div>
-                <div style="background: #f1f5f9; padding: 15px; text-align: center; color: #64748b; font-size: 12px;">
-                    &copy; 2026 Roland's Steak House. All rights reserved.
+
+                <!-- Footer -->
+                <div style="background: #f1f5f9; padding: 25px; text-align: center; border-top: 1px solid #e2e8f0;">
+                    <p style="color: #94a3b8; font-size: 12px; margin: 0 0 10px 0;">Jose Catolico Sr. Ave., General Santos City</p>
+                    <p style="color: #94a3b8; font-size: 12px; margin: 0;">&copy; ${new Date().getFullYear()} Roland's Steak House. All rights reserved.</p>
                 </div>
             </div>
         `
@@ -134,6 +182,56 @@ app.post('/signup', async (req, res) => {
     }
 });
 
+/* SIGNUP VERIFICATION */
+app.post('/api/auth/send-signup-code', async (req, res) => {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ success: false, error: "Email required" });
+
+    try {
+        if (supabase) {
+            const { data: user, error: userError } = await supabase
+                .from('users')
+                .select('*')
+                .eq('email', email)
+                .single();
+
+            if (user) {
+                return res.status(400).json({ success: false, error: "An account with this email already exists." });
+            }
+        }
+
+        const code = Math.floor(100000 + Math.random() * 900000).toString();
+        tempCodes[email] = { code, expires: Date.now() + (10 * 60 * 1000) };
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER || 'your.restaurant.email@gmail.com',
+            to: email,
+            subject: "Verify your email - Roland's Steak House",
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
+                    <div style="background: #1b5e20; padding: 20px; text-align: center; color: white;">
+                        <h2 style="margin: 0;">Roland's Steak House</h2>
+                    </div>
+                    <div style="padding: 30px; text-align: center;">
+                        <h3 style="color: #1e293b; margin-top: 0;">Verify Your Email Address</h3>
+                        <p style="color: #475569; margin-bottom: 25px;">Welcome! Please use the verification code below to complete your sign up:</p>
+                        <div style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #1b5e20; background: #f0fdf4; padding: 15px; border-radius: 8px; border: 2px dashed #86efac; display: inline-block; margin-bottom: 25px;">
+                            ${code}
+                        </div>
+                        <p style="color: #94a3b8; font-size: 13px;">This code will expire in 10 minutes.</p>
+                    </div>
+                </div>
+            `
+        };
+
+        await transporter.sendMail(mailOptions);
+        res.json({ success: true });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, error: "Failed to send verification email." });
+    }
+});
+
 /* FORGOT PASSWORD - USPEEDO INTEGRATION */
 const tempCodes = {}; // In-memory storage for codes: { email: { code, expires } }
 
@@ -142,15 +240,19 @@ app.post('/api/auth/send-code', async (req, res) => {
     if (!email) return res.status(400).json({ success: false, error: "Email required" });
 
     try {
-        // 1. Verify user exists
-        const { data: user, error: userError } = await supabase
-            .from('users')
-            .select('*')
-            .eq('email', email)
-            .single();
+        // 1. Verify user exists (Skip if Supabase is not configured)
+        if (supabase) {
+            const { data: user, error: userError } = await supabase
+                .from('users')
+                .select('*')
+                .eq('email', email)
+                .single();
 
-        if (userError || !user) {
-            return res.status(404).json({ success: false, error: "No account found with this email." });
+            if (userError || !user) {
+                return res.status(404).json({ success: false, error: "No account found with this email." });
+            }
+        } else {
+            console.log("Supabase not configured, bypassing user check for prototype.");
         }
 
         // 2. Generate 6-digit code
@@ -160,43 +262,32 @@ app.post('/api/auth/send-code', async (req, res) => {
             expires: Date.now() + (10 * 60 * 1000) // 10 minutes
         };
 
-        // 3. Send via uSpeedo
-        const accessKeyId = process.env.USPEEDO_ACCESSKEY_ID;
-        const secretKey = process.env.USPEEDO_ACCESSKEY_SECRET;
-        const senderEmail = process.env.USPEEDO_SENDER_EMAIL || 'rolands@gensan.com';
+        // 3. Send via Gmail (Nodemailer)
+        console.log(`✉️ Sending verification code ${code} to ${email} via Gmail...`);
+        
+        const mailOptions = {
+            from: process.env.EMAIL_USER || 'your.restaurant.email@gmail.com',
+            to: email,
+            subject: "Password Reset Code - Roland's Steak House",
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
+                    <div style="background: #1b5e20; padding: 20px; text-align: center; color: white;">
+                        <h2 style="margin: 0;">Roland's Steak House</h2>
+                    </div>
+                    <div style="padding: 30px; text-align: center;">
+                        <h3 style="color: #1e293b; margin-top: 0;">Password Reset Request</h3>
+                        <p style="color: #475569; margin-bottom: 25px;">You requested a password reset. Here is your verification code:</p>
+                        <div style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #1b5e20; background: #f0fdf4; padding: 15px; border-radius: 8px; border: 2px dashed #86efac; display: inline-block; margin-bottom: 25px;">
+                            ${code}
+                        </div>
+                        <p style="color: #94a3b8; font-size: 13px;">This code will expire in 10 minutes.<br>If you did not request this, please ignore this email.</p>
+                    </div>
+                </div>
+            `
+        };
 
-        if (!accessKeyId || !secretKey) {
-            console.error("uSpeedo keys missing in .env");
-            return res.status(500).json({ success: false, error: "Email service not configured." });
-        }
-
-        const auth = Buffer.from(`${accessKeyId}:${secretKey}`).toString('base64');
-
-        console.log(`✉️ Sending verification code ${code} to ${email} via uSpeedo...`);
-
-        const usRes = await fetch('https://api.uspeedo.com/v1/emails/send', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Basic ${auth}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                From: senderEmail,
-                To: email,
-                Subject: "Password Reset Code - Roland's Steak House",
-                Content: `Your verification code is: ${code}. It will expire in 10 minutes.`
-            })
-        });
-
-        const usData = await usRes.json();
-
-        if (usRes.ok && usData.RetCode === 0) {
-            res.json({ success: true });
-        } else {
-            console.error("uSpeedo Error:", usData);
-            // Fallback for local testing: allow code in console if API fails
-            res.json({ success: true, note: "API failed but simulated for prototype", code: code });
-        }
+        await transporter.sendMail(mailOptions);
+        res.json({ success: true });
 
     } catch (err) {
         console.error(err);

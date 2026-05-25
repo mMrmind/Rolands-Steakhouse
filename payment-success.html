@@ -69,7 +69,10 @@
                         customerName: entry.customerName || 'Guest',
                         amount: entry.paymentAmount || 0,
                         reservationNumber: entry.reservationNumber,
-                        paymentMethod: 'PayMongo'
+                        paymentMethod: 'PayMongo',
+                        arrivalDateTime: entry.arrivalDateTimeDisplay || 'TBD',
+                        table: entry.bookedTable || 'Unassigned',
+                        orderSummary: entry.orderSummary || 'Standard Reservation'
                     })
                 }).then(r => console.log('Email sent status:', r.status))
                   .catch(err => console.error('Failed to trigger email', err));

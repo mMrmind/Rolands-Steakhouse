@@ -164,10 +164,19 @@ header .actions {
 }
 
 /* ── AUTH PAGE ── */
+#auth-section {
+    min-height: calc(100vh - 62px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 16px;
+    background: radial-gradient(circle at 50% 25%, rgba(27, 94, 32, 0.07) 0%, rgba(248, 250, 252, 1) 70%);
+}
 .auth-wrap {
-    max-width: 420px;
-    margin: 80px auto;
-    padding: 20px;
+    width: 100%;
+    max-width: 440px;
+    margin: 0 auto;
+    padding: 0;
 }
 .auth-title {
     font-family: 'Playfair Display', serif;
@@ -733,7 +742,7 @@ tr:hover td { background: #f9fdf9; }
    The vertical sidebar is permanently docked on the left.
    No horizontal swiping, no hidden buttons, 1-click access to all tabs. */
 @media (min-width: 900px) {
-    .app-layout {
+    .app-layout:not(.hidden) {
         display: flex !important;
         flex-direction: row !important;
     }
@@ -824,4 +833,12 @@ tr:hover td { background: #f9fdf9; }
     .cal-grid-header { font-size: 10px; }
     .cal-cell { min-height: 52px; font-size: 11px; padding: 2px 4px; }
     .cal-day-badge { font-size: 8px; padding: 1px 3px; }
+}
+
+/* ── STRICT GLOBAL VISIBILITY ENFORCEMENT ── */
+.hidden,
+#dashboard-section.hidden,
+#auth-section.hidden,
+div.hidden {
+    display: none !important;
 }

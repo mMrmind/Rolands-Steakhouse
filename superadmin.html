@@ -40,6 +40,9 @@
     <!-- AUTH PAGE (shown when not logged in) -->
     <div id="auth-section">
         <div class="auth-wrap">
+            <div style="text-align: center; margin-bottom: 12px;">
+                <span style="display: inline-flex; width: 60px; height: 60px; border-radius: 18px; background: rgba(27, 94, 32, 0.1); color: #1b5e20; font-size: 30px; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(27, 94, 32, 0.12);">🛡️</span>
+            </div>
             <h1 class="auth-title">Super Admin</h1>
             <p class="auth-subtitle">Roland's Steakhouse Operations Center</p>
             <div class="auth-card">
@@ -47,13 +50,22 @@
                     <h2>System Authentication</h2>
                     <div>
                         <label for="admin-password">Master Passkey</label>
-                        <input id="admin-password" type="password" placeholder="Enter master passkey">
+                        <input id="admin-password" type="password" placeholder="Enter master passkey" autofocus>
                     </div>
                     <div class="btnrow">
                         <button type="button" id="admin-login-btn">Authenticate</button>
                     </div>
                     <div class="msg" id="auth-message"></div>
                 </div>
+            </div>
+            <div style="margin-top: 22px; display: flex; justify-content: center; align-items: center; gap: 16px; font-size: 13px;">
+                <a href="admin.html" style="color: var(--sa-primary); text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
+                    ← Staff Admin Portal
+                </a>
+                <span style="color: #cbd5e1;">•</span>
+                <a href="index.html" style="color: #64748b; text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; gap: 4px;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
+                    🏠 Customer Homepage
+                </a>
             </div>
         </div>
     </div>
@@ -1005,7 +1017,7 @@
 
         function logoutSuperAdmin() {
             sessionStorage.removeItem('superAdminActive');
-            window.location.reload();
+            window.location.href = 'superadmin.html';
         }
 
         // Live clock
@@ -4179,7 +4191,9 @@
 
             // UI Reveal
             auth.classList.add('hidden');
+            auth.style.setProperty('display', 'none', 'important');
             dashboard.classList.remove('hidden');
+            dashboard.style.removeProperty('display');
             adminStatus.textContent = '🟢 Super Admin';
             logoutBtn.classList.remove('hidden');
         }
@@ -4191,6 +4205,22 @@
 
             if (sessionStorage.getItem('superAdminActive') === 'true') {
                 return renderDashboard();
+            } else {
+                // Strict Failsafe: Hide dashboard completely when logged out
+                const dashboard = document.getElementById('dashboard-section');
+                const auth = document.getElementById('auth-section');
+                const logoutBtn = document.getElementById('logout-admin-btn');
+                const adminStatus = document.getElementById('admin-status');
+                if (dashboard) {
+                    dashboard.classList.add('hidden');
+                    dashboard.style.setProperty('display', 'none', 'important');
+                }
+                if (auth) {
+                    auth.classList.remove('hidden');
+                    auth.style.removeProperty('display');
+                }
+                if (logoutBtn) logoutBtn.classList.add('hidden');
+                if (adminStatus) adminStatus.textContent = '';
             }
 
             document.getElementById('admin-login-btn').addEventListener('click', () => {

@@ -19,6 +19,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/design-system.css">
     <script src="js/design-system.js"></script>
+    <script src="js/inventory-system.js"></script>
     <link rel="stylesheet" href="css/responsive.css">
     <link rel="stylesheet" href="css/payment.css">
 </head>
@@ -106,11 +107,11 @@
                 <div class="offline-divider">or pay manually (if online payment is unavailable)</div>
 
                 <div style="margin-bottom:14px;">
-                    <label style="font-weight:700; font-size:13px; color:#374151; display:block; margin-bottom:8px; text-transform:uppercase; letter-spacing:.5px;">
+                    <label for="proof-upload" style="font-weight:700; font-size:13px; color:#374151; display:block; margin-bottom:8px; text-transform:uppercase; letter-spacing:.5px;">
                         Upload Payment Screenshot
                     </label>
                     <div class="upload-zone" id="uploadZone">
-                        <input type="file" id="proof-upload" accept="image/*" onchange="previewProof(this)">
+                        <input type="file" id="proof-upload" title="Upload Payment Screenshot" placeholder="Upload Payment Screenshot" accept="image/*" onchange="previewProof(this)">
                         <div id="upload-placeholder">
                             <div style="font-size:32px; margin-bottom:8px;">📤</div>
                             <p style="font-size:14px; color:#666; margin:0;">Tap to upload your GCash / QR Ph screenshot</p>
@@ -121,7 +122,7 @@
                     <p id="upload-filename" style="font-size:12px; color:#16a34a; font-weight:600;"></p>
                 </div>
 
-                <input type="text" id="ref-num" class="ref-input" placeholder="GCash / QR Ph reference number (optional)">
+                <input type="text" id="ref-num" title="Reference Number" class="ref-input" placeholder="GCash / QR Ph reference number (optional)">
                 <button class="manual-pay-btn" onclick="submitManualPayment()">✅ Submit Manual Payment</button>
             </div>
 
@@ -280,30 +281,21 @@
             }
         }
 
-        // ── Save reservation draft (used by both flows) ──
+        // ── Save reservation draft (used by PayMongo flow) ──
         function saveReservationDraft(resNo, status) {
             const foodArray = orderSummary ? orderSummary.split(', ') : [];
             const reservationHistory = JSON.parse(localStorage.getItem('reservationHistory') || '[]');
 
-            // Deduct inventory stock
+            // Parse cart items for deferred deduction upon payment confirmation
+            let itemsArray = [];
             const currentCartStr = localStorage.getItem('currentCartObj');
             if (currentCartStr) {
                 try {
-                    const cart    = JSON.parse(currentCartStr);
-                    const invStr  = localStorage.getItem('inventoryItems');
-                    if (invStr) {
-                        let invItems = JSON.parse(invStr);
-                        for (const id in cart) {
-                            const idx = invItems.findIndex(i => i.id === id);
-                            if (idx > -1) {
-                                invItems[idx].sold_stock = (invItems[idx].sold_stock || 0) + cart[id].qty;
-                                invItems[idx].stock = Math.max(0, (invItems[idx].total_stock || 0) + (invItems[idx].added_stock || 0) - invItems[idx].sold_stock);
-                            }
-                        }
-                        localStorage.setItem('inventoryItems', JSON.stringify(invItems));
+                    const cart = JSON.parse(currentCartStr);
+                    for (const id in cart) {
+                        itemsArray.push({ id: id, quantity: cart[id].qty || 1 });
                     }
-                    localStorage.removeItem('currentCartObj');
-                } catch (e) { console.error('Inventory deduction error', e); }
+                } catch (e) { console.error('Cart parse error', e); }
             }
 
             reservationHistory.push({
@@ -316,6 +308,8 @@
                 bookedTable:            bookedTable,
                 orderSummary:           orderSummary,
                 foods:                  foodArray,
+                cartItems:              itemsArray,
+                stockDeducted:          false, // Will be deducted in payment-success.html upon verified payment
                 beefNote:               localStorage.getItem('beefNote') || '',
                 subtotalAmount:         Number(subtotalRaw),
                 discountType:           discountType,
@@ -327,7 +321,7 @@
                 paymentProof:           '',
                 paymentStatus:          status,
                 paymentMethod:          'paymongo',
-                completedAt:            new Date().toISOString()
+                paidAt:                 new Date().toISOString()
             });
 
             localStorage.setItem('reservationHistory', JSON.stringify(reservationHistory));
@@ -366,26 +360,30 @@
             const resNo = 'RES-' + Math.floor(100000 + Math.random() * 900000);
             const hist  = JSON.parse(localStorage.getItem('reservationHistory') || '[]');
 
-            // Deduct inventory
+            // Parse cart items
+            let itemsArray = [];
             const cartStr = localStorage.getItem('currentCartObj');
             if (cartStr) {
                 try {
                     const cart = JSON.parse(cartStr);
-                    const invStr = localStorage.getItem('inventoryItems');
-                    if (invStr) {
-                        let inv = JSON.parse(invStr);
-                        for (const id in cart) {
-                            const idx = inv.findIndex(i => i.id === id);
-                            if (idx > -1) {
-                                inv[idx].sold_stock = (inv[idx].sold_stock || 0) + cart[id].qty;
-                                inv[idx].stock = Math.max(0, (inv[idx].total_stock || 0) + (inv[idx].added_stock || 0) - inv[idx].sold_stock);
-                            }
-                        }
-                        localStorage.setItem('inventoryItems', JSON.stringify(inv));
+                    for (const id in cart) {
+                        itemsArray.push({ id: id, quantity: cart[id].qty || 1 });
                     }
-                    localStorage.removeItem('currentCartObj');
                 } catch (e) {}
             }
+
+            // Atomic validation & stock deduction
+            if (itemsArray.length > 0 && window.InventorySystem && typeof window.InventorySystem.deductIngredientsForOrder === 'function') {
+                const deductResult = window.InventorySystem.deductIngredientsForOrder(itemsArray, 'Manual Payment Order', resNo);
+                if (!deductResult.success) {
+                    const shortageMsg = (deductResult.shortages && deductResult.shortages.length > 0)
+                        ? deductResult.shortages.map(s => `${s.ingredientName}: needed ${s.needed}${s.unit}, only ${s.available}${s.unit} left`).join(', ')
+                        : (deductResult.error || 'Insufficient stock');
+                    showStatus(`⚠️ Cannot process order due to shortage: ${shortageMsg}`, 'error');
+                    return;
+                }
+            }
+            localStorage.removeItem('currentCartObj');
 
             const foodArray = orderSummary ? orderSummary.split(', ') : [];
             hist.push({
@@ -398,13 +396,15 @@
                 bookedTable:            bookedTable,
                 orderSummary:           orderSummary,
                 foods:                  foodArray,
+                cartItems:              itemsArray,
+                stockDeducted:          true,
                 beefNote:               localStorage.getItem('beefNote') || '',
                 paymentAmount:          total,
                 paymentRef:             ref,
                 paymentProof:           localStorage.getItem('tempPaymentUpload') || '',
                 paymentStatus:          'pending',
                 paymentMethod:          'manual',
-                completedAt:            new Date().toISOString()
+                createdAt:              new Date().toISOString()
             });
 
             localStorage.removeItem('tempPaymentUpload');

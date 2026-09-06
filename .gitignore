@@ -6,9 +6,12 @@ node_modules/
 .env.local
 .env.production
 
-# Build artifacts
+# Build artifacts & local duplicates
 dist/
 .vercel/
+final-def/
+.tmp/
+.agents/
 
 # OS files
 .DS_Store

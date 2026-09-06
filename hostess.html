@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="css/hostess.css">
     <link rel="stylesheet" href="css/design-system.css">
     <script src="js/design-system.js"></script>
+    <script src="js/inventory-system.js"></script>
     <link rel="stylesheet" href="css/responsive.css">
 </head>
 <body>
@@ -89,11 +90,13 @@
 
         window.updateTable = function(tId, currentStatus) {
             const nextStatus = cycleStatus[currentStatus] || 'available';
-            const overrides = JSON.parse(localStorage.getItem('tableOverrides') || '{}');
-            
-            overrides[tId] = nextStatus;
-            
-            localStorage.setItem('tableOverrides', JSON.stringify(overrides));
+            if (nextStatus === 'available' && typeof window.markTableAvailableAndDone === 'function') {
+                window.markTableAvailableAndDone(tId);
+            } else {
+                const overrides = JSON.parse(localStorage.getItem('tableOverrides') || '{}');
+                overrides[tId] = nextStatus;
+                localStorage.setItem('tableOverrides', JSON.stringify(overrides));
+            }
             loadFloorPlan();
         };
 

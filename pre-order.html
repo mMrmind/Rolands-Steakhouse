@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pre-Order | Roland's Steak House</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/preorder.css">
-    <link rel="stylesheet" href="css/design-system.css">
-    <script src="js/design-system.js"></script>
-    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/style.css?v=2.0">
+    <link rel="stylesheet" href="css/preorder.css?v=2.0">
+    <link rel="stylesheet" href="css/design-system.css?v=2.0">
+    <script src="js/design-system.js?v=2.0"></script>
+    <script src="js/inventory-system.js?v=2.0"></script>
+    <link rel="stylesheet" href="css/responsive.css?v=2.0">
 </head>
 <body>
 
@@ -55,7 +56,7 @@
                 <span class="mobile-cat-icon">🍽️</span>
                 <label for="mobile-category-select" class="mobile-cat-label">Select Food Category</label>
                 <div class="mobile-cat-select-wrap">
-                    <select id="mobile-category-select" class="mobile-cat-select" onchange="switchCategory(this.value)">
+                    <select id="mobile-category-select" class="mobile-cat-select" title="Select Food Category" aria-label="Select Food Category" onchange="switchCategory(this.value)">
                         <!-- Options populated by JS -->
                     </select>
                     <span class="mobile-cat-arrow">▼</span>
@@ -90,25 +91,8 @@
             <div class="cart-items-container" id="cart-items"></div>
             <div class="cart-total-section">
                 <div class="cart-total-row"><span>Subtotal</span><span id="cart-subtotal">₱0.00</span></div>
-                <div class="cart-total-row" id="discount-row-desktop" style="display:none; color:#16a34a; font-weight:700;">
-                    <span id="discount-label-desktop">PWD Discount (20%)</span>
-                    <span id="discount-val-desktop">-₱0.00</span>
-                </div>
                 <div class="cart-total-row"><span>VAT (12% incl.)</span><span>Included</span></div>
                 <div class="cart-total"><span>Total</span><span id="cart-total">₱0.00</span></div>
-            </div>
-
-            <!-- ── PWD / SENIOR DISCOUNT PANEL (Desktop) ── -->
-            <div style="background:linear-gradient(135deg,#fefce8,#fef9c3); border:1.5px solid #fde68a; border-radius:14px; padding:14px; margin-bottom:14px; display:flex; flex-direction:column; gap:8px;">
-                <div style="font-size:11px; font-weight:800; color:#92400e; text-transform:uppercase; letter-spacing:0.6px;">🏷️ PH Discount (PWD / Senior)</div>
-                <select id="web-discount-type" onchange="handleWebDiscountChange('desktop')" style="padding:9px 12px; border:1.5px solid #fcd34d; border-radius:9px; background:white; font-size:13px; font-weight:700; color:#1e293b; outline:none; cursor:pointer;">
-                    <option value="none">No Discount</option>
-                    <option value="pwd">👨‍🦽 PWD – 20% Discount</option>
-                    <option value="senior">👴 Senior Citizen – 20% Discount</option>
-                </select>
-                <input type="text" id="web-discount-id" placeholder="Enter PWD / Senior ID number"
-                    style="display:none; padding:9px 12px; border:1.5px solid #fcd34d; border-radius:9px; font-size:13px; outline:none;"
-                    oninput="renderCart()">
             </div>
 
             <!-- Beef Preference Panel -->
@@ -160,25 +144,8 @@
             <div class="cart-items-container" id="cart-items-sheet"></div>
             <div class="cart-total-section">
                 <div class="cart-total-row"><span>Subtotal</span><span id="cart-subtotal-sheet">₱0.00</span></div>
-                <div class="cart-total-row" id="discount-row-sheet" style="display:none; color:#16a34a; font-weight:700;">
-                    <span id="discount-label-sheet">PWD Discount (20%)</span>
-                    <span id="discount-val-sheet">-₱0.00</span>
-                </div>
                 <div class="cart-total-row"><span>VAT (12% incl.)</span><span>Included</span></div>
                 <div class="cart-total"><span>Total</span><span id="cart-total-sheet">₱0.00</span></div>
-            </div>
-
-            <!-- ── PWD / SENIOR DISCOUNT PANEL (Sheet) ── -->
-            <div style="background:linear-gradient(135deg,#fefce8,#fef9c3); border:1.5px solid #fde68a; border-radius:14px; padding:14px; margin-bottom:14px; display:flex; flex-direction:column; gap:8px;">
-                <div style="font-size:11px; font-weight:800; color:#92400e; text-transform:uppercase; letter-spacing:0.6px;">🏷️ PH Discount (PWD / Senior)</div>
-                <select id="web-discount-type-sheet" onchange="handleWebDiscountChange('sheet')" style="padding:9px 12px; border:1.5px solid #fcd34d; border-radius:9px; background:white; font-size:13px; font-weight:700; color:#1e293b; outline:none; cursor:pointer;">
-                    <option value="none">No Discount</option>
-                    <option value="pwd">👨‍🦽 PWD – 20% Discount</option>
-                    <option value="senior">👴 Senior Citizen – 20% Discount</option>
-                </select>
-                <input type="text" id="web-discount-id-sheet" placeholder="Enter PWD / Senior ID number"
-                    style="display:none; padding:9px 12px; border:1.5px solid #fcd34d; border-radius:9px; font-size:13px; outline:none;"
-                    oninput="renderCart()">
             </div>
 
             <!-- Beef Preference in sheet -->
@@ -334,11 +301,19 @@
                     // Keep Wine separate from generic drinks
                     if (i.category === 'Drinks' && name.match(/wine|carlo rossi|adega/)) i.category = 'Wines';
 
-                    // Compute virtual stock
-                    const virtualStock = (i.total_stock !== undefined)
-                        ? (i.total_stock + (i.added_stock || 0) - (i.sold_stock || 0))
-                        : (i.stock || 0);
-                    i.stock = Math.max(0, virtualStock);
+                    // Compute portion availability from raw ingredients
+                    if (window.InventorySystem && typeof window.InventorySystem.calculateFoodAvailability === 'function') {
+                        const rawCatalog = window.InventorySystem.getRawIngredients();
+                        const avail = window.InventorySystem.calculateFoodAvailability(i, rawCatalog);
+                        i.stock = avail.availablePortions;
+                        i.isAvailable = avail.isAvailable;
+                        i.missingIngredients = avail.missingIngredients;
+                    } else {
+                        const virtualStock = (i.total_stock !== undefined)
+                            ? (i.total_stock + (i.added_stock || 0) - (i.sold_stock || 0))
+                            : (i.stock || 0);
+                        i.stock = Math.max(0, virtualStock);
+                    }
                     return i;
                 }
 
@@ -400,34 +375,6 @@
         // HELPERS
         // ─────────────────────────────────────────────────────────
         const fmt = n => '₱' + Number(n).toLocaleString(undefined, { minimumFractionDigits: 2 });
-
-        function getWebDiscount(subtotal) {
-            // Sync both selects (desktop/sheet mirror each other)
-            const typeEl  = document.getElementById('web-discount-type');
-            const type    = typeEl ? typeEl.value : 'none';
-            if (type === 'none') return { type: 'none', amount: 0, label: '' };
-            const amount = Math.round(subtotal * 0.20 * 100) / 100;
-            const label  = type === 'pwd' ? 'PWD Discount (20%)' : 'Senior Citizen Discount (20%)';
-            return { type, amount, label };
-        }
-
-        window.handleWebDiscountChange = function(source) {
-            // Keep both selects (desktop + sheet) in sync
-            const desktop = document.getElementById('web-discount-type');
-            const sheet   = document.getElementById('web-discount-type-sheet');
-            const idDesktop = document.getElementById('web-discount-id');
-            const idSheet   = document.getElementById('web-discount-id-sheet');
-
-            if (source === 'desktop' && desktop && sheet) sheet.value = desktop.value;
-            if (source === 'sheet'   && desktop && sheet) desktop.value = sheet.value;
-
-            const val = desktop ? desktop.value : 'none';
-            const show = val !== 'none';
-            if (idDesktop) idDesktop.style.display = show ? 'block' : 'none';
-            if (idSheet)   idSheet.style.display   = show ? 'block' : 'none';
-
-            renderCart();
-        };
 
         function getTotal() {
             return Object.keys(cart).reduce((sum, id) => {
@@ -588,12 +535,10 @@
 
         function renderCart() {
             const subtotal = getTotal();
-            const disc = getWebDiscount(subtotal);
-            const finalTotal = subtotal - disc.amount;
+            const finalTotal = subtotal;
 
             const fmtSubtotal  = fmt(subtotal);
             const fmtTotal     = fmt(finalTotal);
-            const fmtDisc      = fmt(disc.amount);
             const html         = buildCartItemsHTML();
             const itemCount    = Object.values(cart).reduce((s, v) => s + v.qty, 0);
 
@@ -620,34 +565,10 @@
             document.getElementById('cart-subtotal').textContent  = fmtSubtotal;
             document.getElementById('cart-total').textContent     = fmtTotal;
 
-            // Discount rows – desktop
-            const discRowD = document.getElementById('discount-row-desktop');
-            if (discRowD) {
-                if (disc.amount > 0) {
-                    document.getElementById('discount-label-desktop').textContent = disc.label;
-                    document.getElementById('discount-val-desktop').textContent   = '-' + fmtDisc;
-                    discRowD.style.display = 'flex';
-                } else {
-                    discRowD.style.display = 'none';
-                }
-            }
-
             // Mobile sheet
             document.getElementById('cart-items-sheet').innerHTML      = html;
             document.getElementById('cart-subtotal-sheet').textContent  = fmtSubtotal;
             document.getElementById('cart-total-sheet').textContent     = fmtTotal;
-
-            // Discount rows – sheet
-            const discRowS = document.getElementById('discount-row-sheet');
-            if (discRowS) {
-                if (disc.amount > 0) {
-                    document.getElementById('discount-label-sheet').textContent = disc.label;
-                    document.getElementById('discount-val-sheet').textContent   = '-' + fmtDisc;
-                    discRowS.style.display = 'flex';
-                } else {
-                    discRowS.style.display = 'none';
-                }
-            }
 
             // Floating btn badge
             const badge = document.getElementById('cart-badge');
@@ -662,12 +583,10 @@
             if (hasItems) {
                 localStorage.setItem('totalBill', finalTotal);
                 localStorage.setItem('subtotalBill', subtotal);
-                localStorage.setItem('discountType',   disc.type);
-                localStorage.setItem('discountAmount', disc.amount);
-                localStorage.setItem('discountLabel',  disc.label);
-                // ID number (sync from desktop input)
-                const idVal = (document.getElementById('web-discount-id')?.value || '').trim();
-                localStorage.setItem('discountIdNo', idVal);
+                localStorage.removeItem('discountType');
+                localStorage.removeItem('discountAmount');
+                localStorage.removeItem('discountLabel');
+                localStorage.removeItem('discountIdNo');
                 localStorage.setItem('orderSummary',
                     Object.keys(cart).map(id => {
                         const item = menuData.find(i => i.id === id);
@@ -824,8 +743,37 @@
         // ─────────────────────────────────────────────────────────
         // CHECKOUT
         // ─────────────────────────────────────────────────────────
-        window.handleCheckout = function() { 
-            // Exact JSON object to deduct correct stock in payment.html
+        window.handleCheckout = function() {
+            const itemsArray = [];
+            for (const id in cart) {
+                const menuItem = menuData.find(m => m.id === id);
+                itemsArray.push({
+                    id: id,
+                    title: menuItem ? menuItem.title : id,
+                    name: menuItem ? menuItem.title : id,
+                    quantity: cart[id].qty
+                });
+            }
+
+            if (itemsArray.length === 0) {
+                superModal({ title: 'Empty Cart 🛒', message: 'Please add items to your cart before proceeding to payment.' });
+                return;
+            }
+
+            // Validate combined raw ingredients & shared bottlenecks
+            if (window.InventorySystem && typeof window.InventorySystem.validateOrderIngredients === 'function') {
+                const check = window.InventorySystem.validateOrderIngredients(itemsArray);
+                if (!check.isValid) {
+                    const list = check.shortages.map(s => `• <b>${s.ingredientName}</b>: Needed ${s.needed} ${s.unit}, only ${s.available} ${s.unit} in kitchen`).join('<br>');
+                    superModal({
+                        title: 'Stock Shortage 📉',
+                        message: `Sorry, we cannot fulfill this order due to insufficient kitchen ingredients:<br><br>${list}<br><br>Please adjust item quantities in your cart.`
+                    });
+                    return;
+                }
+            }
+
+            // Exact JSON object to pass to payment.html
             localStorage.setItem('currentCartObj', JSON.stringify(cart));
             window.location.href = 'payment.html'; 
         };
@@ -1015,6 +963,49 @@
         window.onpopstate = function() {
             handleBack();
         };
+    </script>
+
+    <!-- STORE STATUS (OPEN / CLOSED) CUSTOMER PROTECTION -->
+    <div id="store-closed-banner" style="display:none; position:fixed; top:0; left:0; right:0; z-index:99999; background:linear-gradient(135deg, #7f1d1d 0%, #dc2626 100%); color:white; padding:12px 20px; text-align:center; font-family:'Inter', sans-serif; font-size:14px; font-weight:700; box-shadow:0 4px 15px rgba(0,0,0,0.3);">
+        🔒 NOTICE: Roland's Steakhouse is currently CLOSED and not accepting online orders or reservations. Please check back during opening hours.
+    </div>
+
+    <script>
+        function checkCustomerStoreStatus() {
+            const status = window.InventorySystem ? window.InventorySystem.getStoreStatus() : (localStorage.getItem('store_status') || 'open');
+            const banner = document.getElementById('store-closed-banner');
+            const isClosed = status === 'closed';
+
+            if (banner) {
+                banner.style.display = isClosed ? 'block' : 'none';
+            }
+
+            document.querySelectorAll('#btn-proceed-order, .sheet-cta, .qty-btn').forEach(btn => {
+                if (isClosed) {
+                    btn.style.pointerEvents = 'none';
+                    btn.style.opacity = '0.5';
+                    btn.style.filter = 'grayscale(1)';
+                } else {
+                    btn.style.pointerEvents = 'auto';
+                    btn.style.opacity = '1';
+                    btn.style.filter = 'none';
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', checkCustomerStoreStatus);
+        window.addEventListener('storeStatusUpdated', checkCustomerStoreStatus);
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'store_status') checkCustomerStoreStatus();
+        });
+        if (typeof BroadcastChannel !== 'undefined') {
+            try {
+                const bc = new BroadcastChannel('inventory_sync_channel');
+                bc.onmessage = (e) => {
+                    if (e.data && e.data.action === 'storeStatusUpdated') checkCustomerStoreStatus();
+                };
+            } catch (err) {}
+        }
     </script>
 </body>
 </html>

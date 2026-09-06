@@ -8,11 +8,13 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500;700&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/admin.css?v=2.0">
     <script src="https://unpkg.com/html5-qrcode"></script>
-    <link rel="stylesheet" href="css/design-system.css">
-    <script src="js/design-system.js"></script>
-    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/design-system.css?v=2.0">
+    <script src="js/design-system.js?v=2.0"></script>
+    <script src="js/inventory-system.js?v=2.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="css/responsive.css?v=2.0">
 </head>
 
 <body>
@@ -31,7 +33,9 @@
             <h1 class="auth-title">Admin Access</h1>
             <div class="auth-card">
                 <div id="no-admin-users" class="hidden" style="text-align: center; padding: 20px;">
-                    <div style="font-size: 40px; margin-bottom: 15px;">🔒</div>
+                    <div style="font-size: 40px; margin-bottom: 15px; display: flex; justify-content: center;">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c5a059" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="3" ry="3"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    </div>
                     <h2 style="color: #1b5e20; margin-bottom: 10px;">Access Restricted</h2>
                     <p style="color: #555; line-height: 1.5; font-size: 14px;">No staff admin accounts have been
                         registered yet. Please contact the <strong>Super Admin</strong> to create your staff account.
@@ -74,11 +78,11 @@
                 <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
                     <button type="button" onclick="window.launchTerminal('kitchen.html')"
                         style="background:#3b82f6; border-radius:10px; padding: 12px 20px; display:flex; align-items:center; gap:8px; border:none; color:white; font-weight:700; cursor:pointer;">
-                        👩‍🍳 Launch Cook Area
+                        Launch Kitchen Display System (KDS)
                     </button>
                     <button type="button" onclick="window.launchTerminal('pos.html')"
                         style="background:#1b5e20; border-radius:10px; padding: 12px 20px; display:flex; align-items:center; gap:8px; color:white; border:none; cursor:pointer;">
-                        📱 Launch POS Terminal
+                        Launch POS Terminal
                     </button>
                 </div>
                 <p style="margin-top: 15px; font-size: 12px; color: #64748b; font-style: italic;">Note: Terminals run
@@ -101,20 +105,19 @@
         <div id="dashboard-section" class="hidden">
             <div class="admin-tabs">
                 <button class="tab-link active" onclick="switchAdminTab('overview', this)">Dashboard Overview</button>
-                <button class="tab-link" onclick="switchAdminTab('walkin', this)">📋 Manual Reservation</button>
+                <button class="tab-link" onclick="switchAdminTab('walkin', this)">Manual Reservation</button>
                 <button class="tab-link" onclick="switchAdminTab('floorplan', this)">Floor Plan</button>
                 <button class="tab-link" onclick="switchAdminTab('menu', this)">Live Inventory</button>
                 <button class="tab-link" onclick="switchAdminTab('chat', this)">Live Chat</button>
-                <button class="tab-link" onclick="switchAdminTab('promotions', this)">🎉 Promotions</button>
-
-                <button class="tab-link" onclick="switchAdminTab('payments', this)">💳 Payments</button>
+                <button class="tab-link" onclick="switchAdminTab('promotions', this)">Promotions</button>
+                <button class="tab-link" onclick="switchAdminTab('payments', this)">Payments</button>
             </div>
 
             <!-- WALK-IN RESERVATION TAB -->
             <div id="tab-walkin" class="admin-tab-content hidden">
                 <div
                     style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
-                    <h2 style="margin:0; font-family:'Playfair Display',serif; color:#2e7d32; font-size:26px;">📋 Manual
+                    <h2 style="margin:0; font-family:'Playfair Display',serif; color:#2e7d32; font-size:26px;">Manual
                         Reservation</h2>
                     <span class="muted" style="font-weight:700;">Book a table directly for a walk-in or phone
                         customer</span>
@@ -157,21 +160,21 @@
                             <label
                                 style="display:block; margin-bottom:5px; font-weight:700; font-size:13px; color:#555;">Arrival
                                 Date *</label>
-                            <input type="date" id="walkin-date"
+                            <input type="date" id="walkin-date" title="Arrival Date" aria-label="Arrival Date"
                                 style="width:100%; padding:11px 13px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-size:14px;">
                         </div>
                         <div>
                             <label
                                 style="display:block; margin-bottom:5px; font-weight:700; font-size:13px; color:#555;">Arrival
                                 Time *</label>
-                            <input type="time" id="walkin-time"
+                            <input type="time" id="walkin-time" title="Arrival Time" aria-label="Arrival Time"
                                 style="width:100%; padding:11px 13px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-size:14px;">
                         </div>
                         <div>
                             <label
                                 style="display:block; margin-bottom:5px; font-weight:700; font-size:13px; color:#555;">Table
                                 *</label>
-                            <select id="walkin-table"
+                            <select id="walkin-table" title="Select Table" aria-label="Select Table"
                                 style="width:100%; padding:11px 13px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; font-size:14px; background:white;">
                                 <option value="">-- Select Table --</option>
                                 <option>Table 1</option>
@@ -204,7 +207,7 @@
                                 Selection *</label>
                             <button type="button" onclick="openWalkinFoodPicker()"
                                 style="width:100%; padding:10px; border-radius:8px; border:1px solid #1b5e20; background:white; color:#1b5e20; font-weight:700; font-size:14px; cursor:pointer; transition:0.2s;">
-                                🍽️ Select Menu Items
+                                Select Menu Items
                             </button>
                             <div id="walkin-order-summary"
                                 style="margin-top:8px; padding:10px; border-radius:8px; background:#f9fafb; border:1px dashed #d1d5db; min-height:40px; font-size:13px; color:#4b5563;">
@@ -233,9 +236,10 @@
                         style="display:none; color:#ef4444; font-size:13px; font-weight:600; margin-bottom:12px;"></div>
 
                     <button type="button" onclick="submitWalkinReservation()"
-                        style="width:100%; padding:15px; font-size:15px; border-radius:10px; border:none; background:#1b5e20; color:white; font-weight:700; cursor:pointer; transition:all 0.2s;"
+                        style="width:100%; padding:15px; font-size:15px; border-radius:10px; border:none; background:#1b5e20; color:white; font-weight:700; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:8px;"
                         onmouseover="this.style.background='#2e7d32'" onmouseout="this.style.background='#1b5e20'">
-                        ✅ Save Reservation
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        Save Reservation
                     </button>
                 </div>
 
@@ -267,7 +271,7 @@
             <div id="tab-promotions" class="admin-tab-content hidden">
                 <div
                     style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
-                    <h2 style="margin:0; font-family:'Playfair Display',serif; color:#2e7d32; font-size:26px;">🎉
+                    <h2 style="margin:0; font-family:'Playfair Display',serif; color:#2e7d32; font-size:26px; display:flex; align-items:center; gap:10px;">
                         Promotions & Ads</h2>
                     <span class="muted" style="font-weight:700;">Promos are shown live on the homepage</span>
                 </div>
@@ -296,15 +300,17 @@
                         Image</label>
                     <div style="border:2px dashed #c8e6c9; border-radius:10px; padding:24px; text-align:center; cursor:pointer; background:#f0fdf4; position:relative; margin-bottom:14px;"
                         onclick="document.getElementById('promo-upload-input').click()">
-                        <div style="font-size:36px;">📷</div>
-                        <div style="font-size:14px; color:#555; margin-top:8px;">Click to upload a promo image</div>
+                        <div style="display:flex; justify-content:center; margin-bottom:8px;">
+                            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                        </div>
+                        <div style="font-size:14px; color:#555; margin-top:4px;">Click to upload a promo image</div>
                         <div style="font-size:12px; color:#aaa; margin-top:4px;">PNG, JPG supported</div>
                         <input type="file" id="promo-upload-input" accept="image/*" style="display:none;"
                             onchange="previewPromoImage(this)">
                     </div>
                     <img id="promo-preview-img" src=""
                         style="display:none; max-height:180px; border-radius:8px; margin-bottom:14px; border:1px solid #e2e8f0;">
-                    <button type="button" onclick="addPromo()" style="width:100%; padding:13px; font-size:15px;">✅
+                    <button type="button" onclick="addPromo()" style="width:100%; padding:13px; font-size:15px; display:flex; align-items:center; justify-content:center; gap:8px;">
                         Publish Promotion</button>
                 </div>
 
@@ -321,18 +327,18 @@
             <div id="tab-payments" class="admin-tab-content hidden">
                 <div
                     style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
-                    <h2 style="margin:0; font-family:'Playfair Display',serif; color:#2e7d32; font-size:26px;">💳
+                    <h2 style="margin:0; font-family:'Playfair Display',serif; color:#2e7d32; font-size:26px;">
                         Payment History</h2>
                     <div style="display:flex; gap:10px; align-items:center;">
                         <div style="display:flex; background:#f1f5f9; padding:4px; border-radius:10px; gap:4px;">
                             <button class="payment-sub-tab active" onclick="switchPaymentFilter('pending', this)"
-                                style="padding:8px 16px; border:none; border-radius:8px; font-weight:700; cursor:pointer; font-size:13px; transition:0.2s;">⏳
+                                style="padding:8px 16px; border:none; border-radius:8px; font-weight:700; cursor:pointer; font-size:13px; transition:0.2s;">
                                 Pending Verification</button>
                             <button class="payment-sub-tab" onclick="switchPaymentFilter('history', this)"
-                                style="padding:8px 16px; border:none; border-radius:8px; font-weight:700; cursor:pointer; font-size:13px; transition:0.2s;">📜
+                                style="padding:8px 16px; border:none; border-radius:8px; font-weight:700; cursor:pointer; font-size:13px; transition:0.2s;">
                                 Payment History</button>
                         </div>
-                        <select id="payment-time-filter" class="payment-time-filter" onchange="renderPayments()">
+                        <select id="payment-time-filter" class="payment-time-filter" title="Payment Time Filter" aria-label="Payment Time Filter" onchange="renderPayments()">
                             <option value="all">All Time</option>
                             <option value="day">Today</option>
                             <option value="week">This Week</option>
@@ -351,15 +357,45 @@
             <!-- MENU ITEM OVERRIDES TAB -->
             <div id="tab-menu" class="admin-tab-content hidden">
                 <div class="card" style="margin-bottom: 24px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
                         <h2 style="font-family: 'Playfair Display', serif; color: #2e7d32; margin: 0; font-size: 20px;">
-                            Live Inventory View</h2>
-                        <span style="font-size:12px; color:#666; font-weight:700;">Stock syncs with Super Admin</span>
+                            Live Inventory & Recipe Management</h2>
+                        <span style="font-size:12px; color:#16a34a; font-weight:700; background:#f0fdf4; padding:4px 10px; border-radius:20px; border:1px solid #bbf7d0;">Dynamic Ingredient Sync Active</span>
                     </div>
-                    <p style="color: #666; margin: 0 0 20px 0; font-size: 14px;">Monitor real-time stock levels of
-                        products here. Only a Super Admin can add or modify the total stock items.</p>
+                    <p style="color: #666; margin: 0 0 16px 0; font-size: 14px;">Monitor real-time food portion availability computed directly from raw ingredient stock levels. Food items automatically update status based on ingredient availability.</p>
+
+                    <!-- Sub Tab Navigation -->
+                    <div style="display:flex; gap:10px; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; flex-wrap:wrap;">
+                        <button id="inv-subtab-food" onclick="switchAdminInvSubTab('food')" style="padding: 8px 16px; border-radius: 8px; font-weight: 700; border: none; background: #2e7d32; color: white; cursor: pointer; display:flex; align-items:center; gap:6px;">Portion Availability</button>
+                        <button id="inv-subtab-raw" onclick="switchAdminInvSubTab('raw')" style="padding: 8px 16px; border-radius: 8px; font-weight: 700; border: none; background: #f1f5f9; color: #475569; cursor: pointer; display:flex; align-items:center; gap:6px;">Raw Ingredients Catalog</button>
+                        <button id="inv-subtab-recipe" onclick="switchAdminInvSubTab('recipe')" style="padding: 8px 16px; border-radius: 8px; font-weight: 700; border: none; background: #f1f5f9; color: #475569; cursor: pointer; display:flex; align-items:center; gap:6px;">Kitchen Recipe Guide</button>
+                        <button id="inv-subtab-wastage" onclick="switchAdminInvSubTab('wastage')" style="padding: 8px 16px; border-radius: 8px; font-weight: 700; border: none; background: #f1f5f9; color: #475569; cursor: pointer; display:flex; align-items:center; gap:6px;">Kitchen Spoilage Log</button>
+                        <button id="inv-subtab-audit" onclick="switchAdminInvSubTab('audit')" style="padding: 8px 16px; border-radius: 8px; font-weight: 700; border: none; background: #f1f5f9; color: #475569; cursor: pointer; display:flex; align-items:center; gap:6px;">Stock Movement Log</button>
+                    </div>
+
+                    <!-- 1. FOOD AVAILABILITY GRID -->
                     <div id="admin-menu-grid">
                         <!-- Menu items rendered via JS -->
+                    </div>
+
+                    <!-- 2. RAW INGREDIENTS MANAGER -->
+                    <div id="admin-raw-ingredients-container" class="hidden">
+                        <!-- Raw ingredients table rendered via JS -->
+                    </div>
+
+                    <!-- 3. RECIPE BUILDER CONTAINER -->
+                    <div id="admin-recipes-container" class="hidden">
+                        <!-- Recipe mappings rendered via JS -->
+                    </div>
+
+                    <!-- 4. KITCHEN WASTAGE CONTAINER -->
+                    <div id="admin-wastage-container" class="hidden">
+                        <!-- Spoilage logs rendered via JS -->
+                    </div>
+
+                    <!-- 5. AUDIT TRAIL LOG CONTAINER -->
+                    <div id="admin-audit-container" class="hidden">
+                        <!-- Audit movement logs rendered via JS -->
                     </div>
                 </div>
             </div>
@@ -420,11 +456,11 @@
                     <div style="display: flex; gap: 12px;">
                         <button type="button" onclick="window.launchTerminal('kitchen.html')"
                             style="background:#3b82f6; color:white; border:none; padding: 10px 18px; border-radius: 8px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 14px;">
-                            🍳 Kitchen
+                            Kitchen
                         </button>
                         <button type="button" onclick="window.launchTerminal('pos.html')"
                             style="background:#1b5e20; color:white; border:none; padding: 10px 18px; border-radius: 8px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 14px;">
-                            📱 POS Terminal
+                            POS Terminal
                         </button>
                     </div>
                 </div>
@@ -460,17 +496,16 @@
                     <div style="display:flex; background-color:#f1f5f9; border-radius:8px; padding:4px; gap: 4px;">
                         <button id="filter-all" type="button" onclick="setResFilter('all')"
                             class="status-filter active">All</button>
-                        <button id="filter-paid" type="button" onclick="setResFilter('paid')" class="status-filter">✅
-                            Paid</button>
+                        <button id="filter-paid" type="button" onclick="setResFilter('paid')" class="status-filter">Paid</button>
                         <button id="filter-unpaid" type="button" onclick="setResFilter('unpaid')"
-                            class="status-filter">❌ Unpaid/Failed</button>
+                            class="status-filter">Unpaid/Failed</button>
                         <button id="filter-pending" type="button" onclick="setResFilter('pending')"
-                            class="status-filter">⏳ Pending</button>
+                            class="status-filter">Pending</button>
                         <button id="filter-discounted" type="button" onclick="setResFilter('discounted')"
-                            class="status-filter">🏷️ Discounted</button>
+                            class="status-filter">Discounted</button>
                     </div>
 
-                    <button type="button" id="export-csv-btn" class="secondary">Export CSV</button>
+                    <button type="button" id="export-csv-btn" class="secondary" onclick="openExportCsvModal()">Export CSV</button>
                 </div>
 
                 <div class="muted" id="summary-line"></div>
@@ -510,33 +545,34 @@
 
                 <!-- Edit Modal -->
                 <div id="edit-modal" class="hidden"
-                    style="position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 100;">
+                    style="position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 100;">
                     <div class="card" style="width: 100%; max-width: 450px; background: white; padding: 25px;">
                         <h2 style="margin-top:0; color:#1b5e20;">Edit Reservation</h2>
                         <input type="hidden" id="edit-index">
+                        <input type="hidden" id="edit-res-num">
 
                         <label
                             style="display:block; margin: 10px 0 5px; font-weight:600; font-size:14px; text-transform:uppercase;">Customer
                             Name</label>
-                        <input type="text" id="edit-customer"
+                        <input type="text" id="edit-customer" title="Customer Name" placeholder="Customer Name" aria-label="Customer Name"
                             style="width: 100%; padding:10px; border:1px solid #ccc; border-radius:5px; box-sizing:border-box;">
 
                         <label
                             style="display:block; margin: 10px 0 5px; font-weight:600; font-size:14px; text-transform:uppercase;">Arrival
                             Date</label>
-                        <input type="date" id="edit-date"
+                        <input type="date" id="edit-date" title="Arrival Date" aria-label="Arrival Date"
                             style="width: 100%; padding:10px; border:1px solid #ccc; border-radius:5px; box-sizing:border-box;">
 
                         <label
                             style="display:block; margin: 10px 0 5px; font-weight:600; font-size:14px; text-transform:uppercase;">Arrival
                             Time</label>
-                        <input type="time" id="edit-time"
+                        <input type="time" id="edit-time" title="Arrival Time" aria-label="Arrival Time"
                             style="width: 100%; padding:10px; border:1px solid #ccc; border-radius:5px; box-sizing:border-box;">
 
                         <label
                             style="display:block; margin: 10px 0 5px; font-weight:600; font-size:14px; text-transform:uppercase;">Table
                             Selection</label>
-                        <select id="edit-table"
+                        <select id="edit-table" title="Table Selection" aria-label="Table Selection"
                             style="width: 100%; padding:10px; border:1px solid #ccc; border-radius:5px; box-sizing:border-box;">
                             <option value="Table 1">Table 1</option>
                             <option value="Table 2">Table 2</option>
@@ -581,13 +617,13 @@
                     </div>
                     <div style="display: flex; gap: 10px;">
                         <button type="button" onclick="window.openFloorPlanEditor()"
-                            style="background:#f59e0b; color:white; border:none; padding:10px 16px; border-radius:8px; font-weight:700; cursor:pointer; font-size: 13px; box-shadow: 0 4px 6px rgba(245,158,11,0.2);">✏️
+                            style="background:#f59e0b; color:white; border:none; padding:10px 16px; border-radius:8px; font-weight:700; cursor:pointer; font-size: 13px; box-shadow: 0 4px 6px rgba(245,158,11,0.2);">
                             Edit Tables</button>
                         <button type="button" onclick="window.fullyBookFloor()"
-                            style="background:#ef4444; color:white; border:none; padding:10px 16px; border-radius:8px; font-weight:700; cursor:pointer; font-size: 13px; box-shadow: 0 4px 6px rgba(239,68,68,0.2);">🔒
+                            style="background:#ef4444; color:white; border:none; padding:10px 16px; border-radius:8px; font-weight:700; cursor:pointer; font-size: 13px; box-shadow: 0 4px 6px rgba(239,68,68,0.2);">
                             Full Booking</button>
                         <button type="button" onclick="window.resetFloor()"
-                            style="background:#16a34a; color:white; border:none; padding:10px 16px; border-radius:8px; font-weight:700; cursor:pointer; font-size: 13px; box-shadow: 0 4px 6px rgba(22,163,74,0.2);">🔓
+                            style="background:#16a34a; color:white; border:none; padding:10px 16px; border-radius:8px; font-weight:700; cursor:pointer; font-size: 13px; box-shadow: 0 4px 6px rgba(22,163,74,0.2);">
                             Open All</button>
                     </div>
                 </div>
@@ -654,7 +690,7 @@
             style="background:white; border-radius:16px; width:100%; max-width:760px; padding:28px; max-height:90vh; display: flex; flex-direction: column; position:relative; margin:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
             <div
                 style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid #e2e8f0; padding-bottom: 16px; margin-bottom: 16px;">
-                <h2 style="margin:0; color:#1b5e20; font-family:'Playfair Display',serif;">✏️ Edit Floor Plan</h2>
+                <h2 style="margin:0; color:#1b5e20; font-family:'Playfair Display',serif;">Edit Floor Plan</h2>
                 <button onclick="document.getElementById('floor-editor-modal').style.display='none'"
                     style="background: #f1f5f9; border: none; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px;">✕</button>
             </div>
@@ -689,9 +725,9 @@
 
             <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; margin-top: 16px; display: flex; gap: 10px;">
                 <button onclick="window.addNewTable()"
-                    style="background:#3b82f6; color:white; flex:1; border-radius:8px;">➕ Add New Table</button>
+                    style="background:#3b82f6; color:white; flex:1; border-radius:8px;">+ Add New Table</button>
                 <button onclick="window.saveFloorPlanConfig()"
-                    style="background:#16a34a; color:white; flex:1; border-radius:8px;">💾 Save Changes</button>
+                    style="background:#16a34a; color:white; flex:1; border-radius:8px;">Save Changes</button>
             </div>
         </div>
     </div>
@@ -703,7 +739,7 @@
             style="background:white; border-radius:16px; width:100%; max-width:520px; padding:28px; max-height:90vh; overflow-y:auto; position:relative; margin:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
             <button onclick="document.getElementById('proof-modal').style.display='none'"
                 style="position:absolute; top:15px; right:15px; background: #f1f5f9; border: none; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; color:#475569; z-index: 20;">✕</button>
-            <h2 style="margin:0 0 14px; color:#1b5e20; font-family:'Playfair Display',serif;">🧾 Payment Proof</h2>
+            <h2 style="margin:0 0 14px; color:#1b5e20; font-family:'Playfair Display',serif;">Payment Proof Attachment</h2>
             <div id="proof-modal-info"
                 style="margin-bottom:16px; font-size:14px; color:#555; border:1px solid #e2e8f0; border-radius:8px; padding:12px;">
             </div>
@@ -774,19 +810,19 @@
             { id: 'INV-B1', title: 'Fillet Mignon', category: 'Beef', price: 935, stock: 50 },
             { id: 'INV-B2', title: 'Tenderloin Steak (200g)', category: 'Beef', price: 740, stock: 50 },
             { id: 'INV-B3', title: 'Tenderloin Tips (200g)', category: 'Beef', price: 740, stock: 50 },
-            { id: 'INV-B4', title: 'Rib Eye Steak (200-350g)', category: 'Beef', price: 675, stock: 50 },
+            { id: 'INV-B4', title: 'Rib Eye Steak (200g-350g)', category: 'Beef', price: 675, stock: 50 },
             { id: 'INV-B5', title: 'Hamburger Steak (204g)', category: 'Beef', price: 505, stock: 50 },
             // T-BONE
-            { id: 'INV-T1', title: 'T-Bone Medium (250-400g)', category: 'T-Bone', price: 715, stock: 50 },
-            { id: 'INV-T2', title: 'T-Bone Large (450-500g)', category: 'T-Bone', price: 790, stock: 50 },
-            { id: 'INV-T3', title: 'T-Bone Extra Large (551-500g)', category: 'T-Bone', price: 865, stock: 50 },
-            { id: 'INV-T4', title: 'T-Bone XX Large (551-500g)', category: 'T-Bone', price: 940, stock: 50 },
-            { id: 'INV-T5', title: 'Porter House (551-600g)', category: 'T-Bone', price: 1015, stock: 50 },
+            { id: 'INV-T1', title: 'T-Bone Medium (250g-400g)', category: 'T-Bone', price: 715, stock: 50 },
+            { id: 'INV-T2', title: 'T-Bone Large (550g-650g)', category: 'T-Bone', price: 790, stock: 50 },
+            { id: 'INV-T3', title: 'T-Bone Extra Large', category: 'T-Bone', price: 865, stock: 50 },
+            { id: 'INV-T4', title: 'T-Bone XX Large', category: 'T-Bone', price: 940, stock: 50 },
+            { id: 'INV-T5', title: 'Porter House (551g-600g)', category: 'T-Bone', price: 1015, stock: 50 },
             // SIRLOIN STEAK
-            { id: 'INV-S1', title: 'Sirloin Mini (250-300g)', category: 'Sirloin Steak', price: 485, stock: 50 },
-            { id: 'INV-S2', title: 'Sirloin Small (251-350g)', category: 'Sirloin Steak', price: 545, stock: 50 },
-            { id: 'INV-S3', title: 'Sirloin Mid Size (351-450g)', category: 'Sirloin Steak', price: 605, stock: 50 },
-            { id: 'INV-S4', title: 'Sirloin Big Size (401-450g)', category: 'Sirloin Steak', price: 670, stock: 50 },
+            { id: 'INV-S1', title: 'Sirloin Mini (250g-300g)', category: 'Sirloin Steak', price: 485, stock: 50 },
+            { id: 'INV-S2', title: 'Sirloin Small (251g-350g)', category: 'Sirloin Steak', price: 545, stock: 50 },
+            { id: 'INV-S3', title: 'Sirloin Mid Size (351g-450g)', category: 'Sirloin Steak', price: 605, stock: 50 },
+            { id: 'INV-S4', title: 'Sirloin Big Size (401g-450g)', category: 'Sirloin Steak', price: 670, stock: 50 },
             // CHICKEN & FISH
             { id: 'INV-CF1', title: 'Whole Chicken', category: 'Chicken & Fish', price: 660, stock: 50 },
             { id: 'INV-CF2', title: 'Half Chicken', category: 'Chicken & Fish', price: 335, stock: 50 },
@@ -801,20 +837,20 @@
             // SIDE ORDERS
             { id: 'INV-SO1', title: 'Cream of Mushroom Soup', category: 'Side Orders', price: 80, stock: 50 },
             { id: 'INV-SO2', title: 'Cream of Chicken Soup', category: 'Side Orders', price: 80, stock: 50 },
-            { id: 'INV-SO3', title: 'Potato Salad', category: 'Side Orders', price: 155, stock: 50 },
-            { id: 'INV-SO4', title: 'French Fries', category: 'Side Orders', price: 155, stock: 50 },
-            { id: 'INV-SO5', title: 'Mashed Potato', category: 'Side Orders', price: 90, stock: 50 },
-            { id: 'INV-SO6', title: 'Garlic Rice', category: 'Side Orders', price: 55, stock: 50 },
-            { id: 'INV-SO7', title: 'Plain Rice', category: 'Side Orders', price: 40, stock: 50 },
-            { id: 'INV-SO8', title: 'Garlic Bread', category: 'Side Orders', price: 45, stock: 50 },
+            { id: 'INV-SO3', title: 'Mashed Potato', category: 'Side Orders', price: 90, stock: 50 },
+            { id: 'INV-SO4', title: 'Potato Salad', category: 'Side Orders', price: 155, stock: 50 },
+            { id: 'INV-SO5', title: 'French Fries', category: 'Side Orders', price: 155, stock: 50 },
+            { id: 'INV-SO6', title: 'Garlic Bread', category: 'Side Orders', price: 45, stock: 50 },
+            { id: 'INV-SO7', title: 'Garlic Rice', category: 'Side Orders', price: 55, stock: 50 },
+            { id: 'INV-SO8', title: 'Plain Rice', category: 'Side Orders', price: 40, stock: 50 },
             // DRINKS
             { id: 'INV-D1', title: 'Mango Juice', category: 'Drinks', price: 135, stock: 50 },
-            { id: 'INV-D2', title: 'Pineapple Juice', category: 'Drinks', price: 95, stock: 50 },
-            { id: 'INV-D3', title: 'Four Seasons', category: 'Drinks', price: 95, stock: 50 },
-            { id: 'INV-D4', title: 'Iced Tea', category: 'Drinks', price: 85, stock: 50 },
-            { id: 'INV-D5', title: 'Blue Lemonade', category: 'Drinks', price: 95, stock: 50 },
+            { id: 'INV-D2', title: 'Four Seasons', category: 'Drinks', price: 95, stock: 50 },
+            { id: 'INV-D3', title: 'Pineapple Juice', category: 'Drinks', price: 95, stock: 50 },
+            { id: 'INV-D4', title: 'Pine-Orange Juice', category: 'Drinks', price: 90, stock: 50 },
+            { id: 'INV-D5', title: 'Iced Tea', category: 'Drinks', price: 85, stock: 50 },
             { id: 'INV-D6', title: 'Cucumber Juice', category: 'Drinks', price: 90, stock: 50 },
-            { id: 'INV-D7', title: 'Pine-Orange Juice', category: 'Drinks', price: 90, stock: 50 },
+            { id: 'INV-D7', title: 'Blue Lemonade', category: 'Drinks', price: 95, stock: 50 },
             { id: 'INV-D8', title: 'Calamansi Juice (Hot/Cold)', category: 'Drinks', price: 70, stock: 50 },
             { id: 'INV-D9', title: 'Coke in Can', category: 'Drinks', price: 95, stock: 50 },
             { id: 'INV-D10', title: 'Sprite | Royal in Can', category: 'Drinks', price: 95, stock: 50 },
@@ -825,22 +861,22 @@
             { id: 'INV-D15', title: 'Coffee with Cream', category: 'Drinks', price: 55, stock: 50 },
             { id: 'INV-D16', title: 'Bottled Water (500ml)', category: 'Drinks', price: 35, stock: 50 },
             // WINES
-            { id: 'INV-W1', title: 'Carlo Rossi (Red)', category: 'Wines', price: 700, stock: 50 },
-            { id: 'INV-W2', title: 'Carlo Rossi (White)', category: 'Wines', price: 700, stock: 50 },
-            { id: 'INV-W3', title: 'Adega De Pegões', category: 'Wines', price: 600, stock: 50 }
+            { id: 'INV-W1', title: 'Carlo Rossi (Red Wine)', category: 'Wines', price: 700, stock: 50 },
+            { id: 'INV-W2', title: 'Carlo Rossi (White Wine)', category: 'Wines', price: 700, stock: 50 },
+            { id: 'INV-W3', title: 'Adega De Pegoos', category: 'Wines', price: 600, stock: 50 }
         ];
 
         const CATEGORIES = [
-            { key: 'Beef', label: '🥩 Beef Steaks' },
-            { id: 'T-Bone', key: 'T-Bone', label: '🦴 T-Bone' },
-            { key: 'Sirloin Steak', label: '🥩 Sirloin Steak' },
-            { key: 'Chicken & Fish', label: '🍗 Chicken & Fish' },
-            { key: 'Sandwich', label: '🍔 Sandwich' },
-            { key: 'Side Orders', label: '🍟 Side Orders' },
-            { key: 'Drinks', label: '🍹 Drinks' },
-            { key: 'Wines', label: '🍷 Wines' },
-            { key: 'Supplies', label: '🧺 Supplies' },
-            { key: 'Others', label: '📦 Others' }
+            { key: 'Beef', label: 'Beef Steaks' },
+            { id: 'T-Bone', key: 'T-Bone', label: 'T-Bone' },
+            { key: 'Sirloin Steak', label: 'Sirloin Steak' },
+            { key: 'Chicken & Fish', label: 'Chicken & Fish' },
+            { key: 'Sandwich', label: 'Sandwich' },
+            { key: 'Side Orders', label: 'Side Orders' },
+            { key: 'Drinks', label: 'Drinks' },
+            { key: 'Wines', label: 'Wines' },
+            { key: 'Supplies', label: 'Supplies' },
+            { key: 'Others', label: 'Others' }
         ];
 
         function getInventory() {
@@ -957,8 +993,125 @@
             return `plain:${str}`;
         }
 
+        function parseRecordDate(r) {
+            if (!r) return new Date();
+            const raw = r.completedAt || r.arrivalDate || r.createdAt || r.date;
+            if (!raw) return new Date();
+            let d = new Date(raw);
+            if (!isNaN(d.getTime())) return d;
+            const parts = String(raw).match(/(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+            if (parts) return new Date(parts[1], parts[2] - 1, parts[3]);
+            return new Date();
+        }
+
+        function seedSampleReservationHistoryIfEmpty() {
+            let hist = [];
+            try {
+                hist = safeJsonParse(localStorage.getItem('reservationHistory'), []) || [];
+            } catch(e) {}
+            
+            if (Array.isArray(hist) && hist.length > 0) return hist;
+
+            const now = new Date();
+            const todayStr = now.toISOString().slice(0, 10);
+            const yesterday = new Date(now); yesterday.setDate(now.getDate() - 1);
+            const threeDaysAgo = new Date(now); threeDaysAgo.setDate(now.getDate() - 3);
+            const tenDaysAgo = new Date(now); tenDaysAgo.setDate(now.getDate() - 10);
+
+            hist = [
+                {
+                    reservationNumber: 'RES-2026-1001',
+                    reservationType: 'priority',
+                    bookedBy: 'online',
+                    customerName: 'Juan Dela Cruz',
+                    bookedTable: 'Table 4 (Garden)',
+                    arrivalDate: todayStr,
+                    arrivalTime: '19:00',
+                    arrivalDateTimeDisplay: `${todayStr} 07:00 PM`,
+                    foods: ['2x Fillet Mignon (250g)', '1x Mushroom Soup', '2x Coke Can'],
+                    paymentAmount: 2450.00,
+                    paymentMethod: 'GCash Online',
+                    paymentStatus: 'paid',
+                    completedAt: now.toISOString()
+                },
+                {
+                    reservationNumber: 'POS-2026-8802',
+                    reservationType: 'standard',
+                    bookedBy: 'staff',
+                    customerName: 'Walk-in Guest (Table 2)',
+                    bookedTable: 'Table 2',
+                    arrivalDate: todayStr,
+                    arrivalTime: '12:30',
+                    arrivalDateTimeDisplay: `${todayStr} 12:30 PM`,
+                    foods: ['1x T-Bone Steak 450g', '1x Garlic Rice', '1x San Mig Light'],
+                    paymentAmount: 1850.00,
+                    paymentMethod: 'Cash',
+                    paymentStatus: 'paid',
+                    completedAt: new Date(now.getTime() - 3600000).toISOString()
+                },
+                {
+                    reservationNumber: 'RES-2026-1003',
+                    reservationType: 'priority',
+                    bookedBy: 'online',
+                    customerName: 'Maria Santos',
+                    bookedTable: 'VIP Booth 1',
+                    arrivalDate: yesterday.toISOString().slice(0, 10),
+                    arrivalTime: '20:00',
+                    arrivalDateTimeDisplay: `${yesterday.toISOString().slice(0, 10)} 08:00 PM`,
+                    foods: ['2x Ribeye Steak Cut', '1x Carlo Rossi Red Wine Bottle'],
+                    paymentAmount: 3900.00,
+                    paymentMethod: 'Credit Card',
+                    paymentStatus: 'paid',
+                    completedAt: yesterday.toISOString()
+                },
+                {
+                    reservationNumber: 'POS-2026-8804',
+                    reservationType: 'standard',
+                    bookedBy: 'staff',
+                    customerName: 'Walk-in Guest (Table 8)',
+                    bookedTable: 'Table 8',
+                    arrivalDate: threeDaysAgo.toISOString().slice(0, 10),
+                    arrivalTime: '13:00',
+                    arrivalDateTimeDisplay: `${threeDaysAgo.toISOString().slice(0, 10)} 01:00 PM`,
+                    foods: ['3x Roland Burger Special', '3x French Fries', '3x Iced Tea'],
+                    paymentAmount: 1470.00,
+                    paymentMethod: 'Cash',
+                    paymentStatus: 'paid',
+                    completedAt: threeDaysAgo.toISOString()
+                },
+                {
+                    reservationNumber: 'RES-2026-0995',
+                    reservationType: 'standard',
+                    bookedBy: 'online',
+                    customerName: 'Alexander Hamilton',
+                    bookedTable: 'Table 5',
+                    arrivalDate: tenDaysAgo.toISOString().slice(0, 10),
+                    arrivalTime: '18:30',
+                    arrivalDateTimeDisplay: `${tenDaysAgo.toISOString().slice(0, 10)} 06:30 PM`,
+                    foods: ['1x Sirloin Steak 400g', '1x Garlic Bread Slices'],
+                    paymentAmount: 1250.00,
+                    paymentMethod: 'Maya Online',
+                    paymentStatus: 'paid',
+                    completedAt: tenDaysAgo.toISOString()
+                }
+            ];
+
+            try {
+                localStorage.setItem('reservationHistory', JSON.stringify(hist));
+            } catch(e) {}
+            return hist;
+        }
+
         function getReservationHistory() {
-            return safeJsonParse(localStorage.getItem('reservationHistory'), []) || [];
+            let hist = safeJsonParse(localStorage.getItem('reservationHistory'), []) || [];
+            if (!Array.isArray(hist) || hist.length === 0) {
+                hist = seedSampleReservationHistoryIfEmpty();
+            }
+            return hist.sort((a, b) => {
+                const ta = parseRecordDate(a).getTime();
+                const tb = parseRecordDate(b).getTime();
+                return tb - ta;
+            });
         }
 
         function setAdminSession(username) {
@@ -1012,7 +1165,7 @@
                 } else {
                     text = foods.join(', ');
                 }
-                if (r.beefNote) text += ` | 🥩 ${r.beefNote}`;
+                if (r.beefNote) text += ` | ${r.beefNote}`;
                 return text;
             }
 
@@ -1075,7 +1228,16 @@
                     tdArrival.textContent = formatArrival(r);
 
                     const tdCustomer = document.createElement('td');
-                    tdCustomer.textContent = r.customerName || '';
+                    const isCustCancelled = (r.approvalStatus === 'rejected' || r.approvalStatus === 'cancelled') && r.cancelledBy === 'customer';
+                    tdCustomer.innerHTML = `
+                        <div style="font-weight:700; color:#1e293b;">${r.customerName || ''}</div>
+                        ${isCustCancelled ? `
+                            <div style="margin-top:3px;">
+                                <span style="font-size:10px; background:#fee2e2; color:#991b1b; font-weight:800; padding:2px 6px; border-radius:4px; display:inline-block;">🚫 SELF-CANCELLED</span>
+                                ${r.cancellationReason ? `<div style="font-size:10.5px; color:#64748b; font-style:italic; margin-top:2px;">"${r.cancellationReason}"</div>` : ''}
+                            </div>
+                        ` : ''}
+                    `;
 
                     const tdTable = document.createElement('td');
                     tdTable.textContent = r.bookedTable || '';
@@ -1093,16 +1255,16 @@
                         kdsBadge.style.cssText = "font-size:10px; font-weight:800; padding:3px 6px; border-radius:4px; display:inline-block; margin-top:6px;";
                         if (r.kdsStatus === 'cooking') {
                             kdsBadge.style.color = '#c2410c'; kdsBadge.style.background = '#ffedd5';
-                            kdsBadge.textContent = '👨‍🍳 COOKING';
+                            kdsBadge.textContent = 'COOKING';
                         } else if (r.kdsStatus === 'ready') {
                             kdsBadge.style.color = '#15803d'; kdsBadge.style.background = '#dcfce7';
-                            kdsBadge.textContent = '✅ MARKED AS COOKED';
+                            kdsBadge.textContent = 'MARKED AS COOKED';
                         } else if (r.kdsStatus === 'served') {
                             kdsBadge.style.color = '#4338ca'; kdsBadge.style.background = '#e0e7ff';
-                            kdsBadge.textContent = '🍽️ DONE / SERVED';
+                            kdsBadge.textContent = 'DONE / SERVED';
                         } else if (r.kdsStatus === 'cancelled') {
                             kdsBadge.style.color = '#991b1b'; kdsBadge.style.background = '#fee2e2';
-                            kdsBadge.textContent = '🚫 CANCELLED';
+                            kdsBadge.textContent = 'CANCELLED';
                         }
                         if (kdsBadge.textContent) tdFoods.appendChild(kdsBadge);
                     }
@@ -1110,24 +1272,24 @@
                     const tdPaid = document.createElement('td');
                     let methodBadge = '';
                     if (r.paymentMethod === 'paymongo') {
-                        methodBadge = '<div style="font-size:10px; color:#166534; font-weight:800; background:#dcfce7; padding:2px 6px; border-radius:4px; display:inline-block; margin-top:4px;">💳 PAYMONGO</div>';
+                        methodBadge = '<div style="font-size:10px; color:#166534; font-weight:800; background:#dcfce7; padding:2px 6px; border-radius:4px; display:inline-block; margin-top:4px;">PAYMONGO</div>';
                     } else if (r.paymentMethod === 'manual') {
-                        methodBadge = '<div style="font-size:10px; color:#9a3412; font-weight:800; background:#ffedd5; padding:2px 6px; border-radius:4px; display:inline-block; margin-top:4px;">🏦 MANUAL</div>';
+                        methodBadge = '<div style="font-size:10px; color:#9a3412; font-weight:800; background:#ffedd5; padding:2px 6px; border-radius:4px; display:inline-block; margin-top:4px;">MANUAL</div>';
                     } else {
-                        methodBadge = '<div style="font-size:10px; color:#475569; font-weight:800; background:#f1f5f9; padding:2px 6px; border-radius:4px; display:inline-block; margin-top:4px;">💵 WALK-IN / COD</div>';
+                        methodBadge = '<div style="font-size:10px; color:#475569; font-weight:800; background:#f1f5f9; padding:2px 6px; border-radius:4px; display:inline-block; margin-top:4px;">WALK-IN / COD</div>';
                     }
 
                     let statusBadge = '';
                     const s = (r.paymentStatus || '').toLowerCase();
 
                     if (s === 'paid' || s === 'verified') {
-                        statusBadge = `<div style="font-size:10px; color:#15803d; font-weight:800; display:block; margin-top:2px;">✅ ${s === 'verified' ? 'VERIFIED' : 'PAID'}</div>`;
+                        statusBadge = `<div style="font-size:10px; color:#15803d; font-weight:800; display:block; margin-top:2px;">${s === 'verified' ? 'VERIFIED' : 'PAID'}</div>`;
                     } else if (s === 'pending_paymongo' || s === 'rejected') {
-                        statusBadge = `<div style="font-size:10px; color:#dc2626; font-weight:800; display:block; margin-top:2px;">❌ ${s === 'rejected' ? 'REJECTED' : 'UNPAID/FAILED'}</div>`;
+                        statusBadge = `<div style="font-size:10px; color:#dc2626; font-weight:800; display:block; margin-top:2px;">${s === 'rejected' ? 'REJECTED' : 'UNPAID/FAILED'}</div>`;
                     } else if (s === 'pending') {
-                        statusBadge = '<div style="font-size:10px; color:#b45309; font-weight:800; display:block; margin-top:2px;">⏳ PENDING CHECK</div>';
+                        statusBadge = '<div style="font-size:10px; color:#b45309; font-weight:800; display:block; margin-top:2px;">PENDING CHECK</div>';
                     } else if (s === 'walk-in') {
-                        statusBadge = '<div style="font-size:10px; color:#1b5e20; font-weight:800; display:block; margin-top:2px;">🤝 WALK-IN PAID</div>';
+                        statusBadge = '<div style="font-size:10px; color:#1b5e20; font-weight:800; display:block; margin-top:2px;">WALK-IN PAID</div>';
                     } else {
                         statusBadge = '<div style="font-size:10px; color:#64748b; font-weight:800; display:block; margin-top:2px;">— NONE / COD —</div>';
                     }
@@ -1135,7 +1297,7 @@
                     let discountBadge = '';
                     if (r.discountType && r.discountType !== 'none') {
                         const typeText = r.discountType === 'pwd' ? 'PWD' : 'SENIOR';
-                        discountBadge = `<div style="font-size:10px; color:#c2410c; font-weight:800; background:#ffedd5; padding:2px 6px; border-radius:4px; display:inline-block; margin-top:4px;">🏷️ ${typeText} DISC (-₱${Number(r.discountAmount || 0).toLocaleString()})</div>`;
+                        discountBadge = `<div style="font-size:10px; color:#c2410c; font-weight:800; background:#ffedd5; padding:2px 6px; border-radius:4px; display:inline-block; margin-top:4px;">${typeText} DISC (-₱${Number(r.discountAmount || 0).toLocaleString()})</div>`;
                     }
 
                     tdPaid.innerHTML = `<div style="font-weight:800; color:#1e293b; font-size:14px;">₱${Number(r.paymentAmount || 0).toLocaleString()}</div>${methodBadge}${statusBadge}${discountBadge}`;
@@ -1148,17 +1310,18 @@
                         tdPaid.appendChild(proofBtn);
                     }
 
+                    const resKey = r.reservationNumber || r.id || r.resNumber || '';
                     const tdActions = document.createElement('td');
                     let approvalBtns = '';
                     const aStatus = r.approvalStatus || 'pending';
                     if (aStatus === 'pending') {
                         approvalBtns = `
-                            <button type="button" style="background:#16a34a; color:white; padding: 6px 10px; font-size: 12px; border:none; border-radius:4px; margin-top:4px; width:100%; cursor:pointer; font-weight:bold;" onclick="window.approveReservation('${r.reservationNumber}')">Approve</button>
-                            <button type="button" style="background:#ef4444; color:white; padding: 6px 10px; font-size: 12px; border:none; border-radius:4px; margin-top:4px; width:100%; cursor:pointer; font-weight:bold;" onclick="window.rejectReservation('${r.reservationNumber}')">Reject</button>
+                            <button type="button" style="background:#16a34a; color:white; padding: 6px 10px; font-size: 12px; border:none; border-radius:4px; margin-top:4px; width:100%; cursor:pointer; font-weight:bold; position:relative; z-index:2;" onclick="event.stopPropagation(); window.approveReservation('${resKey}')">Approve</button>
+                            <button type="button" style="background:#ef4444; color:white; padding: 6px 10px; font-size: 12px; border:none; border-radius:4px; margin-top:4px; width:100%; cursor:pointer; font-weight:bold; position:relative; z-index:2;" onclick="event.stopPropagation(); window.rejectReservation('${resKey}')">Reject</button>
                         `;
                     } else if (aStatus === 'approved') {
                         approvalBtns = `
-                            <button type="button" style="background:#f59e0b; color:white; padding: 6px 10px; font-size: 12px; border:none; border-radius:4px; margin-top:4px; width:100%; cursor:pointer; font-weight:bold;" onclick="window.markSeated('${r.reservationNumber}')">Mark Seated</button>
+                            <button type="button" style="background:#f59e0b; color:white; padding: 6px 10px; font-size: 12px; border:none; border-radius:4px; margin-top:4px; width:100%; cursor:pointer; font-weight:bold; position:relative; z-index:2;" onclick="event.stopPropagation(); window.markSeated('${resKey}')">Mark Seated</button>
                         `;
                     } else if (aStatus === 'seated') {
                         approvalBtns = `<div style="font-size:11px; color:#1b5e20; font-weight:bold; margin-top:4px; text-align:center;">Seated</div>`;
@@ -1168,8 +1331,8 @@
 
                     tdActions.innerHTML = `
                         <div style="display:flex; gap:4px; margin-bottom:4px;">
-                            <button type="button" class="secondary" style="flex:1; padding: 6px; font-size: 11px;" onclick="window.openEdit('${r.reservationNumber}')">Edit</button>
-                            <button type="button" class="danger" style="flex:1; padding: 6px; font-size: 11px;" onclick="window.deleteItem('${r.reservationNumber}')">Del</button>
+                            <button type="button" class="secondary" style="flex:1; padding: 6px; font-size: 11px;" onclick="event.stopPropagation(); window.openEdit('${resKey}')">Edit</button>
+                            <button type="button" class="danger" style="flex:1; padding: 6px; font-size: 11px;" onclick="event.stopPropagation(); window.deleteItem('${resKey}')">Del</button>
                         </div>
                         ${approvalBtns}
                     `;
@@ -1186,19 +1349,19 @@
                 });
             }
 
-            // Expose Edit Functions to Global Scope so buttons can call them
+            // Global Action Handlers
             window.openEdit = function (resObjNum) {
                 const hist = getReservationHistory();
-                const idx = hist.findIndex(h => h.reservationNumber === resObjNum);
+                const idx = hist.findIndex(h => (h.reservationNumber === resObjNum || h.id === resObjNum || String(h.id) === String(resObjNum)));
                 if (idx === -1) return;
                 const r = hist[idx];
 
                 document.getElementById('edit-index').value = idx;
+                document.getElementById('edit-res-num').value = r.reservationNumber || r.id || '';
                 document.getElementById('edit-customer').value = r.customerName || '';
                 document.getElementById('edit-date').value = r.arrivalDate || '';
                 document.getElementById('edit-time').value = r.arrivalTime || '';
 
-                // Extract table number simply if it's full string like 'Table 1'
                 const tSelect = document.getElementById('edit-table');
                 if (r.bookedTable) {
                     for (let i = 0; i < tSelect.options.length; i++) {
@@ -1218,81 +1381,157 @@
                     document.getElementById('edit-beef').value = '';
                 }
 
-                document.getElementById('edit-modal').classList.remove('hidden');
+                const modal = document.getElementById('edit-modal');
+                if (modal) {
+                    modal.classList.remove('hidden');
+                    modal.style.display = 'flex';
+                }
             };
 
             window.closeEditModal = function () {
-                document.getElementById('edit-modal').classList.add('hidden');
+                const modal = document.getElementById('edit-modal');
+                if (modal) {
+                    modal.classList.add('hidden');
+                    modal.style.display = 'none';
+                }
+            };
+
+            window.deleteItem = async function (resNum) {
+                const confirmed = await superModal({
+                    title: 'Delete Reservation?',
+                    message: `Are you sure you want to permanently delete reservation <b>${resNum}</b>?`,
+                    type: 'confirm'
+                });
+                if (!confirmed) return;
+
+                let hist = getReservationHistory();
+                hist = hist.filter(h => (h.reservationNumber !== resNum && h.id !== resNum && String(h.id) !== String(resNum)));
+                localStorage.setItem('reservationHistory', JSON.stringify(hist));
+
+                if (window.showToast) {
+                    window.showToast(`Reservation ${resNum} deleted`, 'info', 3000);
+                }
+                renderDashboard();
+                if (typeof renderFloorPlan === 'function') renderFloorPlan();
             };
 
             window.approveReservation = async function (resNum) {
                 const hist = getReservationHistory();
-                const idx = hist.findIndex(h => h.reservationNumber === resNum);
-                if (idx === -1) return;
+                const idx = hist.findIndex(h => (h.reservationNumber === resNum || h.id === resNum || String(h.id) === String(resNum) || h.resNumber === resNum));
+                if (idx === -1) {
+                    console.warn("Reservation not found for approval:", resNum);
+                    return;
+                }
                 const r = hist[idx];
 
-                // 1. Validation for stock
-                const inv = getInventory();
+                // 1. Stock Validation
+                const inv = typeof getInventory === 'function' ? getInventory() : [];
                 let stockOut = false;
-                if (r.foods && r.foods.length > 0) {
-                    for (const f of r.foods) {
-                        const item = inv.find(i => i.title === f || i.name === f);
-                        if (item && item.stock <= 0) {
-                            stockOut = true;
-                            break;
+                let stockOutName = '';
+                if (r.foods && Array.isArray(r.foods) && r.foods.length > 0 && inv.length > 0) {
+                    for (let f of r.foods) {
+                        const cleanName = String(f).replace(/^\d+x\s*/i, '').split('|')[0].trim().toLowerCase();
+                        const item = inv.find(i => {
+                            const name = (i.title || i.name || '').toLowerCase();
+                            return name && (cleanName.includes(name) || name.includes(cleanName));
+                        });
+                        if (item) {
+                            const val = item.stock_val !== undefined ? item.stock_val : (item.total_stock !== undefined ? item.total_stock : 100);
+                            if (val <= 0) {
+                                stockOut = true;
+                                stockOutName = item.title || item.name;
+                                break;
+                            }
                         }
                     }
                 }
 
                 if (stockOut) {
-                    if (typeof superModal === 'function') {
-                        superModal({ title: 'Stock Validation Failed ❌', message: 'Cannot approve this reservation because one or more pre-ordered items have dropped to zero stock since the time of booking.' });
-                    } else {
-                        alert('Cannot approve this reservation because one or more pre-ordered items have dropped to zero stock since the time of booking.');
-                    }
+                    const msg = `Cannot approve: '${stockOutName}' is out of stock.`;
+                    if (window.showToast) window.showToast(`⚠️ ${msg}`, 'error', 4500);
+                    else alert(msg);
                     return;
                 }
 
-                // 2. AJAX Fetch to /api/reservations/update-status
+                // 2. Sync approval to Supabase / Backend API
                 try {
-                    await fetch('/api/reservations/update-status', {
+                    fetch('/api/reservations/update-status', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ id: r.reservationNumber, status: 'approved' })
-                    });
-                } catch (e) {
-                    console.error('Failed to sync approval state to Supabase', e);
-                }
+                        body: JSON.stringify({ id: r.reservationNumber || r.id || resNum, status: 'approved' })
+                    }).catch(err => console.warn('Sync notice:', err));
+                } catch (e) { }
 
                 // 3. Update local state
                 r.approvalStatus = 'approved';
                 localStorage.setItem('reservationHistory', JSON.stringify(hist));
+
+                if (window.showToast) {
+                    window.showToast(`Reservation ${resNum} Approved!`, 'success', 3500);
+                }
+
                 renderDashboard();
                 if (typeof renderFloorPlan === 'function') renderFloorPlan();
             };
 
             window.rejectReservation = async function (resNum) {
+                const confirmed = confirm(`Cancel / Reject Reservation #${resNum}?\n\nThis will release the booked table and automatically return raw food ingredients to inventory.`);
+                if (!confirmed) return;
+
+                if (window.InventorySystem && typeof window.InventorySystem.cancelReservationWithFood === 'function') {
+                    window.InventorySystem.cancelReservationWithFood({
+                        reservationNumber: resNum,
+                        reason: 'Rejected by Admin',
+                        cancelledBy: 'admin',
+                        operator: 'Admin Staff'
+                    });
+                    if (window.showToast) {
+                        window.showToast(`Reservation ${resNum} Rejected & Inventory Restored`, 'info', 3500);
+                    }
+                    renderDashboard();
+                    if (typeof renderFloorPlan === 'function') renderFloorPlan();
+                    return;
+                }
+
                 const hist = getReservationHistory();
-                const idx = hist.findIndex(h => h.reservationNumber === resNum);
-                if (idx === -1) return;
+                const idx = hist.findIndex(h => (h.reservationNumber === resNum || h.id === resNum || String(h.id) === String(resNum) || h.resNumber === resNum));
+                if (idx === -1) {
+                    console.warn("Reservation not found for rejection:", resNum);
+                    return;
+                }
                 const r = hist[idx];
 
                 try {
-                    await fetch('/api/reservations/update-status', {
+                    fetch('/api/reservations/update-status', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ id: r.reservationNumber, status: 'rejected' })
-                    });
+                        body: JSON.stringify({ id: r.reservationNumber || r.id || resNum, status: 'rejected' })
+                    }).catch(err => console.warn('Sync notice:', err));
                 } catch (e) { }
 
                 r.approvalStatus = 'rejected';
+                r.kdsStatus = 'cancelled';
                 localStorage.setItem('reservationHistory', JSON.stringify(hist));
+
+                // Restore raw ingredient stock if order items exist
+                if (r && window.InventorySystem) {
+                    const itemsToRefund = r.cartItems || r.foods || r.preOrders || r.orderSummary;
+                    if (Array.isArray(itemsToRefund) && itemsToRefund.length > 0) {
+                        window.InventorySystem.restoreIngredientsForOrder(itemsToRefund, `Reservation Rejected #${resNum}`, 'Admin');
+                    }
+                }
 
                 // Release table
                 if (r.bookedTable) {
-                    const overrides = safeJsonParse(localStorage.getItem('tableOverrides'), {});
-                    overrides[r.bookedTable] = 'available';
-                    localStorage.setItem('tableOverrides', JSON.stringify(overrides));
+                    try {
+                        const overrides = JSON.parse(localStorage.getItem('tableOverrides') || '{}');
+                        overrides[r.bookedTable] = 'available';
+                        localStorage.setItem('tableOverrides', JSON.stringify(overrides));
+                    } catch(e) {}
+                }
+
+                if (window.showToast) {
+                    window.showToast(`Reservation ${resNum} Rejected`, 'info', 3500);
                 }
 
                 renderDashboard();
@@ -1301,20 +1540,24 @@
 
             window.markSeated = async function (resNum) {
                 const hist = getReservationHistory();
-                const idx = hist.findIndex(h => h.reservationNumber === resNum);
+                const idx = hist.findIndex(h => (h.reservationNumber === resNum || h.id === resNum || String(h.id) === String(resNum) || h.resNumber === resNum));
                 if (idx === -1) return;
                 const r = hist[idx];
 
                 try {
-                    await fetch('/api/reservations/update-status', {
+                    fetch('/api/reservations/update-status', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ id: r.reservationNumber, status: 'seated' })
-                    });
+                        body: JSON.stringify({ id: r.reservationNumber || r.id || resNum, status: 'seated' })
+                    }).catch(err => console.warn('Sync notice:', err));
                 } catch (e) { }
 
                 r.approvalStatus = 'seated';
                 localStorage.setItem('reservationHistory', JSON.stringify(hist));
+
+                if (window.showToast) {
+                    window.showToast(`Reservation ${resNum} Marked Seated!`, 'success', 3500);
+                }
 
                 if (r.bookedTable) {
                     const overrides = safeJsonParse(localStorage.getItem('tableOverrides'), {});
@@ -1376,8 +1619,15 @@
             };
 
             window.saveEditModal = function () {
-                const idx = parseInt(document.getElementById('edit-index').value);
+                const resNum = document.getElementById('edit-res-num').value;
+                const idxInput = parseInt(document.getElementById('edit-index').value);
                 const hist = getReservationHistory();
+
+                let idx = hist.findIndex(h => h.reservationNumber === resNum);
+                if (idx === -1 && idxInput >= 0 && idxInput < hist.length) {
+                    idx = idxInput;
+                }
+
                 if (idx >= 0 && idx < hist.length) {
                     hist[idx].customerName = document.getElementById('edit-customer').value;
                     hist[idx].arrivalDate = document.getElementById('edit-date').value;
@@ -1399,7 +1649,9 @@
                     });
 
                     localStorage.setItem('reservationHistory', JSON.stringify(hist));
-                    // re-render UI
+                    if (window.showToast) {
+                        window.showToast('✅ Reservation details updated successfully!', 'success', 3000);
+                    }
                     renderDashboard(); // Re-render the whole dashboard state!
                 }
                 window.closeEditModal();
@@ -1792,34 +2044,82 @@
                     noResEl.style.display = 'none';
                     tableRes.forEach((res, i) => {
                         const resIdx = hist.indexOf(res);
+                        const isCompleted = Boolean(res.completedAt);
+                        const isSeated = res.approvalStatus === 'seated';
+                        const isCancelled = res.approvalStatus === 'rejected';
+
+                        let statusBadgeBg = '#e0f2fe';
+                        let statusBadgeColor = '#0369a1';
+                        let statusBadgeText = (res.approvalStatus || 'CONFIRMED').toUpperCase();
+
+                        if (isCompleted) {
+                            statusBadgeBg = '#dcfce7';
+                            statusBadgeColor = '#15803d';
+                            statusBadgeText = 'COMPLETED';
+                        } else if (isSeated) {
+                            statusBadgeBg = '#bae6fd';
+                            statusBadgeColor = '#0284c7';
+                            statusBadgeText = 'SEATED';
+                        } else if (isCancelled) {
+                            statusBadgeBg = '#fee2e2';
+                            statusBadgeColor = '#b91c1c';
+                            statusBadgeText = 'CANCELLED';
+                        }
+
                         const card = document.createElement('div');
                         card.className = 'toast-res-card';
+                        card.style.cssText = `background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.03); ${isCompleted || isCancelled ? 'opacity: 0.75;' : ''}`;
+
                         card.innerHTML = `
                             <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:12px; align-items:center;">
                                 <div>
                                     <strong style="font-size:16px; color:#1e293b;">${res.reservationNumber || 'RES'}</strong>
-                                    <span style="margin-left:8px; font-size:14px; font-weight:500; color:#475569;">${res.customerName || 'Guest'}</span>
+                                    <span style="margin-left:8px; font-size:14px; font-weight:600; color:#334155;">${res.customerName || 'Guest'}</span>
                                 </div>
-                                <span style="background:${res.reservationType === 'priority' ? '#fef08a' : '#e0f2fe'}; color:${res.reservationType === 'priority' ? '#854d0e' : '#0369a1'}; font-size:11px; font-weight:800; padding:4px 10px; border-radius:12px; text-transform:uppercase; letter-spacing:0.5px;">
-                                    ${res.reservationType || 'standard'}
-                                </span>
+                                <div style="display:flex; gap:6px; align-items:center;">
+                                    <span style="background:${statusBadgeBg}; color:${statusBadgeColor}; font-size:11px; font-weight:800; padding:4px 10px; border-radius:12px; text-transform:uppercase; letter-spacing:0.5px;">
+                                        ${statusBadgeText}
+                                    </span>
+                                    <span style="background:${res.reservationType === 'priority' ? '#fef08a' : '#f1f5f9'}; color:${res.reservationType === 'priority' ? '#854d0e' : '#475569'}; font-size:11px; font-weight:800; padding:4px 10px; border-radius:12px; text-transform:uppercase; letter-spacing:0.5px;">
+                                        ${res.reservationType || 'standard'}
+                                    </span>
+                                </div>
                             </div>
                             
-                            <div style="background: white; border-radius: 8px; padding: 12px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 8px;">
+                            <div style="background: #f8fafc; border-radius: 8px; padding: 12px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 8px;">
                                 <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; display: flex; align-items: center; gap: 6px;">
                                     <span>🗓️ ARRIVAL SCHEDULE</span>
                                 </div>
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                                     <div>
                                         <label style="display: block; font-size: 11px; color: #94a3b8; margin-bottom: 4px; font-weight: 600;">Date</label>
-                                        <input type="date" id="toast-date-${resIdx}" value="${res.arrivalDate || ''}" onchange="saveFloorToastEdit(${resIdx})" style="width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 13px; color: #334155; transition: 0.2s; background: #f8fafc;" onfocus="this.style.borderColor='#2e7d32'; this.style.background='white';" onblur="this.style.borderColor='#cbd5e1'; this.style.background='#f8fafc';">
+                                        <input type="date" id="toast-date-${resIdx}" value="${res.arrivalDate || ''}" onchange="saveFloorToastEdit(${resIdx})" style="width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 13px; color: #334155; transition: 0.2s; background: white;" onfocus="this.style.borderColor='#2e7d32';" onblur="this.style.borderColor='#cbd5e1';">
                                     </div>
                                     <div>
                                         <label style="display: block; font-size: 11px; color: #94a3b8; margin-bottom: 4px; font-weight: 600;">Time</label>
-                                        <input type="time" id="toast-time-${resIdx}" value="${res.arrivalTime || ''}" min="10:30" max="21:00" onchange="saveFloorToastEdit(${resIdx})" style="width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 13px; color: #334155; transition: 0.2s; background: #f8fafc;" onfocus="this.style.borderColor='#2e7d32'; this.style.background='white';" onblur="this.style.borderColor='#cbd5e1'; this.style.background='#f8fafc';">
+                                        <input type="time" id="toast-time-${resIdx}" value="${res.arrivalTime || ''}" min="10:30" max="21:00" onchange="saveFloorToastEdit(${resIdx})" style="width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 13px; color: #334155; transition: 0.2s; background: white;" onfocus="this.style.borderColor='#2e7d32';" onblur="this.style.borderColor='#cbd5e1';">
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Direct Reservation Operating Controls -->
+                            ${!isCompleted && !isCancelled ? `
+                            <div style="margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
+                                <button type="button" onclick="updateSingleReservationStatus(${resIdx}, 'seated', '${tId}')" style="flex:1; background:#0284c7; color:white; border:none; padding:8px 12px; border-radius:6px; font-weight:700; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:4px; box-shadow:0 2px 4px rgba(2,132,199,0.2);">
+                                    🪑 Seat Guest
+                                </button>
+                                <button type="button" onclick="updateSingleReservationStatus(${resIdx}, 'completed', '${tId}')" style="flex:1; background:#16a34a; color:white; border:none; padding:8px 12px; border-radius:6px; font-weight:700; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:4px; box-shadow:0 2px 4px rgba(22,163,74,0.2);">
+                                    ✅ Done / Complete
+                                </button>
+                                <button type="button" onclick="updateSingleReservationStatus(${resIdx}, 'rejected', '${tId}')" style="background:#fee2e2; color:#b91c1c; border:1px solid #fca5a5; padding:8px 12px; border-radius:6px; font-weight:700; font-size:12px; cursor:pointer;">
+                                    ❌ Cancel
+                                </button>
+                            </div>
+                            ` : `
+                            <div style="margin-top: 8px; font-size: 12px; color: #64748b; font-style: italic; text-align: right;">
+                                Reservation ${isCompleted ? 'Completed ✅' : 'Cancelled ❌'}
+                            </div>
+                            `}
                         `;
                         listEl.appendChild(card);
                     });
@@ -1835,29 +2135,43 @@
                 btnRow.style.gap = '10px';
                 btnRow.style.marginTop = '20px';
 
+                const doneBtn = document.createElement('button');
+                doneBtn.innerHTML = '✅ Done Eating (Set Available)';
+                doneBtn.style.cssText = 'flex:1; background:#16a34a; color:white; border:none; padding:12px; border-radius:8px; cursor:pointer; font-weight:700; font-size:13px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);';
+                doneBtn.onclick = () => window.markTableAvailableAndDone(tId);
+
                 const cycleBtn = document.createElement('button');
                 cycleBtn.innerHTML = `Set Status: <span style="font-weight: 800; color: #1e293b;">${nextStatus.toUpperCase()}</span>`;
-                cycleBtn.style.cssText = 'flex:1; background:white; border:2px solid #cbd5e1; color:#475569; padding:12px; border-radius:8px; cursor:pointer; font-size:14px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); transition: 0.2s;';
+                cycleBtn.style.cssText = 'flex:1; background:white; border:2px solid #cbd5e1; color:#475569; padding:12px; border-radius:8px; cursor:pointer; font-size:13px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); transition: 0.2s;';
                 cycleBtn.onmouseover = () => cycleBtn.style.borderColor = '#94a3b8';
                 cycleBtn.onmouseout = () => cycleBtn.style.borderColor = '#cbd5e1';
                 cycleBtn.onclick = () => {
-                    overrides[tId] = nextStatus;
-                    localStorage.setItem('tableOverrides', JSON.stringify(overrides));
-                    renderFloorPlan();
-                    toast.style.display = 'none';
+                    if (nextStatus === 'available') {
+                        window.markTableAvailableAndDone(tId);
+                    } else {
+                        overrides[tId] = nextStatus;
+                        localStorage.setItem('tableOverrides', JSON.stringify(overrides));
+                        renderFloorPlan();
+                        toast.style.display = 'none';
+                    }
                 };
 
                 const overrideBtn = document.createElement('button');
                 const isUnavailable = currentStatus === 'unavailable';
                 overrideBtn.innerHTML = isUnavailable ? '🔓 Make Available' : '🔒 Mark Unavailable';
-                overrideBtn.style.cssText = `flex:1; background:${isUnavailable ? '#16a34a' : '#ef4444'}; color:white; border:none; padding:12px; border-radius:8px; cursor:pointer; font-weight:700; font-size:14px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);`;
+                overrideBtn.style.cssText = `flex:1; background:${isUnavailable ? '#16a34a' : '#ef4444'}; color:white; border:none; padding:12px; border-radius:8px; cursor:pointer; font-weight:700; font-size:13px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);`;
                 overrideBtn.onclick = () => {
-                    overrides[tId] = isUnavailable ? 'available' : 'unavailable';
-                    localStorage.setItem('tableOverrides', JSON.stringify(overrides));
-                    renderFloorPlan();
-                    toast.style.display = 'none';
+                    if (isUnavailable) {
+                        window.markTableAvailableAndDone(tId);
+                    } else {
+                        overrides[tId] = 'unavailable';
+                        localStorage.setItem('tableOverrides', JSON.stringify(overrides));
+                        renderFloorPlan();
+                        toast.style.display = 'none';
+                    }
                 };
 
+                btnRow.appendChild(doneBtn);
                 btnRow.appendChild(cycleBtn);
                 btnRow.appendChild(overrideBtn);
                 footerEl.appendChild(btnRow);
@@ -1893,6 +2207,164 @@
                     renderDashboard();
                 }
             };
+
+            window.updateSingleReservationStatus = function (idx, newStatus, tId) {
+                const hist = getReservationHistory();
+                if (idx >= 0 && idx < hist.length) {
+                    const targetRes = hist[idx];
+                    if (newStatus === 'completed') {
+                        targetRes.completedAt = new Date().toISOString();
+                        targetRes.approvalStatus = 'completed';
+                    } else if (newStatus === 'seated') {
+                        targetRes.approvalStatus = 'seated';
+                        targetRes.seatedAt = new Date().toISOString();
+                        const overrides = safeJsonParse(localStorage.getItem('tableOverrides'), {});
+                        overrides[tId] = 'seated';
+                        localStorage.setItem('tableOverrides', JSON.stringify(overrides));
+                    } else if (newStatus === 'rejected') {
+                        const confirmed = confirm(`Cancel Reservation #${targetRes.reservationNumber} for ${targetRes.customerName || 'Guest'}?\n\nThis will release Table ${tId} and return pre-ordered food ingredients to inventory stock.`);
+                        if (!confirmed) return;
+
+                        if (window.InventorySystem && typeof window.InventorySystem.cancelReservationWithFood === 'function') {
+                            window.InventorySystem.cancelReservationWithFood({
+                                reservationNumber: targetRes.reservationNumber,
+                                reason: 'Cancelled by Staff from Table Manager',
+                                cancelledBy: 'admin',
+                                operator: 'Admin Staff'
+                            });
+                            renderFloorPlan();
+                            if (typeof renderDashboard === 'function') renderDashboard();
+                            const updatedOverrides = safeJsonParse(localStorage.getItem('tableOverrides'), {});
+                            openFloorToast(tId, getReservationHistory(), updatedOverrides);
+                            return;
+                        } else {
+                            targetRes.approvalStatus = 'rejected';
+                            targetRes.kdsStatus = 'cancelled';
+                            targetRes.completedAt = new Date().toISOString();
+                        }
+                    }
+
+                    // Check remaining active reservations for this table
+                    const activeRes = hist.filter(r => r.bookedTable === tId && !r.completedAt && r.approvalStatus !== 'rejected' && r.approvalStatus !== 'cancelled');
+                    if (activeRes.length === 0) {
+                        const overrides = safeJsonParse(localStorage.getItem('tableOverrides'), {});
+                        overrides[tId] = 'available';
+                        localStorage.setItem('tableOverrides', JSON.stringify(overrides));
+                    }
+
+                    localStorage.setItem('reservationHistory', JSON.stringify(hist));
+
+                    try {
+                        window.dispatchEvent(new CustomEvent('reservationHistoryUpdated', { detail: hist }));
+                        window.dispatchEvent(new CustomEvent('tableOverridesUpdated', { detail: safeJsonParse(localStorage.getItem('tableOverrides'), {}) }));
+                        if (typeof BroadcastChannel !== 'undefined') {
+                            const bc = new BroadcastChannel('inventory_sync_channel');
+                            bc.postMessage({ action: 'reservationHistoryUpdated', payload: hist });
+                            bc.postMessage({ action: 'tableOverridesUpdated', payload: safeJsonParse(localStorage.getItem('tableOverrides'), {}) });
+                        }
+                    } catch (e) {}
+
+                    renderFloorPlan();
+                    if (typeof renderDashboard === 'function') renderDashboard();
+
+                    const updatedOverrides = safeJsonParse(localStorage.getItem('tableOverrides'), {});
+                    openFloorToast(tId, hist, updatedOverrides);
+                }
+            };
+
+            // ── CUSTOMER SELF-CANCELLATION LIVE ALERT ENGINE ──
+            function playCancellationAlertSound() {
+                try {
+                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(659.25, ctx.currentTime);
+                    osc.frequency.setValueAtTime(523.25, ctx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.25, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.5);
+                } catch (e) {}
+            }
+
+            window.showCustomerCancellationAlertBanner = function(payload) {
+                if (!payload) return;
+                playCancellationAlertSound();
+
+                let container = document.getElementById('cancellation-alerts-container');
+                if (!container) {
+                    container = document.createElement('div');
+                    container.id = 'cancellation-alerts-container';
+                    container.style.cssText = 'position:fixed; top:24px; right:24px; z-index:999999; display:flex; flex-direction:column; gap:10px; max-width:420px; pointer-events:none;';
+                    document.body.appendChild(container);
+                }
+
+                const toast = document.createElement('div');
+                toast.style.cssText = 'background:linear-gradient(135deg, #ffffff 0%, #fff1f2 100%); border:1.5px solid #f87171; border-left:6px solid #dc2626; border-radius:12px; padding:16px 18px; box-shadow:0 12px 30px rgba(220,38,38,0.25); pointer-events:auto; font-family:"Roboto",sans-serif; animation:slideInRight 0.35s ease;';
+                
+                const foodsSummary = payload.foodItems && payload.foodItems.length > 0 
+                    ? (Array.isArray(payload.foodItems) ? payload.foodItems.join(', ') : 'Pre-ordered Food') 
+                    : null;
+
+                toast.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px;">
+                        <div style="flex:1;">
+                            <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+                                <span style="font-size:16px;">🚨</span>
+                                <span style="font-size:11px; font-weight:900; color:#dc2626; text-transform:uppercase; letter-spacing:0.8px;">Customer Self-Cancellation</span>
+                                <span style="font-size:10px; background:#fee2e2; color:#991b1b; padding:1px 6px; border-radius:4px; font-weight:700;">Live</span>
+                            </div>
+                            <div style="font-size:14px; font-weight:800; color:#0f172a; margin-bottom:3px;">
+                                ${payload.customerName || 'Guest'} · <span style="color:#64748b;">#${payload.reservationNumber}</span>
+                            </div>
+                            <div style="font-size:12px; color:#334155; margin-bottom:4px;">
+                                🪑 Table <strong>${payload.bookedTable || 'Assigned'}</strong> is now released (🟢 Available).
+                            </div>
+                            ${foodsSummary ? `
+                                <div style="font-size:11.5px; background:#f0fdf4; border:1px solid #bbf7d0; color:#166534; padding:5px 8px; border-radius:6px; font-weight:700; margin-top:6px;">
+                                    🍲 Food: ${foodsSummary}
+                                    <div style="font-size:10.5px; font-weight:600; color:#15803d; margin-top:2px;">
+                                        ${payload.stockAction === 'restored_to_stock' ? '✅ Raw ingredients automatically returned to warehouse inventory' : '⚠️ Food prep halted (Kitchen notified)'}
+                                    </div>
+                                </div>
+                            ` : ''}
+                            <div style="font-size:11px; color:#64748b; margin-top:6px; font-style:italic;">
+                                Reason: "${payload.reason || 'Customer request'}"
+                            </div>
+                        </div>
+                        <button onclick="this.parentElement.parentElement.remove()" style="background:none; border:none; color:#94a3b8; font-size:18px; cursor:pointer; font-weight:bold; padding:0 4px;">✕</button>
+                    </div>
+                `;
+
+                container.appendChild(toast);
+
+                setTimeout(() => {
+                    if (toast.parentElement) toast.remove();
+                }, 10000);
+            };
+
+            // Global Sync Listeners for Cancellation
+            try {
+                if (typeof BroadcastChannel !== 'undefined') {
+                    const cancelSyncChan = new BroadcastChannel('inventory_sync_channel');
+                    cancelSyncChan.onmessage = function (e) {
+                        if (e.data && e.data.action === 'customerCancelledReservation') {
+                            showCustomerCancellationAlertBanner(e.data.payload);
+                            renderFloorPlan();
+                            renderDashboard();
+                        }
+                    };
+                }
+            } catch (err) {}
+
+            window.addEventListener('customerCancelledReservation', function (e) {
+                showCustomerCancellationAlertBanner(e.detail);
+                renderFloorPlan();
+                renderDashboard();
+            });
 
 
             // Live chat admin logic
@@ -2526,14 +2998,74 @@
 
             // Utility removed (consolidated at top)
 
-            // Live Inventory View using global helpers
+            // ── LIVE INVENTORY & RAW INGREDIENT MANAGEMENT ──
+            window.activeAdminInvSubTab = 'food';
+
+            window.switchAdminInvSubTab = function (tabName) {
+                window.activeAdminInvSubTab = tabName;
+                const foodGrid = document.getElementById('admin-menu-grid');
+                const rawContainer = document.getElementById('admin-raw-ingredients-container');
+                const recipeContainer = document.getElementById('admin-recipes-container');
+                const wastageContainer = document.getElementById('admin-wastage-container');
+                const auditContainer = document.getElementById('admin-audit-container');
+
+                const btnFood = document.getElementById('inv-subtab-food');
+                const btnRaw = document.getElementById('inv-subtab-raw');
+                const btnRecipe = document.getElementById('inv-subtab-recipe');
+                const btnWastage = document.getElementById('inv-subtab-wastage');
+                const btnAudit = document.getElementById('inv-subtab-audit');
+
+                [btnFood, btnRaw, btnRecipe, btnWastage, btnAudit].forEach(b => {
+                    if (b) {
+                        b.style.background = '#f1f5f9';
+                        b.style.color = '#475569';
+                    }
+                });
+
+                foodGrid?.classList.add('hidden');
+                rawContainer?.classList.add('hidden');
+                recipeContainer?.classList.add('hidden');
+                wastageContainer?.classList.add('hidden');
+                auditContainer?.classList.add('hidden');
+
+                if (tabName === 'food') {
+                    if (btnFood) { btnFood.style.background = '#2e7d32'; btnFood.style.color = 'white'; }
+                    foodGrid?.classList.remove('hidden');
+                    renderMenuManagement();
+                } else if (tabName === 'raw') {
+                    if (btnRaw) { btnRaw.style.background = '#2e7d32'; btnRaw.style.color = 'white'; }
+                    rawContainer?.classList.remove('hidden');
+                    renderRawIngredientsContainer();
+                } else if (tabName === 'recipe') {
+                    if (btnRecipe) { btnRecipe.style.background = '#2e7d32'; btnRecipe.style.color = 'white'; }
+                    recipeContainer?.classList.remove('hidden');
+                    renderRecipeBuilderContainer();
+                } else if (tabName === 'wastage') {
+                    if (btnWastage) { btnWastage.style.background = '#2e7d32'; btnWastage.style.color = 'white'; }
+                    wastageContainer?.classList.remove('hidden');
+                    if (window.InventorySystem) window.InventorySystem.renderWastageLogUI(wastageContainer, 'Admin');
+                } else if (tabName === 'audit') {
+                    if (btnAudit) { btnAudit.style.background = '#2e7d32'; btnAudit.style.color = 'white'; }
+                    auditContainer?.classList.remove('hidden');
+                    if (window.InventorySystem) window.InventorySystem.renderAuditLogUI(auditContainer, 'Admin');
+                }
+            };
+
             function renderMenuManagement() {
                 const container = document.getElementById('admin-menu-grid');
                 if (!container) return;
-                container.innerHTML = '';
+                
+                // Sync latest food availability from raw ingredients
+                if (window.InventorySystem) window.InventorySystem.syncFoodMenuStockFromIngredients();
+
                 const items = getInventory();
+                const rawCatalog = window.InventorySystem ? window.InventorySystem.getRawIngredients() : [];
+                const fragment = document.createDocumentFragment();
 
                 CATEGORIES.forEach(cat => {
+                    const catItems = items.filter(i => i.category === cat.key);
+                    if (catItems.length === 0) return;
+
                     const catTitle = document.createElement('h3');
                     catTitle.style.marginTop = '24px';
                     catTitle.style.marginBottom = '12px';
@@ -2543,44 +3075,761 @@
                     catTitle.style.paddingBottom = '6px';
                     catTitle.style.fontSize = '18px';
                     catTitle.textContent = cat.label;
-                    container.appendChild(catTitle);
+                    fragment.appendChild(catTitle);
 
                     const grid = document.createElement('div');
                     grid.className = 'grid';
-                    grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(200px, 1fr))';
-                    grid.style.gap = '12px';
+                    grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(220px, 1fr))';
+                    grid.style.gap = '14px';
 
-                    const catItems = items.filter(i => i.category === cat.key);
                     catItems.forEach(item => {
-                        const isOut = item.stock <= 0;
-                        const isLow = item.stock > 0 && item.stock <= (item.threshold || 5);
+                        let avail = { availablePortions: item.stock || 0, isAvailable: (item.stock || 0) > 0, status: (item.stock || 0) <= 0 ? 'Out of Stock' : 'Available', missingIngredients: [], recipe: [] };
+                        if (window.InventorySystem) {
+                            avail = window.InventorySystem.calculateFoodAvailability(item, rawCatalog);
+                        }
+
+                        const isOut = !avail.isAvailable || avail.availablePortions <= 0;
+                        const isLow = avail.availablePortions > 0 && avail.availablePortions <= 5;
                         const statusColor = isOut ? '#ef4444' : (isLow ? '#f59e0b' : '#16a34a');
-                        const statusLabel = isOut ? 'Sold Out' : (isLow ? 'Low Stock' : 'Available');
+                        const statusLabel = isOut ? 'OUT OF STOCK' : (isLow ? 'LOW STOCK' : 'AVAILABLE');
 
                         const imgSrc = item.image ? item.image : `https://placehold.co/400x300/f0fdf4/2e7d32?text=${encodeURIComponent(item.title.substring(0, 2))}`;
+
+                        let recipeSummary = 'No raw ingredients assigned';
+                        if (avail.recipe && avail.recipe.length > 0) {
+                            recipeSummary = avail.recipe.map(r => `${r.name}: ${r.needed}${r.unit}`).join(', ');
+                        }
+
+                        let missingText = '';
+                        if (isOut && avail.missingIngredients && avail.missingIngredients.length > 0) {
+                            missingText = `<div style="font-size:11px; color:#dc2626; margin-top:4px; font-weight:bold;">⚠️ Missing: ${avail.missingIngredients.join(', ')}</div>`;
+                        }
 
                         const el = document.createElement('div');
                         el.className = 'card';
                         el.style.textAlign = 'center';
-                        el.style.padding = '14px 10px';
+                        el.style.padding = '14px 12px';
+                        el.style.position = 'relative';
+                        el.style.display = 'flex';
+                        el.style.flexDirection = 'column';
+                        el.style.justifyContent = 'space-between';
 
                         el.innerHTML = `
-                            <div style="position:relative;">
-                                <img src="${imgSrc}" style="width:100%; height:90px; object-fit:cover; border-radius:4px; margin-bottom:8px;">
+                            <div>
+                                <div style="position:relative;">
+                                    <img src="${imgSrc}" style="width:100%; height:95px; object-fit:cover; border-radius:6px; margin-bottom:8px;">
+                                    <span style="position:absolute; top:6px; right:6px; background:${statusColor}; color:white; font-size:10px; font-weight:800; padding:3px 8px; border-radius:12px; text-transform:uppercase; box-shadow:0 2px 4px rgba(0,0,0,0.2);">
+                                        ${statusLabel}
+                                    </span>
+                                </div>
+                                <div style="font-weight: 700; margin-bottom: 2px; color: #1e293b; font-size: 14px; min-height: 20px;">${item.title}</div>
+                                <div style="font-size: 11px; color: #64748b; margin-bottom: 8px; font-style: italic; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;" title="${recipeSummary}">
+                                    Needed: ${recipeSummary}
+                                </div>
+                                ${missingText}
                             </div>
-                            <div style="font-weight: 700; margin-bottom: 2px; color: #444; font-size: 13px; min-height: 20px;">${item.title}</div>
-                            <div style="font-size: 11px; color: #64748b; margin-bottom: 8px; font-style: italic;">Needed: ${item.ingredients || 'None listed'}</div>
                             
-                            <div style="font-size: 15px; font-weight: bold; margin-bottom: 8px;">Stock: <span style="color: ${statusColor}">${item.stock || 0}</span></div>
-                            <div style="width: 100%; font-size: 12px; font-weight: 700; padding: 6px; border-radius: 4px; box-sizing: border-box; background: ${statusColor}15; color: ${statusColor}; border: 1px solid ${statusColor}40;">
-                                ${statusLabel.toUpperCase()}
+                            <div style="margin-top:12px;">
+                                <div style="font-size: 14px; font-weight: 800; margin-bottom: 8px; color:#0f172a;">
+                                    Portions: <span style="color: ${statusColor}; font-size:16px;">${avail.availablePortions}</span>
+                                </div>
+                                <button onclick="openRecipeEditorModal('${item.id}')" style="width:100%; padding:8px; border-radius:6px; border:1px solid #cbd5e1; background:#f8fafc; color:#334155; font-size:12px; font-weight:700; cursor:pointer; transition:all 0.2s;">
+                                    ✏️ Edit Recipe
+                                </button>
                             </div>
                         `;
                         grid.appendChild(el);
                     });
-                    container.appendChild(grid);
+                    fragment.appendChild(grid);
                 });
+
+                container.innerHTML = '';
+                container.appendChild(fragment);
             }
+
+            // ── SMART OPERATIONAL HEALTH SUMMARY BANNER ──
+            function renderInventoryHealthBanner() {
+                const summary = window.InventorySystem ? window.InventorySystem.getInventoryHealthSummary() : null;
+                if (!summary) return '';
+
+                const isCritical = summary.healthStatus === 'Critical';
+                const isWarning = summary.healthStatus === 'Attention Needed';
+                const bgGradient = isCritical ? 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)' : (isWarning ? 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)' : 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)');
+                const borderColor = isCritical ? '#fca5a5' : (isWarning ? '#fde68a' : '#86efac');
+                const statusBadgeBg = isCritical ? '#ef4444' : (isWarning ? '#f59e0b' : '#16a34a');
+
+                const storeStatus = window.InventorySystem ? window.InventorySystem.getStoreStatus() : 'open';
+                const isStoreOpen = storeStatus === 'open';
+                const storeBadgeHtml = `<span style="font-size:11px; background:${isStoreOpen ? 'rgba(46,125,50,0.1)' : 'rgba(220,38,38,0.1)'}; color:${isStoreOpen ? '#1b5e20' : '#dc2626'}; padding:4px 10px; border-radius:12px; font-weight:700; border:1px solid ${isStoreOpen ? 'rgba(46,125,50,0.2)' : 'rgba(220,38,38,0.2)'};">
+                    ${isStoreOpen ? '🏪 Store Online: OPEN' : '🔒 Store Online: CLOSED'}
+                </span>`;
+
+                return `
+                    <div style="background:${bgGradient}; border:1px solid ${borderColor}; border-radius:12px; padding:16px; margin-bottom:20px; box-shadow:0 2px 8px rgba(0,0,0,0.03);">
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                            <div style="display:flex; align-items:center; gap:12px;">
+                                <span style="background:${statusBadgeBg}; color:white; padding:6px 14px; border-radius:20px; font-weight:800; font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">
+                                    ${summary.healthStatus === 'Optimal' ? '🟢 OPERATIONAL: OPTIMAL' : (isCritical ? '🔴 ALERT: CRITICAL STOCK' : '⚠️ ALERT: LOW STOCK')}
+                                </span>
+                                <div style="font-size:13px; color:#334155; font-weight:600;">
+                                    ${summary.lowCount} Low Stock Ingredients | ${summary.outCount} Out of Stock | <strong style="color:#b91c1c;">${summary.affectedFoodCount} Menu Food Items Affected</strong>
+                                </div>
+                            </div>
+                            <div style="display:flex; gap:10px; align-items:center;">
+                                ${storeBadgeHtml}
+                                <span style="font-size:11px; background:rgba(46,125,50,0.1); color:#1b5e20; padding:4px 10px; border-radius:12px; font-weight:700; border:1px solid rgba(46,125,50,0.2);">
+                                    ⚡ Admin & Super Admin Sync Active
+                                </span>
+                                ${(summary.lowCount > 0 || summary.outCount > 0) ? `
+                                    <button onclick="triggerSmartAutoRestockAll()" style="background:#16a34a; color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:800; font-size:13px; cursor:pointer; box-shadow:0 4px 10px rgba(22,163,74,0.25); display:flex; align-items:center; gap:6px;">
+                                        ⚡ Smart Auto-Restock All Low Stock
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            let isRefreshingInvTab = false;
+            let refreshInvTimer = null;
+            function refreshActiveAdminInvTab() {
+                if (refreshInvTimer) clearTimeout(refreshInvTimer);
+                refreshInvTimer = setTimeout(() => {
+                    if (isRefreshingInvTab) return;
+                    isRefreshingInvTab = true;
+                    try {
+                        if (window.activeAdminInvSubTab === 'raw') {
+                            renderRawIngredientsContainer();
+                        } else if (window.activeAdminInvSubTab === 'recipe') {
+                            renderRecipeBuilderContainer();
+                        } else if (window.activeAdminInvSubTab === 'wastage') {
+                            if (window.InventorySystem) window.InventorySystem.renderWastageLogUI(document.getElementById('admin-wastage-container'), 'Admin');
+                        } else if (window.activeAdminInvSubTab === 'audit') {
+                            if (window.InventorySystem) window.InventorySystem.renderAuditLogUI(document.getElementById('admin-audit-container'), 'Admin');
+                        } else {
+                            renderMenuManagement();
+                        }
+                    } finally {
+                        isRefreshingInvTab = false;
+                    }
+                }, 300);
+            }
+
+            // ── LIVE BROADCAST & LOCALSTORAGE SYNC LISTENERS FOR STAFF ADMIN ──
+            try {
+                if (typeof BroadcastChannel !== 'undefined') {
+                    const adminSyncChannel = new BroadcastChannel('inventory_sync_channel');
+                    adminSyncChannel.onmessage = function (event) {
+                        refreshActiveAdminInvTab();
+                        if (typeof renderFloorPlan === 'function') renderFloorPlan();
+                        if (typeof renderReservations === 'function') renderReservations();
+                        if (typeof renderTodayQueue === 'function') renderTodayQueue();
+                    };
+                }
+            } catch (e) {}
+
+            window.addEventListener('storage', function (e) {
+                if (e.key === 'inventoryItems' || e.key === 'rawIngredients') {
+                    refreshActiveAdminInvTab();
+                }
+                if (e.key === 'reservationHistory' || e.key === 'tableOverrides' || e.key === 'floorPlanConfig') {
+                    if (typeof renderFloorPlan === 'function') renderFloorPlan();
+                    if (typeof renderReservations === 'function') renderReservations();
+                    if (typeof renderTodayQueue === 'function') renderTodayQueue();
+                }
+            });
+
+            window.addEventListener('inventoryUpdated', function () { refreshActiveAdminInvTab(); });
+            window.addEventListener('rawIngredientsUpdated', function () { refreshActiveAdminInvTab(); });
+
+            window.triggerSmartAutoRestockAll = function () {
+                if (window.InventorySystem) {
+                    const count = window.InventorySystem.autoRestockAllLowStock();
+                    alert(`⚡ Smart Restock Complete! Restocked ${count} low-stock ingredient(s) back to safe operational levels.`);
+                    if (window.activeAdminInvSubTab === 'raw') renderRawIngredientsContainer();
+                    else renderMenuManagement();
+                }
+            };
+
+            window.quickRestockIngredientInline = function (ingId, amount) {
+                if (window.InventorySystem) {
+                    const item = window.InventorySystem.restockRawIngredient(ingId, amount);
+                    if (item) {
+                        if (window.activeAdminInvSubTab === 'raw') renderRawIngredientsContainer();
+                        else renderMenuManagement();
+                    }
+                }
+            };
+
+            window.adminRawFilter = 'all';
+
+            window.setAdminRawFilter = function (filterVal) {
+                window.adminRawFilter = filterVal;
+                renderRawIngredientsContainer();
+            };
+
+            // ── RAW INGREDIENTS CONTAINER RENDERER ──
+            function renderRawIngredientsContainer() {
+                const container = document.getElementById('admin-raw-ingredients-container');
+                if (!container) return;
+                
+                let rawList = window.InventorySystem ? window.InventorySystem.getRawIngredients() : [];
+                const healthBannerHtml = renderInventoryHealthBanner();
+
+                // Apply active filter
+                if (window.adminRawFilter === 'low') {
+                    rawList = rawList.filter(i => (Number(i.stock) || 0) > 0 && (Number(i.stock) || 0) <= (Number(i.minThreshold) || 10));
+                } else if (window.adminRawFilter === 'out') {
+                    rawList = rawList.filter(i => (Number(i.stock) || 0) <= 0);
+                } else if (window.adminRawFilter !== 'all') {
+                    rawList = rawList.filter(i => (i.category || '').toLowerCase() === window.adminRawFilter.toLowerCase());
+                }
+
+                container.innerHTML = `
+                    ${healthBannerHtml}
+
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:12px;">
+                        <div>
+                            <h3 style="margin:0; font-family:'Playfair Display',serif; color:#1b5e20;">Raw Ingredients Inventory Catalog</h3>
+                            <span style="font-size:12px; color:#64748b;">Manage raw materials, fast 1-tap restocking, and safety thresholds</span>
+                        </div>
+                        <button onclick="openAddRawIngredientModal()" style="background:#16a34a; color:white; border:none; padding:10px 18px; border-radius:8px; font-weight:bold; cursor:pointer; box-shadow:0 4px 10px rgba(22,163,74,0.2);">
+                            + Add New Raw Ingredient
+                        </button>
+                    </div>
+
+                    <!-- Filter Chips -->
+                    <div style="display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; align-items:center;">
+                        <span style="font-size:12px; font-weight:bold; color:#475569; margin-right:4px;">Filter By:</span>
+                        <button onclick="setAdminRawFilter('all')" style="padding:6px 12px; border-radius:20px; border:1px solid #cbd5e1; background:${window.adminRawFilter==='all'?'#1b5e20':'white'}; color:${window.adminRawFilter==='all'?'white':'#475569'}; font-size:12px; font-weight:bold; cursor:pointer;">All</button>
+                        <button onclick="setAdminRawFilter('low')" style="padding:6px 12px; border-radius:20px; border:1px solid #fde68a; background:${window.adminRawFilter==='low'?'#f59e0b':'#fffbeb'}; color:${window.adminRawFilter==='low'?'white':'#b45309'}; font-size:12px; font-weight:bold; cursor:pointer;">⚠️ Low Stock Only</button>
+                        <button onclick="setAdminRawFilter('out')" style="padding:6px 12px; border-radius:20px; border:1px solid #fca5a5; background:${window.adminRawFilter==='out'?'#ef4444':'#fef2f2'}; color:${window.adminRawFilter==='out'?'white':'#b91c1c'}; font-size:12px; font-weight:bold; cursor:pointer;">🔴 Out of Stock Only</button>
+                        <button onclick="setAdminRawFilter('Meat')" style="padding:6px 12px; border-radius:20px; border:1px solid #cbd5e1; background:${window.adminRawFilter==='Meat'?'#2e7d32':'#f8fafc'}; color:${window.adminRawFilter==='Meat'?'white':'#475569'}; font-size:12px; font-weight:bold; cursor:pointer;">🥩 Meat</button>
+                        <button onclick="setAdminRawFilter('Beverages')" style="padding:6px 12px; border-radius:20px; border:1px solid #cbd5e1; background:${window.adminRawFilter==='Beverages'?'#2e7d32':'#f8fafc'}; color:${window.adminRawFilter==='Beverages'?'white':'#475569'}; font-size:12px; font-weight:bold; cursor:pointer;">🍹 Beverages</button>
+                    </div>
+
+                    <div style="overflow-x:auto;">
+                        <table style="width:100%; border-collapse:collapse; font-size:13px; text-align:left;">
+                            <thead>
+                                <tr style="background:#f8fafc; border-bottom:2px solid #e2e8f0; color:#475569;">
+                                    <th style="padding:12px;">Ingredient Name</th>
+                                    <th style="padding:12px;">Category</th>
+                                    <th style="padding:12px;">Current Stock</th>
+                                    <th style="padding:12px;">Min Threshold</th>
+                                    <th style="padding:12px;">Stock Status</th>
+                                    <th style="padding:12px; text-align:right;">1-Tap Quick Restock</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rawList.map(ing => {
+                                    const isCritical = ing.stock <= 0;
+                                    const isLow = ing.stock > 0 && ing.stock <= (ing.minThreshold || 100);
+                                    const statusColor = isCritical ? '#ef4444' : (isLow ? '#f59e0b' : '#16a34a');
+                                    const statusText = isCritical ? 'OUT OF STOCK' : (isLow ? 'LOW STOCK' : 'OK');
+
+                                    // Quick restock amounts depending on unit
+                                    let pill1 = 1000, pill1Label = '+1 kg';
+                                    let pill2 = 5000, pill2Label = '+5 kg';
+                                    if (ing.unit === 'ml' || ing.unit === 'L') { pill1 = 1000; pill1Label = '+1 L'; pill2 = 5000; pill2Label = '+5 L'; }
+                                    else if (ing.unit === 'pcs' || ing.unit === 'slices') { pill1 = 10; pill1Label = '+10 pcs'; pill2 = 50; pill2Label = '+50 pcs'; }
+
+                                    return `
+                                        <tr style="border-bottom:1px solid #f1f5f9;">
+                                            <td style="padding:12px; font-weight:bold; color:#1e293b;">${ing.name}</td>
+                                            <td style="padding:12px; color:#64748b;">${ing.category || 'General'}</td>
+                                            <td style="padding:12px; font-size:14px; font-weight:bold; color:${statusColor};" id="ing-stock-val-${ing.id}">
+                                                ${ing.stock} ${ing.unit}
+                                            </td>
+                                            <td style="padding:12px; color:#64748b;">${ing.minThreshold || 0} ${ing.unit}</td>
+                                            <td style="padding:12px;">
+                                                <span style="background:${statusColor}15; color:${statusColor}; border:1px solid ${statusColor}40; padding:4px 10px; border-radius:12px; font-size:11px; font-weight:bold;">
+                                                    ${statusText}
+                                                </span>
+                                            </td>
+                                            <td style="padding:12px; text-align:right;">
+                                                <div style="display:inline-flex; gap:6px;">
+                                                    <button onclick="quickRestockIngredientInline('${ing.id}', ${pill1})" style="background:#f0fdf4; color:#16a34a; border:1px solid #86efac; padding:5px 10px; border-radius:6px; font-size:11px; font-weight:bold; cursor:pointer; transition:all 0.15s;">
+                                                        ${pill1Label}
+                                                    </button>
+                                                    <button onclick="quickRestockIngredientInline('${ing.id}', ${pill2})" style="background:#2e7d32; color:white; border:none; padding:5px 10px; border-radius:6px; font-size:11px; font-weight:bold; cursor:pointer; transition:all 0.15s;">
+                                                        ${pill2Label}
+                                                    </button>
+                                                    <button onclick="promptRestockRawIngredient('${ing.id}')" style="background:#cbd5e1; color:#334155; border:none; padding:5px 8px; border-radius:6px; font-size:11px; font-weight:bold; cursor:pointer;">
+                                                        Custom
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            // ── RECIPE BUILDER CONTAINER RENDERER ──
+            window.activeRecipeFilterCat = 'All';
+            window.adminRecipeSearchQuery = '';
+
+            window.filterRecipeCategory = function(cat) {
+                window.activeRecipeFilterCat = cat;
+                renderRecipeBuilderContainer();
+            };
+
+            window.filterAdminRecipeSearch = function(query) {
+                window.adminRecipeSearchQuery = (query || '').toLowerCase().trim();
+                renderRecipeBuilderContainer();
+            };
+
+            window.applyOfficialMasterRecipesWithToast = function() {
+                if (window.InventorySystem && typeof window.InventorySystem.syncMasterRecipes === 'function') {
+                    window.InventorySystem.syncMasterRecipes(true);
+                }
+                renderRecipeBuilderContainer();
+                if (typeof renderMenuManagement === 'function') renderMenuManagement();
+                alert("✅ Official Roland's Recipes Applied Successfully!\n\n🥩 Steaks: Meat Cut + Salt & Pepper + Margarine + Oyster Sauce\n🍗 Chicken: Chicken + Ketchup + Butter\n🐟 Fish: Fish + Toyo + Kalamansi\n\nAll portion availability and automatic deductions are up to date!");
+            };
+
+            window.resetSingleRecipeToDefault = function(menuId) {
+                if (!window.InventorySystem || !window.InventorySystem.DEFAULT_FOOD_RECIPES[menuId]) return;
+                const def = window.InventorySystem.DEFAULT_FOOD_RECIPES[menuId];
+                window.InventorySystem.saveItemRecipe(menuId, JSON.parse(JSON.stringify(def)), 'Admin Staff');
+                renderRecipeBuilderContainer();
+            };
+
+            function renderRecipeBuilderContainer() {
+                const container = document.getElementById('admin-recipes-container');
+                if (!container) return;
+
+                if (window.InventorySystem && typeof window.InventorySystem.syncMasterRecipes === 'function') {
+                    window.InventorySystem.syncMasterRecipes(false);
+                }
+
+                const items = getInventory();
+                const rawCatalog = window.InventorySystem ? window.InventorySystem.getRawIngredients() : [];
+                const currentCat = window.activeRecipeFilterCat || 'All';
+                const searchQ = window.adminRecipeSearchQuery || '';
+
+                const categories = [
+                    { id: 'All', label: 'All Items' },
+                    { id: 'Beef', label: '🥩 Steaks (Beef)' },
+                    { id: 'T-Bone', label: '🥩 T-Bone' },
+                    { id: 'Sirloin Steak', label: '🥩 Sirloin' },
+                    { id: 'Chicken & Fish', label: '🍗 Chicken & 🐟 Fish' },
+                    { id: 'Sandwich', label: '🍔 Sandwiches' },
+                    { id: 'Side Orders', label: '🍟 Sides' },
+                    { id: 'Drinks', label: '🥤 Drinks' },
+                    { id: 'Wines', label: '🍷 Wines' }
+                ];
+
+                let filteredItems = items;
+                if (currentCat !== 'All') {
+                    filteredItems = filteredItems.filter(i => (i.category || '').toLowerCase() === currentCat.toLowerCase());
+                }
+
+                if (searchQ) {
+                    filteredItems = filteredItems.filter(item => {
+                        const titleMatch = (item.title || '').toLowerCase().includes(searchQ);
+                        const catMatch = (item.category || '').toLowerCase().includes(searchQ);
+                        const recipe = window.InventorySystem ? window.InventorySystem.getItemRecipe(item.id, item) : [];
+                        const ingMatch = recipe.some(r => {
+                            const raw = rawCatalog.find(x => x.id === r.ingredientId);
+                            return raw && raw.name.toLowerCase().includes(searchQ);
+                        });
+                        return titleMatch || catMatch || ingMatch;
+                    });
+                }
+
+                container.innerHTML = `
+                    <!-- Kitchen Banner & Executive Actions -->
+                    <div style="background:linear-gradient(135deg, #14532d 0%, #166534 100%); color:white; padding:18px 24px; border-radius:14px; margin-bottom:16px; box-shadow:0 6px 20px rgba(20,83,45,0.18); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
+                        <div style="flex:1; min-width:280px;">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span style="font-size:20px;">💡</span>
+                                <h3 style="margin:0; font-family:'Playfair Display',serif; color:#fef08a; font-size:18px;">Roland's Kitchen Bill of Materials (BOM)</h3>
+                            </div>
+                            <p style="margin:4px 0 0 0; font-size:13px; color:#dcfce7; line-height:1.4;">
+                                Official kitchen standard: Every dish ordered automatically deducts exact raw cuts, seasonings, and sauces.
+                            </p>
+                        </div>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                            <button type="button" onclick="applyOfficialMasterRecipesWithToast()" style="background:#22c55e; color:white; border:none; padding:10px 18px; border-radius:8px; font-size:13px; font-weight:800; cursor:pointer; display:flex; align-items:center; gap:6px; box-shadow:0 4px 10px rgba(0,0,0,0.2);">
+                                ✨ Sync Official Recipes (Steak, Chicken, Fish)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Search & Filter Controls -->
+                    <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:16px; margin-bottom:16px; box-shadow:0 1px 3px rgba(0,0,0,0.05); display:flex; flex-direction:column; gap:12px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                            <div style="position:relative; flex:1; min-width:260px;">
+                                <input type="text" id="admin-recipe-search-box" value="${searchQ}" oninput="filterAdminRecipeSearch(this.value)" placeholder="🔍 Search dishes or ingredients (e.g. Tenderloin, Oyster Sauce, Ketchup, Tanigue)..." style="width:100%; padding:10px 14px; border-radius:8px; border:1px solid #cbd5e1; font-size:13px; box-sizing:border-box;">
+                                ${searchQ ? `<button onclick="filterAdminRecipeSearch('')" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); border:none; background:none; cursor:pointer; color:#94a3b8; font-weight:bold;">✕</button>` : ''}
+                            </div>
+                            <div style="font-size:12px; background:#f0fdf4; border:1px solid #bbf7d0; padding:6px 14px; border-radius:20px; color:#166534; font-weight:700;">
+                                Showing ${filteredItems.length} of ${items.length} Menu Items
+                            </div>
+                        </div>
+
+                        <!-- Category Filter Tabs -->
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                            ${categories.map(cat => {
+                                const isActive = currentCat === cat.id;
+                                return `
+                                    <button type="button" onclick="filterRecipeCategory('${cat.id}')" style="padding:6px 12px; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; border:1px solid ${isActive ? '#2e7d32' : '#cbd5e1'}; background:${isActive ? '#2e7d32' : '#ffffff'}; color:${isActive ? '#ffffff' : '#475569'}; transition:all 0.2s;">
+                                        ${cat.label}
+                                    </button>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                    
+                    <!-- Recipe List Grid -->
+                    <div style="display:flex; flex-direction:column; gap:12px;">
+                        ${filteredItems.length === 0 ? `
+                            <div style="background:white; border:1px solid #e2e8f0; border-radius:12px; padding:32px; text-align:center; color:#64748b;">
+                                <p style="font-size:16px; margin:0 0 8px 0; font-weight:bold;">No recipes match your search "${searchQ}"</p>
+                                <button onclick="filterAdminRecipeSearch(''); filterRecipeCategory('All');" style="background:#16a34a; color:white; border:none; padding:8px 16px; border-radius:6px; font-weight:bold; cursor:pointer;">Reset Search & Category</button>
+                            </div>
+                        ` : filteredItems.map(item => {
+                            const recipe = window.InventorySystem ? window.InventorySystem.getItemRecipe(item.id, item) : [];
+                            const avail = window.InventorySystem ? window.InventorySystem.calculateFoodAvailability(item, rawCatalog) : { availablePortions: item.stock || 0 };
+
+                            // Determine status pill
+                            let portionsBg = '#f0fdf4', portionsColor = '#166534', portionsBorder = '#bbf7d0', statusDot = '🟢';
+                            if (avail.availablePortions <= 0) {
+                                portionsBg = '#fef2f2'; portionsColor = '#991b1b'; portionsBorder = '#fecaca'; statusDot = '🔴';
+                            } else if (avail.availablePortions <= 10) {
+                                portionsBg = '#fffbeb'; portionsColor = '#b45309'; portionsBorder = '#fde68a'; statusDot = '🟡';
+                            }
+
+                            return `
+                                <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+                                    <div style="flex:2; min-width:240px;">
+                                        <div style="display:flex; align-items:center; gap:8px;">
+                                            <span style="font-weight:800; font-size:15px; color:#0f172a;">${item.title}</span>
+                                            <span style="font-size:11px; background:#f1f5f9; color:#475569; padding:2px 8px; border-radius:12px; font-weight:600;">${item.category}</span>
+                                            <span style="font-size:12px; font-weight:700; color:#166534;">₱${Number(item.price || 0).toLocaleString()}</span>
+                                        </div>
+
+                                        <!-- Raw Recipe Ingredients Display -->
+                                        <div style="font-size:12px; margin-top:8px; display:flex; flex-wrap:wrap; gap:6px;">
+                                            ${recipe.length > 0 ? recipe.map(r => {
+                                                const ingObj = rawCatalog.find(i => i.id === r.ingredientId);
+                                                const name = ingObj ? ingObj.name : r.ingredientId;
+                                                
+                                                // Intelligent Visual Badges with Icons
+                                                let badgeStyle = 'background:#f1f5f9; color:#334155; border:1px solid #cbd5e1;';
+                                                let icon = '📦';
+                                                
+                                                if (name.includes('Tenderloin') || name.includes('Ribeye') || name.includes('T-Bone') || name.includes('Sirloin') || name.includes('Patty') || name.includes('Beef')) {
+                                                    badgeStyle = 'background:#fef2f2; color:#991b1b; border:1px solid #fecaca;';
+                                                    icon = '🥩';
+                                                } else if (name.includes('Chicken')) {
+                                                    badgeStyle = 'background:#fff7ed; color:#9a3412; border:1px solid #fed7aa;';
+                                                    icon = '🍗';
+                                                } else if (name.includes('Fish') || name.includes('Tanigue') || name.includes('Bangus')) {
+                                                    badgeStyle = 'background:#f0f9ff; color:#0369a1; border:1px solid #bae6fd;';
+                                                    icon = '🐟';
+                                                } else if (name.includes('Salt & Pepper') || name.includes('Seasoning')) {
+                                                    badgeStyle = 'background:#fefce8; color:#854d0e; border:1px solid #fef08a;';
+                                                    icon = '🧂';
+                                                } else if (name.includes('Margarine')) {
+                                                    badgeStyle = 'background:#fffbeb; color:#b45309; border:1px solid #fde68a;';
+                                                    icon = '🧈';
+                                                } else if (name.includes('Oyster Sauce')) {
+                                                    badgeStyle = 'background:#faf5ff; color:#6b21a8; border:1px solid #e9d5ff;';
+                                                    icon = '🍶';
+                                                } else if (name.includes('Ketchup')) {
+                                                    badgeStyle = 'background:#fef2f2; color:#b91c1c; border:1px solid #fca5a5;';
+                                                    icon = '🍅';
+                                                } else if (name.includes('Butter')) {
+                                                    badgeStyle = 'background:#fef9c3; color:#713f12; border:1px solid #fde047;';
+                                                    icon = '🧈';
+                                                } else if (name.includes('Toyo')) {
+                                                    badgeStyle = 'background:#f8fafc; color:#1e293b; border:1px solid #cbd5e1;';
+                                                    icon = '🍶';
+                                                } else if (name.includes('Kalamansi')) {
+                                                    badgeStyle = 'background:#f0fdf4; color:#15803d; border:1px solid #86efac;';
+                                                    icon = '🍋';
+                                                } else if (name.includes('Bun')) {
+                                                    badgeStyle = 'background:#fefce8; color:#854d0e; border:1px solid #fef08a;';
+                                                    icon = '🍔';
+                                                } else if (name.includes('Potato')) {
+                                                    badgeStyle = 'background:#fefce8; color:#854d0e; border:1px solid #fef08a;';
+                                                    icon = '🥔';
+                                                }
+
+                                                return `<span style="${badgeStyle} padding:3px 10px; border-radius:6px; font-weight:700; font-size:11.5px; display:inline-flex; align-items:center; gap:5px; box-shadow:0 1px 2px rgba(0,0,0,0.03);">
+                                                    <span>${icon}</span>
+                                                    <span>${name}:</span>
+                                                    <span style="opacity:0.9;">${r.qty}${r.unit || ''}</span>
+                                                </span>`;
+                                            }).join('') : '<span style="color:#ef4444; font-style:italic;">No raw ingredients mapped yet</span>'}
+                                        </div>
+                                    </div>
+
+                                    <!-- Portion Status & Action Buttons -->
+                                    <div style="display:flex; align-items:center; gap:16px;">
+                                        <div style="background:${portionsBg}; border:1px solid ${portionsBorder}; padding:8px 14px; border-radius:10px; text-align:right;">
+                                            <div style="font-size:11px; color:#64748b; font-weight:700; text-transform:uppercase;">Kitchen Ready</div>
+                                            <div style="font-size:15px; font-weight:800; color:${portionsColor}; display:flex; align-items:center; gap:4px; justify-content:flex-end;">
+                                                <span>${statusDot}</span>
+                                                <span>${avail.availablePortions} portions</span>
+                                            </div>
+                                        </div>
+                                        <div style="display:flex; flex-direction:column; gap:6px;">
+                                            <button onclick="openRecipeEditorModal('${item.id}')" style="background:#2e7d32; color:white; border:none; padding:8px 14px; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:6px; box-shadow:0 2px 6px rgba(46,125,50,0.2);">
+                                                ✏️ Edit Recipe
+                                            </button>
+                                            ${window.InventorySystem && window.InventorySystem.DEFAULT_FOOD_RECIPES[item.id] ? `
+                                                <button onclick="resetSingleRecipeToDefault('${item.id}')" title="Reset this recipe to Roland's Standard BOM" style="background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; padding:4px 8px; border-radius:6px; font-size:10.5px; font-weight:600; cursor:pointer;">
+                                                    🔄 Reset to Std
+                                                </button>
+                                            ` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+            }
+
+            // ── RECIPE EDITOR MODAL CONTROLLERS ──
+            window.currentEditingRecipeMenuId = null;
+            window.currentEditingRecipeTemp = [];
+
+            window.openRecipeEditorModal = function (menuId) {
+                window.currentEditingRecipeMenuId = menuId;
+                const items = getInventory();
+                const item = items.find(i => i.id === menuId);
+                if (!item) return;
+
+                document.getElementById('recipe-modal-title').textContent = `Edit Recipe: ${item.title}`;
+                document.getElementById('recipe-modal-subtitle').textContent = `Category: ${item.category} | Set raw ingredients required for 1 serving`;
+
+                window.currentEditingRecipeTemp = JSON.parse(JSON.stringify(window.InventorySystem.getItemRecipe(menuId, item)));
+
+                const rawSelect = document.getElementById('recipe-add-ing-select');
+                if (rawSelect) {
+                    const rawList = window.InventorySystem.getRawIngredients();
+                    rawSelect.innerHTML = rawList.map(r => `<option value="${r.id}">${r.name} (${r.unit}) - Stock: ${r.stock}${r.unit}</option>`).join('');
+                }
+
+                renderTempRecipeList();
+                document.getElementById('recipe-editor-modal')?.classList.remove('hidden');
+            };
+
+            window.applyQuickRecipePreset = function(presetKey) {
+                const rawCatalog = window.InventorySystem.getRawIngredients();
+                let ingId = '', qty = 0, unit = '';
+
+                // Steak Presets
+                if (presetKey === 'beef200') { ingId = 'ING-BEEF-TENDERLOIN'; qty = 200; unit = 'g'; }
+                else if (presetKey === 'ribeye300') { ingId = 'ING-BEEF-RIBEYE'; qty = 300; unit = 'g'; }
+                else if (presetKey === 'tbone450') { ingId = 'ING-BEEF-TBONE'; qty = 450; unit = 'g'; }
+                else if (presetKey === 'sirloin350') { ingId = 'ING-BEEF-SIRLOIN'; qty = 350; unit = 'g'; }
+                else if (presetKey === 'patty1') { ingId = 'ING-BEEF-PATTY'; qty = 1; unit = 'pcs'; }
+                else if (presetKey === 'saltpepper5') { ingId = 'ING-SALT-PEPPER'; qty = 5; unit = 'g'; }
+                else if (presetKey === 'margarine20') { ingId = 'ING-MARGARINE'; qty = 20; unit = 'g'; }
+                else if (presetKey === 'oystersauce30') { ingId = 'ING-OYSTER-SAUCE'; qty = 30; unit = 'ml'; }
+                
+                // Chicken Presets
+                else if (presetKey === 'chicken1') { ingId = 'ING-CHICKEN-WHOLE'; qty = 1; unit = 'pcs'; }
+                else if (presetKey === 'chicken05') { ingId = 'ING-CHICKEN-WHOLE'; qty = 0.5; unit = 'pcs'; }
+                else if (presetKey === 'ketchup50') { ingId = 'ING-KETCHUP'; qty = 50; unit = 'g'; }
+                else if (presetKey === 'butter20') { ingId = 'ING-BUTTER'; qty = 20; unit = 'g'; }
+                
+                // Fish Presets
+                else if (presetKey === 'tanigue250') { ingId = 'ING-FISH-TANIGUE'; qty = 250; unit = 'g'; }
+                else if (presetKey === 'bangus1') { ingId = 'ING-FISH-BANGUS'; qty = 1; unit = 'pcs'; }
+                else if (presetKey === 'toyo30') { ingId = 'ING-TOYO'; qty = 30; unit = 'ml'; }
+                else if (presetKey === 'kalamansi20') { ingId = 'ING-KALAMANSI'; qty = 20; unit = 'ml'; }
+                
+                // Side / Burger Presets
+                else if (presetKey === 'sauce50') { ingId = 'ING-MUSHROOM-SAUCE'; qty = 50; unit = 'ml'; }
+                else if (presetKey === 'bun1') { ingId = 'ING-BURGER-BUN'; qty = 1; unit = 'pcs'; }
+                else if (presetKey === 'potato150') { ingId = 'ING-POTATO'; qty = 150; unit = 'g'; }
+
+                const rawIng = rawCatalog.find(i => i.id === ingId);
+                if (!rawIng) return;
+
+                const existing = window.currentEditingRecipeTemp.find(r => r.ingredientId === ingId);
+                if (existing) existing.qty = qty;
+                else window.currentEditingRecipeTemp.push({ ingredientId: ingId, qty: qty, unit: unit || rawIng.unit });
+
+                renderTempRecipeList();
+            };
+
+            window.closeRecipeEditorModal = function () {
+                document.getElementById('recipe-editor-modal')?.classList.add('hidden');
+            };
+
+            function renderTempRecipeList() {
+                const listContainer = document.getElementById('recipe-ingredients-list');
+                if (!listContainer) return;
+
+                const rawCatalog = window.InventorySystem.getRawIngredients();
+                if (window.currentEditingRecipeTemp.length === 0) {
+                    listContainer.innerHTML = `<div style="color:#94a3b8; font-style:italic; padding:10px;">No raw ingredients added to this recipe yet.</div>`;
+                    return;
+                }
+
+                listContainer.innerHTML = window.currentEditingRecipeTemp.map((r, idx) => {
+                    const rawIng = rawCatalog.find(i => i.id === r.ingredientId);
+                    const name = rawIng ? rawIng.name : r.ingredientId;
+                    const unit = r.unit || (rawIng ? rawIng.unit : '');
+
+                    return `
+                        <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; border:1px solid #cbd5e1; padding:10px 14px; border-radius:8px;">
+                            <div>
+                                <strong style="color:#0f172a; font-size:14px;">${name}</strong>
+                                <span style="font-size:12px; color:#64748b; margin-left:8px;">(${r.qty} ${unit} per portion)</span>
+                            </div>
+                            <button type="button" onclick="removeIngredientFromRecipeTemp(${idx})" style="background:#fee2e2; color:#ef4444; border:none; padding:4px 10px; border-radius:6px; font-weight:bold; cursor:pointer;">
+                                🗑️ Remove
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            window.addIngredientToRecipeTemp = function () {
+                const selectEl = document.getElementById('recipe-add-ing-select');
+                const qtyEl = document.getElementById('recipe-add-qty-input');
+                if (!selectEl || !qtyEl) return;
+
+                const ingId = selectEl.value;
+                const qty = Number(qtyEl.value);
+
+                if (!ingId || isNaN(qty) || qty <= 0) {
+                    alert('Please select a valid raw ingredient and enter quantity > 0.');
+                    return;
+                }
+
+                const rawCatalog = window.InventorySystem.getRawIngredients();
+                const rawIng = rawCatalog.find(i => i.id === ingId);
+
+                const existing = window.currentEditingRecipeTemp.find(r => r.ingredientId === ingId);
+                if (existing) {
+                    existing.qty = qty;
+                } else {
+                    window.currentEditingRecipeTemp.push({
+                        ingredientId: ingId,
+                        qty: qty,
+                        unit: rawIng ? rawIng.unit : 'units'
+                    });
+                }
+
+                qtyEl.value = '';
+                renderTempRecipeList();
+            };
+
+            window.removeIngredientFromRecipeTemp = function (idx) {
+                window.currentEditingRecipeTemp.splice(idx, 1);
+                renderTempRecipeList();
+            };
+
+            window.saveCurrentRecipeModal = function () {
+                if (!window.currentEditingRecipeMenuId) return;
+                window.InventorySystem.saveItemRecipe(window.currentEditingRecipeMenuId, window.currentEditingRecipeTemp);
+                closeRecipeEditorModal();
+                alert('✅ Food Recipe saved successfully!');
+
+                if (window.activeAdminInvSubTab === 'food') renderMenuManagement();
+                else if (window.activeAdminInvSubTab === 'recipe') renderRecipeBuilderContainer();
+            };
+
+            // ── RAW INGREDIENT RESTOCK & ADD CONTROLLERS ──
+            window.promptRestockRawIngredient = async function (ingId) {
+                const rawList = window.InventorySystem ? window.InventorySystem.getRawIngredients() : [];
+                const ing = rawList.find(i => i.id === ingId);
+                if (!ing) return;
+
+                let addAmt = null;
+                if (typeof window.superModal === 'function') {
+                    const amountStr = await window.superModal({
+                        title: `📦 Custom Restock - ${ing.name}`,
+                        message: `Current Stock: <b>${ing.stock.toLocaleString()} ${ing.unit}</b>.<br>Enter the quantity to ADD:`,
+                        showInput: true,
+                        placeholder: `e.g. 1000 (${ing.unit})`,
+                        inputType: 'number',
+                        confirmText: 'Restock Ingredient',
+                        cancelText: 'Cancel'
+                    });
+                    if (amountStr === null || amountStr === undefined || String(amountStr).trim() === '') return;
+                    addAmt = Number(amountStr);
+                } else {
+                    const amountStr = prompt(`Restock ${ing.name} (Current Stock: ${ing.stock} ${ing.unit}):\nEnter amount to ADD:`, '1000');
+                    if (!amountStr) return;
+                    addAmt = Number(amountStr);
+                }
+
+                if (isNaN(addAmt) || addAmt <= 0) {
+                    if (typeof window.superModal === 'function') {
+                        await window.superModal({ title: 'Invalid Restock Amount ⚠️', message: 'Please enter a valid positive number for restock.' });
+                    } else {
+                        alert('Invalid restock amount.');
+                    }
+                    return;
+                }
+
+                const updatedItem = window.InventorySystem.restockRawIngredient(ingId, addAmt);
+                const newStock = updatedItem ? updatedItem.stock : ing.stock + addAmt;
+
+                if (typeof window.superModal === 'function') {
+                    await window.superModal({
+                        title: 'Restock Successful ✅',
+                        message: `Successfully restocked <b>${ing.name}</b> by <b>+${addAmt.toLocaleString()} ${ing.unit}</b>.<br>New Current Stock: <b>${newStock.toLocaleString()} ${ing.unit}</b>.`
+                    });
+                } else {
+                    alert(`✅ Successfully restocked ${ing.name}! New Stock: ${newStock} ${ing.unit}`);
+                }
+
+                if (typeof renderRawIngredientsContainer === 'function') renderRawIngredientsContainer();
+                if (typeof refreshActiveAdminInvTab === 'function') refreshActiveAdminInvTab();
+            };
+
+            window.openAddRawIngredientModal = function () {
+                document.getElementById('raw-ing-name').value = '';
+                document.getElementById('raw-ing-stock').value = '';
+                document.getElementById('raw-ing-threshold').value = '';
+                document.getElementById('raw-ingredient-modal')?.classList.remove('hidden');
+            };
+
+            window.closeRawIngredientModal = function () {
+                document.getElementById('raw-ingredient-modal')?.classList.add('hidden');
+            };
+
+            window.saveNewRawIngredientModal = function () {
+                const name = document.getElementById('raw-ing-name').value.trim();
+                const cat = document.getElementById('raw-ing-cat').value;
+                const unit = document.getElementById('raw-ing-unit').value;
+                const stock = Number(document.getElementById('raw-ing-stock').value) || 0;
+                const minThreshold = Number(document.getElementById('raw-ing-threshold').value) || 10;
+
+                if (!name) {
+                    alert('Please enter ingredient name.');
+                    return;
+                }
+
+                window.InventorySystem.addRawIngredient({
+                    name: name,
+                    category: cat,
+                    unit: unit,
+                    stock: stock,
+                    minThreshold: minThreshold
+                });
+
+                closeRawIngredientModal();
+                alert(`✅ Raw ingredient "${name}" added!`);
+
+                if (window.activeAdminInvSubTab === 'raw') renderRawIngredientsContainer();
+                else renderMenuManagement();
+            };
 
             renderMenuManagement();
 
@@ -2611,69 +3860,189 @@
             };
 
             // Export CSV
-            const exportBtn = document.getElementById('export-csv-btn');
-            exportBtn.onclick = () => {
-                const rows = history.slice().sort((a, b) => {
-                    const ta = new Date(a.completedAt || 0).getTime();
-                    const tb = new Date(b.completedAt || 0).getTime();
-                    return tb - ta;
-                });
+            // Export CSV
+            window.openExportCsvModal = function() {
+                document.getElementById('export-csv-modal')?.classList.remove('hidden');
+            };
 
-                const header = [
-                    'Order Number',
-                    'Order Type',
-                    'Date/Time of Arrival',
-                    'Customer Name',
-                    'Table',
-                    'Items Ordered',
-                    'Total Paid (PHP)',
-                    'Transaction Completed'
-                ];
-                const csvLines = [header.join(',')];
+            window.closeExportCsvModal = function() {
+                document.getElementById('export-csv-modal')?.classList.add('hidden');
+            };
 
-                rows.forEach(r => {
-                    const foods = Array.isArray(r.foods) ? r.foods.join('; ') : (r.orderSummary || 'None');
-
-                    let arrDate = r.arrivalDateTimeDisplay || (r.arrivalDate ? `${r.arrivalDate} ${r.arrivalTime || ''}` : '');
-                    if (!arrDate || arrDate.trim() === '') arrDate = 'Walk-in / POS';
-
-                    let compDate = '';
-                    if (r.completedAt) {
-                        try {
-                            const d = new Date(r.completedAt);
-                            compDate = d.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
-                        } catch (e) { compDate = r.completedAt; }
+            window.generateAndDownloadCsvReport = function(forcedTimeframe, forcedFormat) {
+                try {
+                    let selectedTimeframe = forcedTimeframe;
+                    if (!selectedTimeframe || typeof selectedTimeframe !== 'string') {
+                        selectedTimeframe = document.querySelector('input[name="csv-timeframe"]:checked')?.value || 'all';
                     }
 
-                    let typeStr = r.reservationType || 'Unknown';
-                    if (typeStr === 'standard' && r.bookedBy === 'staff') typeStr = 'POS Order';
-                    else if (typeStr === 'priority') typeStr = 'Priority';
-                    else if (typeStr === 'standard') typeStr = 'Standard';
+                    let selectedFormat = forcedFormat;
+                    if (!selectedFormat || typeof selectedFormat !== 'string') {
+                        selectedFormat = document.querySelector('input[name="export-format"]:checked')?.value || 'xlsx';
+                    }
 
-                    const values = [
-                        r.reservationNumber || 'N/A',
-                        typeStr,
-                        arrDate,
-                        r.customerName || 'Walk-in Guest',
-                        r.bookedTable || 'None',
-                        foods,
-                        Number(r.paymentAmount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-                        compDate || 'Not Completed'
-                    ].map(v => `"${String(v).replaceAll('"', '""')}"`);
+                    let allRecords = getReservationHistory();
+                    if (!Array.isArray(allRecords) || allRecords.length === 0) {
+                        allRecords = seedSampleReservationHistoryIfEmpty();
+                    }
 
-                    csvLines.push(values.join(','));
-                });
+                    const now = new Date();
+                    const todayStr = now.toISOString().slice(0, 10);
+                    const currentYear = now.getFullYear();
+                    const currentMonth = now.getMonth();
 
-                const blob = new Blob(['\uFEFF' + csvLines.join('\n')], { type: 'text/csv;charset=utf-8;' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `Rolands-Sales-Report-${new Date().toISOString().slice(0, 10)}.csv`;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-                URL.revokeObjectURL(url);
+                    const filteredRecords = allRecords.filter(r => {
+                        if (selectedTimeframe === 'all') return true;
+
+                        const dateObj = parseRecordDate(r);
+                        const recordYear = dateObj.getFullYear();
+                        const recordMonth = dateObj.getMonth();
+                        const recordDateStr = dateObj.toISOString().slice(0, 10);
+
+                        if (selectedTimeframe === 'day' || selectedTimeframe === 'today') {
+                            return recordDateStr === todayStr;
+                        } else if (selectedTimeframe === 'week') {
+                            const weekAgo = new Date();
+                            weekAgo.setDate(now.getDate() - 7);
+                            weekAgo.setHours(0, 0, 0, 0);
+                            return dateObj >= weekAgo && dateObj <= now;
+                        } else if (selectedTimeframe === 'month') {
+                            return recordYear === currentYear && recordMonth === currentMonth;
+                        } else if (selectedTimeframe === 'year') {
+                            return recordYear === currentYear;
+                        }
+                        return true;
+                    });
+
+                    const recordsToExport = (filteredRecords && filteredRecords.length > 0) ? filteredRecords : allRecords;
+
+                    recordsToExport.sort((a, b) => {
+                        const ta = parseRecordDate(a).getTime();
+                        const tb = parseRecordDate(b).getTime();
+                        return tb - ta;
+                    });
+
+                    const headers = [
+                        'Order Number',
+                        'Order Type',
+                        'Date/Time of Arrival',
+                        'Customer Name',
+                        'Table',
+                        'Items Ordered',
+                        'Total Paid (PHP)',
+                        'Transaction Completed'
+                    ];
+
+                    const rowsData = [headers];
+
+                    recordsToExport.forEach(r => {
+                        let itemsStr = '';
+                        if (Array.isArray(r.foods) && r.foods.length > 0) {
+                            itemsStr = r.foods.join('; ');
+                        } else if (r.orderSummary) {
+                            itemsStr = r.orderSummary;
+                        } else {
+                            itemsStr = 'None';
+                        }
+
+                        let arrDate = r.arrivalDateTimeDisplay || (r.arrivalDate ? `${r.arrivalDate} ${r.arrivalTime || ''}` : '');
+                        if (!arrDate || arrDate.trim() === '') arrDate = 'Walk-in / POS';
+
+                        let compDate = '';
+                        if (r.completedAt) {
+                            try {
+                                const d = new Date(r.completedAt);
+                                compDate = d.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+                            } catch (e) { compDate = String(r.completedAt); }
+                        } else {
+                            compDate = 'Completed';
+                        }
+
+                        let typeStr = r.reservationType || 'Unknown';
+                        if (typeStr === 'standard' && r.bookedBy === 'staff') typeStr = 'POS Order';
+                        else if (typeStr === 'priority') typeStr = 'Priority Pre-Order';
+                        else if (typeStr === 'standard') typeStr = 'Standard Reservation';
+
+                        rowsData.push([
+                            r.reservationNumber || 'N/A',
+                            typeStr,
+                            arrDate,
+                            r.customerName || 'Walk-in Guest',
+                            r.bookedTable || 'Table N/A',
+                            itemsStr,
+                            Number(r.paymentAmount || 0).toFixed(2),
+                            compDate
+                        ]);
+                    });
+
+                    if (selectedFormat === 'xlsx' && typeof XLSX !== 'undefined') {
+                        // ── DYNAMIC EXCEL COLUMN AUTO-FIT CALCULATOR ──
+                        function autoFitColumns(dataArray) {
+                            if (!dataArray || dataArray.length === 0) return [];
+                            return dataArray[0].map((_, colIdx) => {
+                                let maxLen = 10;
+                                dataArray.forEach(row => {
+                                    const val = row[colIdx] !== undefined && row[colIdx] !== null ? String(row[colIdx]) : '';
+                                    if (val.length > maxLen) maxLen = val.length;
+                                });
+                                return { wch: Math.min(Math.max(maxLen + 5, 14), 70) };
+                            });
+                        }
+
+                        const wb = XLSX.utils.book_new();
+                        const ws = XLSX.utils.aoa_to_sheet(rowsData);
+                        ws['!cols'] = autoFitColumns(rowsData);
+                        XLSX.utils.book_append_sheet(wb, ws, "Sales & Transactions");
+
+                        const filename = `Rolands-Sales-Report-${selectedTimeframe}-${todayStr}.xlsx`;
+                        XLSX.writeFile(wb, filename);
+
+                        closeExportCsvModal();
+                        return;
+                    }
+
+                    // ── CSV EXPORT WITH UTF-8 BOM ──
+                    let csvContent = '\uFEFF';
+                    rowsData.forEach(row => {
+                        csvContent += row.map(val => `"${String(val).replaceAll('"', '""')}"`).join(',') + '\n';
+                    });
+
+                    const filename = `Rolands-Sales-Report-${selectedTimeframe}-${todayStr}.csv`;
+
+                    try {
+                        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = filename;
+                        link.style.display = 'none';
+                        document.body.appendChild(link);
+                        link.click();
+                        setTimeout(() => {
+                            if (link.parentNode) link.parentNode.removeChild(link);
+                            URL.revokeObjectURL(url);
+                        }, 3000);
+                    } catch (e) {
+                        const encodedUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent);
+                        const link = document.createElement('a');
+                        link.href = encodedUri;
+                        link.download = filename;
+                        document.body.appendChild(link);
+                        link.click();
+                        setTimeout(() => { if (link.parentNode) link.parentNode.removeChild(link); }, 3000);
+                    }
+
+                    closeExportCsvModal();
+                } catch(err) {
+                    console.error('Error exporting report:', err);
+                    alert('Error generating report: ' + err.message);
+                }
             };
+
+            const exportBtn = document.getElementById('export-csv-btn');
+            if (exportBtn) {
+                exportBtn.onclick = window.openExportCsvModal;
+            }
 
             // Clear history removed from regular admin
 
@@ -3039,6 +4408,38 @@
             }
             orderSummary = foodArray.join(', ');
 
+            // Build structured cart for raw ingredient deduction
+            const structuredCart = [];
+            for (const id in currentSelection) {
+                if (currentSelection[id] > 0) {
+                    structuredCart.push({ id: id, quantity: currentSelection[id] });
+                }
+            }
+
+            // Pre-flight check & atomic raw ingredient deduction
+            if (structuredCart.length > 0 && window.InventorySystem) {
+                if (typeof window.InventorySystem.validateOrderIngredients === 'function') {
+                    const check = window.InventorySystem.validateOrderIngredients(structuredCart);
+                    if (!check.isValid) {
+                        const list = check.shortages.map(s => `${s.ingredientName}: needed ${s.needed}${s.unit}, only ${s.available}${s.unit} left`).join(', ');
+                        if (window.showToast) {
+                            window.showToast(`Cannot save walk-in: ${list}`, 'error', 5000);
+                        } else {
+                            alert(`Cannot save walk-in due to kitchen shortage: ${list}`);
+                        }
+                        return;
+                    }
+                }
+
+                if (typeof window.InventorySystem.deductIngredientsForOrder === 'function') {
+                    const deductResult = window.InventorySystem.deductIngredientsForOrder(structuredCart, 'Admin Walk-in', resNo);
+                    if (!deductResult.success) {
+                        alert('Stock deduction failed: ' + (deductResult.error || 'Insufficient stock'));
+                        return;
+                    }
+                }
+            }
+
             const reservation = {
                 reservationNumber: resNo,
                 reservationType: walkinType,
@@ -3056,29 +4457,17 @@
                 paymentStatus: 'walk-in',
                 bookedBy: 'staff',
                 completedAt: new Date().toISOString(),
-                cartItems: currentSelection // Keep structured data too
+                cartItems: structuredCart,
+                stockDeducted: true
             };
 
             const history = JSON.parse(localStorage.getItem('reservationHistory') || '[]');
             history.push(reservation);
             localStorage.setItem('reservationHistory', JSON.stringify(history));
 
-            // Deduct inventory if priority? Or just for all walkins?
-            // Usually walk-ins should deduct stock immediately.
-            try {
-                const invStr = localStorage.getItem('inventoryItems');
-                if (invStr) {
-                    let items = JSON.parse(invStr);
-                    for (const id in currentSelection) {
-                        const idx = items.findIndex(i => i.id === id);
-                        if (idx > -1) {
-                            items[idx].stock = Math.max(0, items[idx].stock - currentSelection[id]);
-                        }
-                    }
-                    localStorage.setItem('inventoryItems', JSON.stringify(items));
-                    renderMenuManagement(); // Refresh inventory tab
-                }
-            } catch (e) { console.error("Stock deduction failed", e); }
+            if (typeof renderMenuManagement === 'function') {
+                renderMenuManagement(); // Refresh inventory tab
+            }
 
             // Show success toast
             const toast = document.getElementById('walkin-toast');
@@ -3217,7 +4606,10 @@
                 }
                 renderRecentWalkins();
             }
-            if (tab === 'menu' && typeof renderMenuManagement === 'function') renderMenuManagement();
+            if (tab === 'menu') {
+                if (typeof window.switchAdminInvSubTab === 'function') window.switchAdminInvSubTab(window.activeAdminInvSubTab || 'food');
+                else if (typeof renderMenuManagement === 'function') renderMenuManagement();
+            }
             if (tab === 'promotions' && typeof renderPromotions === 'function') renderPromotions();
             if (tab === 'payments' && typeof renderPaymentHistory === 'function') renderPaymentHistory();
         };
@@ -3225,6 +4617,189 @@
         // Auto-render recent walk-ins when tab loads
         document.querySelector('[onclick="switchAdminTab(\'walkin\', this)"]')?.addEventListener('click', renderRecentWalkins);
     </script>
+
+    <!-- RECIPE EDITOR MODAL -->
+    <div id="recipe-editor-modal" class="hidden" style="position:fixed; inset:0; z-index:99999; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center;">
+        <div style="background:white; border-radius:20px; width:95%; max-width:650px; max-height:90vh; display:flex; flex-direction:column; box-shadow:0 25px 50px -12px rgba(0,0,0,0.3); overflow:hidden;">
+            <!-- Header -->
+            <div style="padding:20px 24px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; background:#f8fafc;">
+                <div>
+                    <h3 id="recipe-modal-title" style="margin:0; font-family:'Playfair Display',serif; color:#1b5e20; font-size:20px;">Edit Food Recipe</h3>
+                    <span id="recipe-modal-subtitle" style="font-size:13px; color:#64748b;">Configure required raw ingredients per serving</span>
+                </div>
+                <button onclick="closeRecipeEditorModal()" style="background:none; border:none; color:#64748b; cursor:pointer; font-size:22px; font-weight:bold;">✕</button>
+            </div>
+            <!-- Body -->
+            <div style="padding:24px; overflow-y:auto; flex:1;">
+                <!-- Current Recipe List -->
+                <h4 style="margin:0 0 12px 0; color:#1e293b; font-size:15px;">Required Ingredients per Serving:</h4>
+                <div id="recipe-ingredients-list" style="margin-bottom:20px; display:flex; flex-direction:column; gap:10px;">
+                    <!-- Filled via JS -->
+                </div>
+
+                <!-- Add Ingredient Section -->
+                <div style="background:#f0fdf4; border:1px dashed #86efac; border-radius:12px; padding:16px;">
+                    <h5 style="margin:0 0 10px 0; color:#166534; font-size:14px;">+ Add Raw Ingredient to Recipe</h5>
+                    
+                    <!-- Quick Presets -->
+                    <div style="margin-bottom:14px; display:flex; flex-direction:column; gap:8px;">
+                        <div style="font-size:11px; font-weight:bold; color:#15803d; text-transform:uppercase; letter-spacing:0.5px;">⚡ 1-Click Recipe Presets:</div>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+                            <span style="font-size:11px; font-weight:700; color:#475569;">🥩 Steaks:</span>
+                            <button type="button" onclick="applyQuickRecipePreset('beef200')" style="padding:4px 8px; border-radius:4px; border:1px solid #bbf7d0; background:white; color:#166534; font-size:11px; font-weight:bold; cursor:pointer;">+ 200g Tenderloin</button>
+                            <button type="button" onclick="applyQuickRecipePreset('ribeye300')" style="padding:4px 8px; border-radius:4px; border:1px solid #bbf7d0; background:white; color:#166534; font-size:11px; font-weight:bold; cursor:pointer;">+ 300g Ribeye</button>
+                            <button type="button" onclick="applyQuickRecipePreset('tbone450')" style="padding:4px 8px; border-radius:4px; border:1px solid #bbf7d0; background:white; color:#166534; font-size:11px; font-weight:bold; cursor:pointer;">+ 450g T-Bone</button>
+                            <button type="button" onclick="applyQuickRecipePreset('sirloin350')" style="padding:4px 8px; border-radius:4px; border:1px solid #bbf7d0; background:white; color:#166534; font-size:11px; font-weight:bold; cursor:pointer;">+ 350g Sirloin</button>
+                            <button type="button" onclick="applyQuickRecipePreset('patty1')" style="padding:4px 8px; border-radius:4px; border:1px solid #bbf7d0; background:white; color:#166534; font-size:11px; font-weight:bold; cursor:pointer;">+ 1 Beef Patty</button>
+                            <button type="button" onclick="applyQuickRecipePreset('saltpepper5')" style="padding:4px 8px; border-radius:4px; border:1px solid #fde047; background:#fef9c3; color:#854d0e; font-size:11px; font-weight:bold; cursor:pointer;">+ 5g Salt & Pepper</button>
+                            <button type="button" onclick="applyQuickRecipePreset('margarine20')" style="padding:4px 8px; border-radius:4px; border:1px solid #fde047; background:#fef9c3; color:#854d0e; font-size:11px; font-weight:bold; cursor:pointer;">+ 20g Margarine</button>
+                            <button type="button" onclick="applyQuickRecipePreset('oystersauce30')" style="padding:4px 8px; border-radius:4px; border:1px solid #fde047; background:#fef9c3; color:#854d0e; font-size:11px; font-weight:bold; cursor:pointer;">+ 30ml Oyster Sauce</button>
+                        </div>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+                            <span style="font-size:11px; font-weight:700; color:#475569;">🍗 Chicken:</span>
+                            <button type="button" onclick="applyQuickRecipePreset('chicken1')" style="padding:4px 8px; border-radius:4px; border:1px solid #fed7aa; background:#fff7ed; color:#9a3412; font-size:11px; font-weight:bold; cursor:pointer;">+ 1 Whole Chicken</button>
+                            <button type="button" onclick="applyQuickRecipePreset('chicken05')" style="padding:4px 8px; border-radius:4px; border:1px solid #fed7aa; background:#fff7ed; color:#9a3412; font-size:11px; font-weight:bold; cursor:pointer;">+ 0.5 Half Chicken</button>
+                            <button type="button" onclick="applyQuickRecipePreset('ketchup50')" style="padding:4px 8px; border-radius:4px; border:1px solid #fca5a5; background:#fef2f2; color:#991b1b; font-size:11px; font-weight:bold; cursor:pointer;">+ 50g Ketchup</button>
+                            <button type="button" onclick="applyQuickRecipePreset('butter20')" style="padding:4px 8px; border-radius:4px; border:1px solid #fed7aa; background:#fff7ed; color:#9a3412; font-size:11px; font-weight:bold; cursor:pointer;">+ 20g Butter</button>
+                        </div>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+                            <span style="font-size:11px; font-weight:700; color:#475569;">🐟 Fish:</span>
+                            <button type="button" onclick="applyQuickRecipePreset('tanigue250')" style="padding:4px 8px; border-radius:4px; border:1px solid #bae6fd; background:#f0f9ff; color:#0369a1; font-size:11px; font-weight:bold; cursor:pointer;">+ 250g Tanigue</button>
+                            <button type="button" onclick="applyQuickRecipePreset('bangus1')" style="padding:4px 8px; border-radius:4px; border:1px solid #bae6fd; background:#f0f9ff; color:#0369a1; font-size:11px; font-weight:bold; cursor:pointer;">+ 1 Bangus</button>
+                            <button type="button" onclick="applyQuickRecipePreset('toyo30')" style="padding:4px 8px; border-radius:4px; border:1px solid #cbd5e1; background:#f8fafc; color:#334155; font-size:11px; font-weight:bold; cursor:pointer;">+ 30ml Toyo</button>
+                            <button type="button" onclick="applyQuickRecipePreset('kalamansi20')" style="padding:4px 8px; border-radius:4px; border:1px solid #bbf7d0; background:#f0fdf4; color:#166534; font-size:11px; font-weight:bold; cursor:pointer;">+ 20ml Kalamansi</button>
+                        </div>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+                            <span style="font-size:11px; font-weight:700; color:#475569;">🍟 Sides & Buns:</span>
+                            <button type="button" onclick="applyQuickRecipePreset('bun1')" style="padding:4px 8px; border-radius:4px; border:1px solid #cbd5e1; background:white; color:#334155; font-size:11px; font-weight:bold; cursor:pointer;">+ 1 Burger Bun</button>
+                            <button type="button" onclick="applyQuickRecipePreset('potato150')" style="padding:4px 8px; border-radius:4px; border:1px solid #cbd5e1; background:white; color:#334155; font-size:11px; font-weight:bold; cursor:pointer;">+ 150g Potato</button>
+                            <button type="button" onclick="applyQuickRecipePreset('sauce50')" style="padding:4px 8px; border-radius:4px; border:1px solid #cbd5e1; background:white; color:#334155; font-size:11px; font-weight:bold; cursor:pointer;">+ 50ml Mushroom Sauce</button>
+                        </div>
+                    </div>
+
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <select id="recipe-add-ing-select" title="Select Ingredient to Add" aria-label="Select Ingredient to Add" style="flex:2; min-width:180px; padding:10px; border-radius:8px; border:1px solid #cbd5e1;">
+                            <!-- Options populated via JS -->
+                        </select>
+                        <input type="number" id="recipe-add-qty-input" placeholder="Qty per serving" style="flex:1; min-width:110px; padding:10px; border-radius:8px; border:1px solid #cbd5e1;" step="any" min="0.01">
+                        <button type="button" onclick="addIngredientToRecipeTemp()" style="background:#16a34a; color:white; border:none; padding:10px 16px; border-radius:8px; font-weight:bold; cursor:pointer;">+ Add</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Footer -->
+            <div style="padding:16px 24px; border-top:1px solid #e2e8f0; background:#f8fafc; display:flex; justify-content:flex-end; gap:12px;">
+                <button type="button" onclick="closeRecipeEditorModal()" style="padding:10px 20px; border-radius:8px; border:1px solid #cbd5e1; background:white; cursor:pointer;">Cancel</button>
+                <button type="button" onclick="saveCurrentRecipeModal()" style="padding:10px 24px; border-radius:8px; border:none; background:#2e7d32; color:white; font-weight:bold; cursor:pointer; box-shadow:0 4px 12px rgba(46,125,50,0.25);">💾 Save Recipe</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADD / RESTOCK RAW INGREDIENT MODAL -->
+    <div id="raw-ingredient-modal" class="hidden" style="position:fixed; inset:0; z-index:99999; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center;">
+        <div style="background:white; border-radius:20px; width:95%; max-width:500px; padding:24px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.3);">
+            <h3 id="raw-modal-title" style="margin:0 0 16px 0; font-family:'Playfair Display',serif; color:#1b5e20;">Add New Raw Ingredient</h3>
+            <div style="display:flex; flex-direction:column; gap:12px;">
+                <div>
+                    <label style="font-size:13px; font-weight:bold; color:#475569; display:block; margin-bottom:4px;">Ingredient Name</label>
+                    <input type="text" id="raw-ing-name" placeholder="e.g. Ribeye Cut, Salt, Milk" style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1; box-sizing:border-box;">
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <div style="flex:1;">
+                        <label style="font-size:13px; font-weight:bold; color:#475569; display:block; margin-bottom:4px;">Category</label>
+                        <select id="raw-ing-cat" title="Category" aria-label="Category" style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1; box-sizing:border-box;">
+                            <option value="Meat">Meat</option>
+                            <option value="Poultry">Poultry</option>
+                            <option value="Seafood">Seafood</option>
+                            <option value="Bakery">Bakery</option>
+                            <option value="Produce">Produce</option>
+                            <option value="Dairy">Dairy</option>
+                            <option value="Grains">Grains</option>
+                            <option value="Sauces & Liquids">Sauces & Liquids</option>
+                            <option value="Beverages">Beverages</option>
+                            <option value="Others">Others</option>
+                        </select>
+                    </div>
+                    <div style="flex:1;">
+                        <label style="font-size:13px; font-weight:bold; color:#475569; display:block; margin-bottom:4px;">Unit of Measure</label>
+                        <select id="raw-ing-unit" title="Unit of Measure" aria-label="Unit of Measure" style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1; box-sizing:border-box;">
+                            <option value="g">Grams (g)</option>
+                            <option value="kg">Kilograms (kg)</option>
+                            <option value="ml">Milliliters (ml)</option>
+                            <option value="L">Liters (L)</option>
+                            <option value="pcs">Pieces (pcs)</option>
+                            <option value="slices">Slices</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <div style="flex:1;">
+                        <label style="font-size:13px; font-weight:bold; color:#475569; display:block; margin-bottom:4px;">Initial Stock</label>
+                        <input type="number" id="raw-ing-stock" placeholder="1000" style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1; box-sizing:border-box;">
+                    </div>
+                    <div style="flex:1;">
+                        <label style="font-size:13px; font-weight:bold; color:#475569; display:block; margin-bottom:4px;">Min Threshold</label>
+                        <input type="number" id="raw-ing-threshold" placeholder="100" style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1; box-sizing:border-box;">
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top:20px; display:flex; justify-content:flex-end; gap:12px;">
+                <button type="button" onclick="closeRawIngredientModal()" style="padding:10px 20px; border-radius:8px; border:1px solid #cbd5e1; background:white; cursor:pointer;">Cancel</button>
+                <button type="button" onclick="saveNewRawIngredientModal()" style="padding:10px 24px; border-radius:8px; border:none; background:#16a34a; color:white; font-weight:bold; cursor:pointer;">Save Ingredient</button>
+            </div>
+        </div>
+    </div>
+    <!-- EXPORT OPTIONS MODAL (EXCEL & CSV) -->
+    <div id="export-csv-modal" class="hidden" style="position:fixed; inset:0; z-index:99999; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center;">
+        <div style="background:white; border-radius:20px; width:95%; max-width:500px; padding:24px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.3);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid #e2e8f0; padding-bottom:12px;">
+                <h3 style="margin:0; font-family:'Playfair Display',serif; color:#1b5e20; font-size:20px;">⬇️ Export Transactions Report</h3>
+                <button onclick="closeExportCsvModal()" style="background:none; border:none; color:#64748b; cursor:pointer; font-size:22px; font-weight:bold;">✕</button>
+            </div>
+            
+            <div style="margin-bottom:16px;">
+                <label style="font-size:13px; font-weight:bold; color:#334155; display:block; margin-bottom:6px;">Select Export Format:</label>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <label style="display:flex; align-items:center; gap:8px; padding:10px 12px; background:#f0fdf4; border:2px solid #86efac; border-radius:10px; cursor:pointer; font-weight:bold; font-size:13px; color:#166534;">
+                        <input type="radio" name="export-format" value="xlsx" checked style="accent-color:#166534;">
+                        📊 Excel (.xlsx)<br><span style="font-size:10px; font-weight:normal; color:#15803d;">Auto-fitted columns</span>
+                    </label>
+                    <label style="display:flex; align-items:center; gap:8px; padding:10px 12px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; cursor:pointer; font-weight:bold; font-size:13px; color:#334155;">
+                        <input type="radio" name="export-format" value="csv" style="accent-color:#1b5e20;">
+                        📄 CSV (.csv)<br><span style="font-size:10px; font-weight:normal; color:#64748b;">Plain Text</span>
+                    </label>
+                </div>
+            </div>
+
+            <label style="font-size:13px; font-weight:bold; color:#334155; display:block; margin-bottom:6px;">Select Date Timeframe:</label>
+            <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:20px;">
+                <label style="display:flex; align-items:center; gap:10px; padding:8px 12px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; cursor:pointer; font-weight:bold; font-size:13px; color:#1e293b;">
+                    <input type="radio" name="csv-timeframe" value="all" checked style="accent-color:#1b5e20;">
+                    🌐 All Time (All Records)
+                </label>
+                <label style="display:flex; align-items:center; gap:10px; padding:8px 12px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; cursor:pointer; font-weight:bold; font-size:13px; color:#1e293b;">
+                    <input type="radio" name="csv-timeframe" value="day" style="accent-color:#1b5e20;">
+                    📅 Today Only
+                </label>
+                <label style="display:flex; align-items:center; gap:10px; padding:8px 12px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; cursor:pointer; font-weight:bold; font-size:13px; color:#1e293b;">
+                    <input type="radio" name="csv-timeframe" value="week" style="accent-color:#1b5e20;">
+                    📆 This Week (Last 7 Days)
+                </label>
+                <label style="display:flex; align-items:center; gap:10px; padding:8px 12px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; cursor:pointer; font-weight:bold; font-size:13px; color:#1e293b;">
+                    <input type="radio" name="csv-timeframe" value="month" style="accent-color:#1b5e20;">
+                    🗓️ This Month
+                </label>
+                <label style="display:flex; align-items:center; gap:10px; padding:8px 12px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; cursor:pointer; font-weight:bold; font-size:13px; color:#1e293b;">
+                    <input type="radio" name="csv-timeframe" value="year" style="accent-color:#1b5e20;">
+                    🏛️ This Year
+                </label>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:10px;">
+                <button type="button" onclick="closeExportCsvModal()" style="padding:10px 18px; border-radius:8px; border:1px solid #cbd5e1; background:white; cursor:pointer; font-weight:600;">Cancel</button>
+                <button type="button" onclick="generateAndDownloadCsvReport()" style="padding:10px 22px; border-radius:8px; border:none; background:#1b5e20; color:white; font-weight:bold; cursor:pointer; box-shadow:0 4px 12px rgba(27,94,32,0.25);">⬇️ Download Report</button>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

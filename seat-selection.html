@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/design-system.css">
     <script src="js/design-system.js"></script>
+    <script src="js/inventory-system.js"></script>
     <link rel="stylesheet" href="css/responsive.css">
 </head>
 <body class="seat-selection-page">
@@ -272,6 +273,25 @@
         // ──────────────────────────────────────────────────────────
         const chosenDate = localStorage.getItem('arrivalDate') || '';
         const chosenTime = localStorage.getItem('arrivalTime') || '';
+
+        // Guard Check: Block Holiday / Closed Dates
+        if (chosenDate && typeof window.checkHolidayOrBlockedDate === 'function') {
+            const holidayCheck = window.checkHolidayOrBlockedDate(chosenDate);
+            if (holidayCheck.isBlocked) {
+                if (typeof superModal === 'function') {
+                    superModal({
+                        title: 'Holiday / Restaurant Closed 🚫',
+                        message: `Sorry, Roland's Steak House is closed on <b>${holidayCheck.name}</b> (${chosenDate}). Please select an available non-holiday date.`
+                    }).then(() => {
+                        window.location.href = 'index.html#reservations';
+                    });
+                } else {
+                    alert(`Sorry, Roland's Steak House is closed on ${holidayCheck.name} (${chosenDate}).`);
+                    window.location.href = 'index.html#reservations';
+                }
+            }
+        }
+
         const overrides  = JSON.parse(localStorage.getItem('tableOverrides')     || '{}');
         const history    = JSON.parse(localStorage.getItem('reservationHistory') || '[]');
 
@@ -358,6 +378,12 @@
 
         // Confirm booking (Standard / Priority)
         confirmBtn.addEventListener('click', () => {
+            const status = window.InventorySystem ? window.InventorySystem.getStoreStatus() : (localStorage.getItem('store_status') || 'open');
+            if (status === 'closed') {
+                if (window.showToast) window.showToast('Roland\'s Steakhouse is currently CLOSED for reservations.', 'error');
+                else alert('Roland\'s Steakhouse is currently CLOSED for reservations.');
+                return;
+            }
             if (!chosenTableId) return;
             localStorage.setItem('bookedTable',     chosenTableId);
             localStorage.setItem('reservationType', reservationType);
@@ -365,6 +391,50 @@
                 ? 'pre-order.html'
                 : 'standard-payment.html';
         });
+    </script>
+
+    <!-- STORE STATUS (OPEN / CLOSED) CUSTOMER PROTECTION -->
+    <div id="store-closed-banner" style="display:none; position:fixed; top:0; left:0; right:0; z-index:99999; background:linear-gradient(135deg, #7f1d1d 0%, #dc2626 100%); color:white; padding:12px 20px; text-align:center; font-family:'Inter', sans-serif; font-size:14px; font-weight:700; box-shadow:0 4px 15px rgba(0,0,0,0.3);">
+        🔒 NOTICE: Roland's Steakhouse is currently CLOSED and not accepting online orders or reservations. Please check back during opening hours.
+    </div>
+
+    <script>
+        function checkCustomerStoreStatus() {
+            const status = window.InventorySystem ? window.InventorySystem.getStoreStatus() : (localStorage.getItem('store_status') || 'open');
+            const banner = document.getElementById('store-closed-banner');
+            const isClosed = status === 'closed';
+
+            if (banner) {
+                banner.style.display = isClosed ? 'block' : 'none';
+            }
+
+            const confirmBtn = document.getElementById('confirm-final-btn');
+            if (confirmBtn) {
+                if (isClosed) {
+                    confirmBtn.style.pointerEvents = 'none';
+                    confirmBtn.style.opacity = '0.5';
+                    confirmBtn.style.filter = 'grayscale(1)';
+                } else {
+                    confirmBtn.style.pointerEvents = 'auto';
+                    confirmBtn.style.opacity = '1';
+                    confirmBtn.style.filter = 'none';
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', checkCustomerStoreStatus);
+        window.addEventListener('storeStatusUpdated', checkCustomerStoreStatus);
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'store_status') checkCustomerStoreStatus();
+        });
+        if (typeof BroadcastChannel !== 'undefined') {
+            try {
+                const bc = new BroadcastChannel('inventory_sync_channel');
+                bc.onmessage = (e) => {
+                    if (e.data && e.data.action === 'storeStatusUpdated') checkCustomerStoreStatus();
+                };
+            } catch (err) {}
+        }
     </script>
 </body>
 </html>

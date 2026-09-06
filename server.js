@@ -7,8 +7,18 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Serve all HTML, CSS, JS, images from the project root
-app.use(express.static(__dirname));
+// Serve static assets with no-cache in local development to ensure instant updates
+app.use((req, res, next) => {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+    next();
+});
+
+app.use(express.static(__dirname, {
+    etag: false,
+    lastModified: false
+}));
 
 // Initialize Supabase (Pulls from your .env file or Vercel Environment Variables)
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -22,6 +32,64 @@ if (supabaseUrl && supabaseKey) {
 }
 
 
+// ── SECURITY & SANITIZATION HELPERS ──
+function escapeHtml(str) {
+    if (typeof str !== 'string') return '';
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+// Memory Rate Limiter
+const rateLimitMap = new Map();
+const tempCodes = {}; // In-memory storage for codes: { email: { code, expires } }
+
+// ── AUTOMATED MEMORY SWEEPER (PREVENTS MEMORY LEAKS UNDER HIGH TRAFFIC) ──
+setInterval(() => {
+    const now = Date.now();
+    // 1. Prune expired rate limit records
+    for (const [key, record] of rateLimitMap.entries()) {
+        if (now > record.resetTime) {
+            rateLimitMap.delete(key);
+        }
+    }
+    // 2. Prune expired temp verification codes
+    for (const email in tempCodes) {
+        if (tempCodes[email] && tempCodes[email].expires && now > tempCodes[email].expires) {
+            delete tempCodes[email];
+        }
+    }
+}, 5 * 60 * 1000); // Sweeps every 5 minutes
+
+function createRateLimiter(maxRequests = 10, windowMs = 60000) {
+    return (req, res, next) => {
+        const ip = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'client';
+        const key = `${req.path}:${ip}`;
+        const now = Date.now();
+        const record = rateLimitMap.get(key) || { count: 0, resetTime: now + windowMs };
+
+        if (now > record.resetTime) {
+            record.count = 1;
+            record.resetTime = now + windowMs;
+        } else {
+            record.count++;
+        }
+
+        rateLimitMap.set(key, record);
+
+        if (record.count > maxRequests) {
+            return res.status(429).json({ success: false, error: 'Too many requests. Please try again later.' });
+        }
+        next();
+    };
+}
+
+const authLimiter = createRateLimiter(10, 60000); // 10 attempts per min
+const emailLimiter = createRateLimiter(5, 60000);  // 5 email receipts per min
+
 const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
@@ -32,29 +100,36 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-app.post('/api/send-receipt', async (req, res) => {
+app.post('/api/send-receipt', emailLimiter, async (req, res) => {
     const { email, customerName, amount, reservationNumber, paymentMethod, arrivalDateTime, table, orderSummary } = req.body;
 
     if (!email) {
         return res.status(400).json({ error: 'No email provided' });
     }
 
+    const safeName = escapeHtml(customerName || 'Guest');
+    const safeResNumber = escapeHtml(reservationNumber || 'N/A');
+    const safeArrival = escapeHtml(arrivalDateTime || 'N/A');
+    const safeTable = escapeHtml(table || 'Unassigned');
+    const safeMethod = escapeHtml(paymentMethod || 'Online');
+    const safeSummary = escapeHtml(orderSummary || 'Standard Reservation (No Pre-Orders)');
+    const safeAmount = Number(amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 });
+
     const mailOptions = {
         from: process.env.EMAIL_USER || 'your.restaurant.email@gmail.com',
         to: email,
-        subject: `Roland's Steak House - Receipt for ${reservationNumber}`,
+        subject: `Roland's Steak House - Receipt for ${safeResNumber}`,
         html: `
             <div style="font-family: 'Inter', Helvetica, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
                 <!-- Header -->
                 <div style="background: linear-gradient(135deg, #1b5e20 0%, #0d3811 100%); padding: 35px 20px; text-align: center;">
-                    <img src="https://i.imgur.com/your-logo-url-if-hosted.png" alt="Roland's Logo" style="height: 50px; margin-bottom: 15px; display: none;"> <!-- Hidden until hosted image added -->
                     <h1 style="color: #ffffff; margin: 0; font-size: 28px; letter-spacing: 1px; font-weight: 800;">Roland's Steak House</h1>
                     <p style="color: #a7f3d0; margin: 8px 0 0; font-size: 14px; text-transform: uppercase; letter-spacing: 2px;">Official E-Receipt</p>
                 </div>
 
                 <!-- Body -->
                 <div style="padding: 40px 30px;">
-                    <h2 style="color: #0f172a; margin-top: 0; font-size: 22px;">Hi ${customerName || 'Guest'},</h2>
+                    <h2 style="color: #0f172a; margin-top: 0; font-size: 22px;">Hi ${safeName},</h2>
                     <p style="color: #475569; font-size: 15px; line-height: 1.6;">Thank you for securing your table with us. Your priority reservation is officially confirmed and your payment has been processed successfully.</p>
                     
                     <!-- Details Card -->
@@ -63,7 +138,7 @@ app.post('/api/send-receipt', async (req, res) => {
                         <div style="margin-bottom: 15px;">
                             <span style="color: #64748b; font-size: 14px;">Reservation No.</span>
                             <div style="float: right;">
-                                <strong style="color: #0f172a; font-size: 15px; background: #e2e8f0; padding: 4px 10px; border-radius: 6px;">${reservationNumber}</strong>
+                                <strong style="color: #0f172a; font-size: 15px; background: #e2e8f0; padding: 4px 10px; border-radius: 6px;">${safeResNumber}</strong>
                             </div>
                             <div style="clear: both;"></div>
                         </div>
@@ -71,7 +146,7 @@ app.post('/api/send-receipt', async (req, res) => {
                         <div style="margin-bottom: 15px;">
                             <span style="color: #64748b; font-size: 14px;">Arrival Time</span>
                             <div style="float: right;">
-                                <strong style="color: #0f172a; font-size: 14px;">${arrivalDateTime || 'N/A'}</strong>
+                                <strong style="color: #0f172a; font-size: 14px;">${safeArrival}</strong>
                             </div>
                             <div style="clear: both;"></div>
                         </div>
@@ -79,7 +154,7 @@ app.post('/api/send-receipt', async (req, res) => {
                         <div style="margin-bottom: 15px;">
                             <span style="color: #64748b; font-size: 14px;">Table Assignment</span>
                             <div style="float: right;">
-                                <strong style="color: #0f172a; font-size: 14px;">${table || 'Unassigned'}</strong>
+                                <strong style="color: #0f172a; font-size: 14px;">${safeTable}</strong>
                             </div>
                             <div style="clear: both;"></div>
                         </div>
@@ -89,14 +164,14 @@ app.post('/api/send-receipt', async (req, res) => {
                         <div style="margin-bottom: 20px;">
                             <span style="display: block; color: #64748b; font-size: 14px; margin-bottom: 8px;">Pre-Order Summary</span>
                             <div style="color: #334155; font-size: 14px; line-height: 1.5; background: #ffffff; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
-                                ${orderSummary || 'Standard Reservation (No Pre-Orders)'}
+                                ${safeSummary}
                             </div>
                         </div>
 
                         <div style="border-top: 1px dashed #cbd5e1; margin: 20px 0; padding-top: 20px;">
-                            <span style="color: #64748b; font-size: 15px; font-weight: 600;">Total Paid (${paymentMethod || 'Online'})</span>
+                            <span style="color: #64748b; font-size: 15px; font-weight: 600;">Total Paid (${safeMethod})</span>
                             <div style="float: right;">
-                                <strong style="color: #16a34a; font-size: 24px;">₱${amount}</strong>
+                                <strong style="color: #16a34a; font-size: 24px;">₱${safeAmount}</strong>
                             </div>
                             <div style="clear: both;"></div>
                         </div>
@@ -105,7 +180,7 @@ app.post('/api/send-receipt', async (req, res) => {
                     <!-- Call to Action -->
                     <div style="text-align: center; margin-top: 35px;">
                         <p style="color: #64748b; font-size: 14px; margin-bottom: 20px;">For the fastest check-in, please present your digital QR code to our hostess upon arrival.</p>
-                        <a href="http://localhost:3000/receipt.html?res=${reservationNumber}" 
+                        <a href="http://localhost:3000/receipt.html?res=${encodeURIComponent(reservationNumber || '')}" 
                            style="background: #16a34a; color: #ffffff; padding: 16px 36px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 16px; display: inline-block;">
                            📋 View Digital QR Receipt
                         </a>
@@ -131,7 +206,7 @@ app.post('/api/send-receipt', async (req, res) => {
 });
 
 /* LOGIN */
-app.post('/login', async (req, res) => {
+app.post('/login', authLimiter, async (req, res) => {
     const { email, password } = req.body;
 
     try {
@@ -165,7 +240,7 @@ app.post('/login', async (req, res) => {
 });
 
 /* SIGNUP */
-app.post('/signup', async (req, res) => {
+app.post('/signup', authLimiter, async (req, res) => {
     const { name, email, password } = req.body;
 
     try {
@@ -183,7 +258,7 @@ app.post('/signup', async (req, res) => {
 });
 
 /* SIGNUP VERIFICATION */
-app.post('/api/auth/send-signup-code', async (req, res) => {
+app.post('/api/auth/send-signup-code', authLimiter, async (req, res) => {
     const { email } = req.body;
     if (!email) return res.status(400).json({ success: false, error: "Email required" });
 
@@ -216,7 +291,7 @@ app.post('/api/auth/send-signup-code', async (req, res) => {
                         <h3 style="color: #1e293b; margin-top: 0;">Verify Your Email Address</h3>
                         <p style="color: #475569; margin-bottom: 25px;">Welcome! Please use the verification code below to complete your sign up:</p>
                         <div style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #1b5e20; background: #f0fdf4; padding: 15px; border-radius: 8px; border: 2px dashed #86efac; display: inline-block; margin-bottom: 25px;">
-                            ${code}
+                            ${escapeHtml(code)}
                         </div>
                         <p style="color: #94a3b8; font-size: 13px;">This code will expire in 10 minutes.</p>
                     </div>
@@ -233,9 +308,8 @@ app.post('/api/auth/send-signup-code', async (req, res) => {
 });
 
 /* FORGOT PASSWORD - USPEEDO INTEGRATION */
-const tempCodes = {}; // In-memory storage for codes: { email: { code, expires } }
 
-app.post('/api/auth/send-code', async (req, res) => {
+app.post('/api/auth/send-code', authLimiter, async (req, res) => {
     const { email } = req.body;
     if (!email) return res.status(400).json({ success: false, error: "Email required" });
 

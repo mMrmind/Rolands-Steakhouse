@@ -2050,22 +2050,22 @@ body.vip-mode .reservation-filter label span {
 .chat-bubble-btn {
     width: 60px;
     height: 60px;
-    background: #ff9000;
+    background: linear-gradient(135deg, #1b5e20, #2e7d32);
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
-    color: #1a0800;
-    font-size: 28px;
-    box-shadow: 0 4px 15px rgba(255, 144, 0, 0.4);
+    color: #ffffff;
+    font-size: 26px;
+    box-shadow: 0 4px 18px rgba(27, 94, 32, 0.45);
     cursor: pointer;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: none;
+    border: 2px solid rgba(255, 255, 255, 0.25);
     pointer-events: auto; /* Always allow bubble clicks */
 }
 .chat-bubble-btn:hover {
-    transform: scale(1.1);
-    box-shadow: 0 6px 20px rgba(255, 144, 0, 0.6);
+    transform: scale(1.08);
+    box-shadow: 0 8px 25px rgba(27, 94, 32, 0.65);
 }
 
 .chat-panel {

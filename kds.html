@@ -4,153 +4,184 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kitchen Display System (KDS) | Roland's</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@400;500;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/kds.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/kitchen.css">
+    <link rel="stylesheet" href="css/design-system.css">
+    <script src="js/design-system.js"></script>
     <link rel="stylesheet" href="css/responsive.css">
 </head>
 <body>
 
     <header>
-        <div class="brand">Kitchen Display (KDS)</div>
-        <div class="kds-clock" id="live-clock">00:00:00</div>
+        <div class="brand-section">
+            <div class="brand">ROLAND'S KDS DISPLAY</div>
+            <div class="kds-clock" id="live-clock">00:00:00</div>
+        </div>
+        <div class="metrics-bar">
+            <a href="kitchen.html" style="text-decoration:none;">
+                <button class="icon-btn" type="button">
+                    👨‍🍳 Switch to Interactive Cook Terminal
+                </button>
+            </a>
+        </div>
     </header>
 
-    <div class="container">
-        <div class="controls">
-        <span class="kds-sync-hint">Syncs automatically every 5 seconds.</span>
+    <div class="toolbar">
+        <div class="filter-tabs">
+            <button class="tab-btn active" id="tab-all" type="button" onclick="setFilter('all')">ALL ORDERS</button>
+            <button class="tab-btn" id="tab-pending" type="button" onclick="setFilter('pending')">PENDING</button>
+            <button class="tab-btn" id="tab-cooking" type="button" onclick="setFilter('cooking')">COOKING</button>
+            <button class="tab-btn" id="tab-ready" type="button" onclick="setFilter('ready')">READY</button>
         </div>
-        
-        <div class="ticket-grid" id="ticket-grid">
-            <!-- Tickets injected via JS -->
-            <div class="no-tickets">Loading queue...</div>
+        <div style="font-size: 13px; color: var(--kds-text-muted); font-weight: 600;">
+            ● Auto-syncs every 3 seconds
         </div>
     </div>
 
+    <main class="container">
+        <div class="ticket-grid" id="ticket-grid">
+            <div class="kds-empty">Loading Kitchen Queue...</div>
+        </div>
+    </main>
+
     <script>
-        // Update Live Clock
+        let activeFilter = 'all';
+
         function updateClock() {
-            const now = new Date();
-            document.getElementById('live-clock').textContent = now.toLocaleTimeString();
+            const clockEl = document.getElementById('live-clock');
+            if (clockEl) clockEl.textContent = new Date().toLocaleTimeString();
         }
         setInterval(updateClock, 1000);
         updateClock();
 
+        function setFilter(filterName) {
+            activeFilter = filterName;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById(`tab-${filterName}`);
+            if (activeBtn) activeBtn.classList.add('active');
+            loadTickets();
+        }
+
+        function getElapsedTimerHtml(createdAtIso) {
+            if (!createdAtIso) return `<span class="timer-badge normal">⏱️ Recent</span>`;
+            const createdMs = new Date(createdAtIso).getTime();
+            if (isNaN(createdMs)) return `<span class="timer-badge normal">⏱️ Recent</span>`;
+            
+            const diffMins = Math.floor((Date.now() - createdMs) / 60000);
+            if (diffMins < 10) return `<span class="timer-badge normal">⏱️ ${diffMins}m ago</span>`;
+            if (diffMins < 20) return `<span class="timer-badge warning">⏱️ ${diffMins}m ago</span>`;
+            return `<span class="timer-badge urgent">🔥 URGENT ${diffMins}m</span>`;
+        }
+
         function loadTickets() {
             const hist = JSON.parse(localStorage.getItem('reservationHistory') || '[]');
-            const overrides = JSON.parse(localStorage.getItem('tableOverrides') || '{}');
             const grid = document.getElementById('ticket-grid');
-            grid.innerHTML = '';
-            
-            // Separate into active queue and continuous orders
-            const activeOrders = [];
-            const continuousOrders = [];
+            if (!grid) return;
 
-            hist.forEach(r => {
-                if (!r.foods || r.foods.length === 0) return;
-                
-                const isSeated = overrides[r.bookedTable] === 'seated';
-                const isServed = r.kdsStatus === 'served';
+            let foodOrders = hist.map((r, index) => ({ ...r, _originalIndex: index }))
+                .filter(r => r.foods && r.foods.length > 0 && r.kdsStatus !== 'served' && r.kdsStatus !== 'cancelled');
 
-                if (isSeated && isServed) {
-                    continuousOrders.push(r);
-                } else if (!isServed) {
-                    activeOrders.push(r);
-                }
+            if (activeFilter !== 'all') {
+                foodOrders = foodOrders.filter(o => (o.kdsStatus || 'pending') === activeFilter);
+            }
+
+            foodOrders.sort((a, b) => {
+                const statusOrder = { 'pending': 1, 'cooking': 2, 'ready': 3 };
+                const stA = statusOrder[a.kdsStatus || 'pending'] || 1;
+                const stB = statusOrder[b.kdsStatus || 'pending'] || 1;
+                if (stA !== stB) return stA - stB;
+                return (a._originalIndex - b._originalIndex);
             });
-            
-            // Sort to push Ready to the end, or oldest to the front
-            activeOrders.sort((a, b) => {
-                if (a.kdsStatus === 'ready' && b.kdsStatus !== 'ready') return 1;
-                if (b.kdsStatus === 'ready' && a.kdsStatus !== 'ready') return -1;
-                if (a.arrivalTime && b.arrivalTime) return a.arrivalTime.localeCompare(b.arrivalTime);
-                return 0;
-            });
-            
-            if (activeOrders.length === 0 && continuousOrders.length === 0) {
-                grid.innerHTML = `<div class="no-tickets">No Active Pre-Orders in Queue</div>`;
+
+            if (foodOrders.length === 0) {
+                grid.innerHTML = `<div class="kds-empty">No active food orders in queue.</div>`;
                 return;
             }
 
-            // Render function for a single ticket
-            const renderTicket = (r, isContinuous) => {
-                // Find real index for saving back to localStorage
-                const realIdx = hist.findIndex(hr => hr.reservationNumber === r.reservationNumber);
-                
-                const status = isContinuous ? 'continuous' : (r.kdsStatus || 'pending');
+            grid.innerHTML = '';
+            foodOrders.forEach(r => {
+                const realIdx = r._originalIndex;
+                const status = r.kdsStatus || 'pending';
                 const t = document.createElement('div');
                 t.className = `ticket status-${status}`;
-                if (isContinuous) t.style.opacity = '0.8'; // slight dim for continuous
-                
-                // Construct the food line items natively 
-                let beefNoteHtml = '';
+
+                const foodsHtml = (r.foods || []).map(f => {
+                    const match = f.match(/^(\d+x)\s+(.*)/);
+                    if (match) {
+                        return `<li><span class="qty-tag">${match[1]}</span> <span>${escapeHtml(match[2])}</span></li>`;
+                    }
+                    return `<li><span class="qty-tag">1x</span> <span>${escapeHtml(f)}</span></li>`;
+                }).join('');
+
+                let donenessHtml = '';
                 if (r.beefNote) {
-                    const bn = r.beefNote.toLowerCase();
-                    if (bn.includes('rare') || bn.includes('medium')) {
-                        beefNoteHtml = `<li style="color: #dc2626; font-weight: 800; font-size: 1.1em; background: #fee2e2; padding: 4px 8px; border-radius: 4px; margin-bottom: 5px; border: 1px solid #f87171;">🔥 ${r.beefNote.toUpperCase()}</li>`;
-                    } else {
-                        beefNoteHtml = `<li style="font-style: italic; color: #b45309; font-weight: bold; margin-bottom: 5px;">Note: ${r.beefNote}</li>`;
-                    }
-                }
-                const foodsHtml = beefNoteHtml + (r.foods || []).map(f => `<li><span class="qty">1x</span> ${f}</li>`).join('');
-                
-                let btns = '';
-                if (!isContinuous) {
-                    if (status === 'pending') {
-                        btns = `<button class="btn-cook" onclick="updateStatus(${realIdx}, 'cooking')">Start Cooking</button>`;
-                    } else if (status === 'cooking') {
-                        btns = `<button class="btn-ready" onclick="updateStatus(${realIdx}, 'ready')">Mark Ready</button>`;
-                    } else if (status === 'ready') {
-                        btns = `<button class="btn-clear" onclick="updateStatus(${realIdx}, 'served')">Dismiss (Served)</button>`;
-                    }
-                } else {
-                    btns = `<div style="text-align:center; font-size:12px; color:#6b7280; font-weight:bold;">Open Bill - Clears when table is un-seated</div>`;
+                    donenessHtml = `<div class="doneness-badge">🔥 DONENESS: ${escapeHtml(r.beefNote.toUpperCase())}</div>`;
                 }
 
+                let btns = '';
+                if (status === 'pending') {
+                    btns = `<button class="btn-cook" onclick="updateStatus(${realIdx}, 'cooking')">START COOKING</button>`;
+                } else if (status === 'cooking') {
+                    btns = `<button class="btn-ready" onclick="updateStatus(${realIdx}, 'ready')">MARK READY</button>`;
+                } else if (status === 'ready') {
+                    btns = `<button class="btn-dismiss" onclick="updateStatus(${realIdx}, 'served')">DONE / DISMISS</button>`;
+                }
+
+                const tableText = r.bookedTable ? (r.bookedTable.toLowerCase().includes('table') ? r.bookedTable.toUpperCase() : `TABLE ${r.bookedTable}`) : 'WALK-IN';
+
                 t.innerHTML = `
-                    <div class="ticket-header" style="${isContinuous ? 'background:#f3f4f6;' : ''}">
+                    <div class="ticket-header">
                         <div>
-                            <div class="ticket-table">${r.bookedTable || 'Waiting'}</div>
-                            <div class="ticket-name">${r.customerName}</div>
-                            <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">#${r.reservationNumber}</div>
+                            <div class="table-badge">${escapeHtml(tableText)}</div>
+                            <div class="customer-name">${escapeHtml(r.customerName || 'Guest')}</div>
                         </div>
                         <div class="ticket-meta">
-                            <div class="ticket-time">${r.arrivalTime || 'ASAP'}</div>
-                            <div class="ticket-status status-text-${status}">${isContinuous ? 'OPEN BILL' : status}</div>
+                            ${getElapsedTimerHtml(r.createdAt || r.kdsUpdateAt)}
+                            <span class="status-badge ${status}">${status}</span>
                         </div>
                     </div>
+                    ${donenessHtml}
                     <ul class="food-list">${foodsHtml}</ul>
                     <div class="actions">${btns}</div>
                 `;
-                return t;
-            };
-
-            // Append active orders
-            activeOrders.forEach(r => grid.appendChild(renderTicket(r, false)));
-
-            // Append continuous orders section if any exist
-            if (continuousOrders.length > 0) {
-                const sep = document.createElement('div');
-                sep.style.cssText = 'grid-column: 1 / -1; margin-top: 20px; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 2px dashed #cbd5e1; color: #475569; font-family: Playfair Display, serif; font-size: 24px; font-weight: bold;';
-                sep.textContent = '🔄 Continuous Orders (Open Bills)';
-                grid.appendChild(sep);
-                
-                continuousOrders.forEach(r => grid.appendChild(renderTicket(r, true)));
-            }
+                grid.appendChild(t);
+            });
         }
 
         window.updateStatus = function(idx, newStatus) {
             const hist = JSON.parse(localStorage.getItem('reservationHistory') || '[]');
-            if(hist[idx]) {
+            if (hist[idx]) {
                 hist[idx].kdsStatus = newStatus;
+                hist[idx].kdsUpdateAt = new Date().toISOString();
                 localStorage.setItem('reservationHistory', JSON.stringify(hist));
+                try {
+                    window.dispatchEvent(new CustomEvent('reservationHistoryUpdated', { detail: hist }));
+                    if (typeof BroadcastChannel !== 'undefined') {
+                        new BroadcastChannel('inventory_sync_channel').postMessage({ action: 'reservationHistoryUpdated', payload: hist });
+                    }
+                } catch (e) {}
                 loadTickets();
             }
         };
 
-        // Network Poller
-        setInterval(loadTickets, 5000);
-        
-        // Initial Load
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'reservationHistory' || e.key === 'tableOverrides') {
+                loadTickets();
+            }
+        });
+
+        try {
+            if (typeof BroadcastChannel !== 'undefined') {
+                const kdsChannel = new BroadcastChannel('inventory_sync_channel');
+                kdsChannel.onmessage = function (e) {
+                    if (e.data && (e.data.action === 'reservationHistoryUpdated' || e.data.action === 'tableOverridesUpdated')) {
+                        loadTickets();
+                    }
+                };
+            }
+        } catch (e) {}
+
+        setInterval(loadTickets, 3000);
         loadTickets();
     </script>
 </body>

@@ -7,8 +7,8 @@
         {
             "type": "chrome",
             "request": "launch",
-            "name": "Launch index.html in Chrome",
-            "file": "${workspaceFolder}/index.html"
+            "name": "Open index.html",
+            "file": "c:\\Users\\Aldus\\OneDrive\\Desktop\\Capstone prototype\\index.html"
         }
     ]
 }

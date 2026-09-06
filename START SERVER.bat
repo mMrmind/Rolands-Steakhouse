@@ -32,10 +32,10 @@ if not exist "node_modules" (
 
 :: Start the server in background via cmd
 echo  Starting server...
-start "Roland's Server" cmd /c "node server.js"
+start "Roland's Server" cmd /k "node server.js"
 
 :: Wait for server to boot
-timeout /t 3 /nobreak >nul
+ping 127.0.0.1 -n 4 >nul
 
 :: Open browser automatically
 echo  Opening browser...

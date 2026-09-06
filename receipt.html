@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="css/receipt.css">
     <link rel="stylesheet" href="css/design-system.css">
     <script src="js/design-system.js"></script>
+    <script src="js/inventory-system.js"></script>
     <link rel="stylesheet" href="css/responsive.css">
 </head>
 
@@ -75,6 +76,7 @@
         <div class="btn-area">
             <button class="print-btn" onclick="window.print()">🖨️ PRINT RECEIPT</button>
             <button class="print-btn" style="background:#334155;" onclick="downloadReceiptAsPhoto()">📥 DOWNLOAD RECEIPT</button>
+            <button id="btn-cancel-reservation-receipt" class="home-btn" style="background:#dc2626; color:white; border:none; margin-top:4px;" onclick="cancelReceiptReservation()">🚫 CANCEL RESERVATION</button>
             <button class="home-btn" onclick="window.location.href='index.html'">RETURN HOME</button>
         </div>
     </div>
@@ -130,39 +132,96 @@
                 name = myRes.customerName || 'Valued Guest';
                 table = myRes.bookedTable || 'TBD';
                 total = myRes.paymentAmount || '0';
-                orders = myRes.orderSummary || 'No items selected';
+                orders = (myRes.foods && myRes.foods.length) ? myRes.foods.join(', ') : (myRes.orderSummary || 'Standard Reservation');
                 reservationNumber = myRes.reservationNumber;
                 arrivalDisplay = myRes.arrivalDateTimeDisplay || new Date().toLocaleString('en-GB', { hour12: false });
             }
         }
 
         // Fill receipt
-        document.getElementById('order-num').textContent = reservationNumber;
-        document.getElementById('customer-name').textContent = name;
-        document.getElementById('table-id').textContent = table;
-        document.getElementById('total-amount').textContent = Number(total).toLocaleString();
-        document.getElementById('date-now').textContent = arrivalDisplay;
+        if (document.getElementById('order-num')) document.getElementById('order-num').textContent = reservationNumber;
+        if (document.getElementById('customer-name')) document.getElementById('customer-name').textContent = name;
+        if (document.getElementById('table-id')) document.getElementById('table-id').textContent = table;
+        if (document.getElementById('total-amount')) document.getElementById('total-amount').textContent = Number(total).toLocaleString();
+        if (document.getElementById('date-now')) document.getElementById('date-now').textContent = arrivalDisplay;
 
         // Fill order items
         const list = document.getElementById('order-items-list');
-        orders.split(', ').forEach(item => {
-            if (item) {
-                const li = document.createElement('li');
-                li.className = 'order-item';
-                li.innerHTML = `<span>${item}</span> <span>(Paid)</span>`;
-                list.appendChild(li);
-            }
-        });
+        if (list) {
+            list.innerHTML = '';
+            const itemList = Array.isArray(orders) ? orders : String(orders).split(/,\s*/);
+            itemList.forEach(item => {
+                if (item && item.trim()) {
+                    const li = document.createElement('li');
+                    li.className = 'order-item';
+                    li.innerHTML = `<span>${item.trim()}</span> <span>(Paid)</span>`;
+                    list.appendChild(li);
+                }
+            });
+        }
 
         // Initialize QR Code
-        new QRCode(document.getElementById("qrcode"), {
-            text: reservationNumber,
-            width: 120,
-            height: 120,
-            colorDark: "#1e293b",
-            colorLight: "#ffffff",
-            correctLevel: QRCode.CorrectLevel.H
-        });
+        const qrContainer = document.getElementById("qrcode");
+        if (qrContainer) {
+            qrContainer.innerHTML = '';
+            new QRCode(qrContainer, {
+                text: reservationNumber,
+                width: 120,
+                height: 120,
+                colorDark: "#1e293b",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        // Check if reservation is cancelled
+        const hist = JSON.parse(localStorage.getItem('reservationHistory') || '[]');
+        const currentRes = hist.find(r => r.reservationNumber === reservationNumber);
+        const cancelBtn = document.getElementById('btn-cancel-reservation-receipt');
+
+        const isCancelled = currentRes && (currentRes.approvalStatus === 'rejected' || currentRes.approvalStatus === 'cancelled' || currentRes.kdsStatus === 'cancelled');
+        const isCompleted = currentRes && (Boolean(currentRes.completedAt) || currentRes.approvalStatus === 'completed' || currentRes.kdsStatus === 'served');
+
+        if (isCancelled || isCompleted) {
+            if (cancelBtn) cancelBtn.style.display = 'none';
+        }
+
+        if (isCancelled) {
+            const paper = document.getElementById('receipt-capture-area');
+            if (paper) {
+                const stamp = document.createElement('div');
+                stamp.style.cssText = 'border:3px solid #dc2626; color:#dc2626; font-size:24px; font-weight:900; text-transform:uppercase; letter-spacing:3px; padding:8px 16px; border-radius:8px; text-align:center; margin:16px auto; width:fit-content; transform:rotate(-5deg);';
+                stamp.textContent = 'CANCELLED';
+                paper.insertBefore(stamp, paper.firstChild);
+            }
+        }
+
+        function cancelReceiptReservation() {
+            const resNum = reservationNumber;
+            if (!resNum || resNum === 'TBD') {
+                alert('No active reservation found.');
+                return;
+            }
+
+            const reason = prompt(`Please enter the reason for cancelling reservation #${resNum}:`, 'Customer requested cancellation from receipt page');
+            if (!reason) return; // user cancelled prompt
+
+            if (window.InventorySystem && typeof window.InventorySystem.cancelReservationWithFood === 'function') {
+                const res = window.InventorySystem.cancelReservationWithFood({
+                    reservationNumber: resNum,
+                    reason: reason,
+                    cancelledBy: 'customer',
+                    operator: 'Customer Receipt Portal'
+                });
+
+                if (res && res.success) {
+                    alert(`✅ Reservation #${resNum} has been cancelled successfully.\n\nYour table has been released and all pre-ordered foods have been cancelled.`);
+                    window.location.reload();
+                } else {
+                    alert('Could not cancel reservation: ' + (res?.error || 'Unknown error'));
+                }
+            } else {
+                alert('Inventory system offline.');
+            }
+        }
     </script>
 </body>
 

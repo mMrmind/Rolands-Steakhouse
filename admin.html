@@ -604,6 +604,67 @@
                     </div>
                 </div>
 
+                <!-- REFUND MODAL -->
+                <div id="refund-modal" class="modal-overlay hidden"
+                    style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 10000; backdrop-filter: blur(4px);">
+                    <div class="modal-card"
+                        style="background: white; padding: 25px 30px; border-radius: 16px; width: 90%; max-width: 460px; box-shadow: 0 20px 40px rgba(0,0,0,0.25); border: 1px solid #e2e8f0; animation: modalPop 0.25s ease;">
+                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px;">
+                            <div style="background:#eff6ff; color:#2563eb; width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:bold;">💸</div>
+                            <div>
+                                <h3 style="margin:0; color:#1e3a8a; font-size:18px;">Issue Customer Refund</h3>
+                                <p style="margin:2px 0 0; font-size:12px; color:#64748b;">Record and process refund for cancelled reservation</p>
+                            </div>
+                        </div>
+
+                        <input type="hidden" id="refund-res-num">
+                        
+                        <div style="background:#f8fafc; padding:12px 16px; border-radius:10px; border:1px solid #e2e8f0; margin-bottom:15px; font-size:13px;">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                                <span style="color:#64748b;">Reservation:</span>
+                                <strong id="refund-display-res" style="color:#0f172a;">—</strong>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                                <span style="color:#64748b;">Customer:</span>
+                                <strong id="refund-display-customer" style="color:#0f172a;">—</strong>
+                            </div>
+                            <div style="display:flex; justify-content:space-between;">
+                                <span style="color:#64748b;">Original Paid:</span>
+                                <strong id="refund-display-original" style="color:#15803d;">₱0.00</strong>
+                            </div>
+                        </div>
+
+                        <label style="display:block; margin: 10px 0 5px; font-weight:600; font-size:12px; text-transform:uppercase; color:#475569;">Refund Amount (₱)</label>
+                        <input type="number" id="refund-amount" step="0.01" min="0" placeholder="0.00"
+                            style="width: 100%; padding:10px; border:1.5px solid #cbd5e1; border-radius:8px; box-sizing:border-box; font-size:15px; font-weight:bold; color:#0f172a;">
+
+                        <label style="display:block; margin: 12px 0 5px; font-weight:600; font-size:12px; text-transform:uppercase; color:#475569;">Refund Method</label>
+                        <select id="refund-method"
+                            style="width: 100%; padding:10px; border:1.5px solid #cbd5e1; border-radius:8px; box-sizing:border-box; font-size:14px; color:#0f172a;">
+                            <option value="gcash">GCash (Manual Transfer)</option>
+                            <option value="paymaya">PayMaya (Maya)</option>
+                            <option value="cash">Cash (In-Store)</option>
+                            <option value="bank_transfer">Bank Transfer</option>
+                            <option value="paymongo">PayMongo Gateway (Card/Online)</option>
+                        </select>
+
+                        <label style="display:block; margin: 12px 0 5px; font-weight:600; font-size:12px; text-transform:uppercase; color:#475569;">Reference / Transaction #</label>
+                        <input type="text" id="refund-ref" placeholder="e.g. GCash Ref No. 123456789"
+                            style="width: 100%; padding:10px; border:1.5px solid #cbd5e1; border-radius:8px; box-sizing:border-box; font-size:13px;">
+
+                        <label style="display:block; margin: 12px 0 5px; font-weight:600; font-size:12px; text-transform:uppercase; color:#475569;">Refund Reason / Notes</label>
+                        <input type="text" id="refund-reason" placeholder="e.g. Customer requested cancellation"
+                            style="width: 100%; padding:10px; border:1.5px solid #cbd5e1; border-radius:8px; box-sizing:border-box; font-size:13px;">
+
+                        <div style="display:flex; gap: 10px; margin-top:20px;">
+                            <button type="button" class="secondary" onclick="window.closeRefundModal()"
+                                style="flex:1; padding:10px; border-radius:8px; font-weight:700; cursor:pointer;">Cancel</button>
+                            <button type="button" onclick="window.submitRefundModal()"
+                                style="flex:1; padding:10px; background:#2563eb; color:white; border:none; border-radius:8px; font-weight:700; cursor:pointer; box-shadow:0 4px 10px rgba(37,99,235,0.3);">Confirm Refund</button>
+                        </div>
+                    </div>
+                </div>
+
             </div> <!-- End tab-overview -->
 
 
@@ -1282,7 +1343,11 @@
                     let statusBadge = '';
                     const s = (r.paymentStatus || '').toLowerCase();
 
-                    if (s === 'paid' || s === 'verified') {
+                    if (r.refundStatus === 'refunded' || s === 'refunded') {
+                        statusBadge = `<div style="font-size:10px; color:#1e40af; font-weight:800; background:#eff6ff; padding:2px 6px; border-radius:4px; display:inline-block; margin-top:2px; border:1px solid #bfdbfe;">💸 REFUNDED (-₱${Number(r.refundAmount || r.paymentAmount || 0).toLocaleString()})</div>`;
+                    } else if (r.refundStatus === 'pending_refund') {
+                        statusBadge = `<div style="font-size:10px; color:#b45309; font-weight:800; background:#fef3c7; padding:2px 6px; border-radius:4px; display:inline-block; margin-top:2px; border:1px solid #fde68a;">⚠️ REFUND PENDING</div>`;
+                    } else if (s === 'paid' || s === 'verified') {
                         statusBadge = `<div style="font-size:10px; color:#15803d; font-weight:800; display:block; margin-top:2px;">${s === 'verified' ? 'VERIFIED' : 'PAID'}</div>`;
                     } else if (s === 'pending_paymongo' || s === 'rejected') {
                         statusBadge = `<div style="font-size:10px; color:#dc2626; font-weight:800; display:block; margin-top:2px;">${s === 'rejected' ? 'REJECTED' : 'UNPAID/FAILED'}</div>`;
@@ -1325,8 +1390,18 @@
                         `;
                     } else if (aStatus === 'seated') {
                         approvalBtns = `<div style="font-size:11px; color:#1b5e20; font-weight:bold; margin-top:4px; text-align:center;">Seated</div>`;
-                    } else if (aStatus === 'rejected') {
-                        approvalBtns = `<div style="font-size:11px; color:#991b1b; font-weight:bold; margin-top:4px; text-align:center;">Rejected</div>`;
+                    } else if (aStatus === 'rejected' || aStatus === 'cancelled') {
+                        approvalBtns = `<div style="font-size:11px; color:#991b1b; font-weight:bold; margin-top:4px; text-align:center;">${aStatus === 'cancelled' ? 'Cancelled' : 'Rejected'}</div>`;
+                    }
+
+                    const isCancelledOrRejected = aStatus === 'rejected' || aStatus === 'cancelled' || r.kdsStatus === 'cancelled';
+                    const hasPayment = s === 'paid' || s === 'walk-in' || s === 'verified' || Number(r.paymentAmount) > 0;
+                    if (r.refundStatus === 'refunded' || s === 'refunded') {
+                        approvalBtns += `<div style="font-size:10px; color:#1e40af; font-weight:bold; margin-top:4px; text-align:center;">💸 Refund Processed</div>`;
+                    } else if (isCancelledOrRejected && (r.refundStatus === 'pending_refund' || hasPayment)) {
+                        approvalBtns += `
+                            <button type="button" style="background:#2563eb; color:white; padding: 5px 8px; font-size: 11px; border:none; border-radius:4px; margin-top:4px; width:100%; cursor:pointer; font-weight:bold; display:flex; align-items:center; justify-content:center; gap:4px; position:relative; z-index:2;" onclick="event.stopPropagation(); window.openRefundModal('${resKey}')">💸 Issue Refund</button>
+                        `;
                     }
 
                     tdActions.innerHTML = `
@@ -1348,6 +1423,75 @@
                     historyTbody.appendChild(tr);
                 });
             }
+
+            // Global Action Handlers
+            window.openRefundModal = function(resNum) {
+                const hist = getReservationHistory();
+                const r = hist.find(h => (h.reservationNumber === resNum || h.id === resNum || String(h.id) === String(resNum) || h.resNumber === resNum));
+                if (!r) {
+                    if (window.showToast) window.showToast('Reservation not found', 'error');
+                    return;
+                }
+                const originalPaid = Number(r.paymentAmount || r.totalBill || r.amount || 0);
+
+                document.getElementById('refund-res-num').value = r.reservationNumber || r.id || resNum;
+                document.getElementById('refund-display-res').textContent = r.reservationNumber || r.id || resNum;
+                document.getElementById('refund-display-customer').textContent = r.customerName || 'Guest';
+                document.getElementById('refund-display-original').textContent = '₱' + originalPaid.toLocaleString(undefined, { minimumFractionDigits: 2 });
+                document.getElementById('refund-amount').value = originalPaid;
+                document.getElementById('refund-ref').value = '';
+                document.getElementById('refund-reason').value = r.cancellationReason || 'Customer requested cancellation';
+
+                const modal = document.getElementById('refund-modal');
+                if (modal) {
+                    modal.classList.remove('hidden');
+                    modal.style.display = 'flex';
+                }
+            };
+
+            window.closeRefundModal = function() {
+                const modal = document.getElementById('refund-modal');
+                if (modal) {
+                    modal.classList.add('hidden');
+                    modal.style.display = 'none';
+                }
+            };
+
+            window.submitRefundModal = async function() {
+                const resNum = document.getElementById('refund-res-num').value;
+                const amt = parseFloat(document.getElementById('refund-amount').value) || 0;
+                const method = document.getElementById('refund-method').value;
+                const ref = document.getElementById('refund-ref').value.trim();
+                const reason = document.getElementById('refund-reason').value.trim() || 'Customer requested cancellation';
+
+                if (amt < 0) {
+                    alert('Refund amount cannot be negative.');
+                    return;
+                }
+
+                if (window.InventorySystem && typeof window.InventorySystem.processReservationRefund === 'function') {
+                    const result = window.InventorySystem.processReservationRefund({
+                        reservationNumber: resNum,
+                        amount: amt,
+                        method: method,
+                        refNumber: ref,
+                        reason: reason,
+                        operator: 'Admin'
+                    });
+
+                    if (result && result.success) {
+                        window.closeRefundModal();
+                        if (window.showToast) {
+                            window.showToast(`Refund of ₱${amt.toLocaleString()} processed for #${resNum}`, 'success', 4000);
+                        }
+                        renderDashboard();
+                    } else {
+                        alert('Could not process refund: ' + (result?.error || 'Unknown error'));
+                    }
+                } else {
+                    alert('Inventory system offline.');
+                }
+            };
 
             // Global Action Handlers
             window.openEdit = function (resObjNum) {

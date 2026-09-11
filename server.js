@@ -615,6 +615,57 @@ app.post('/api/paymongo/checkout', async (req, res) => {
     }
 });
 
+/* PROCESS PAYMONGO REFUND (Optional Gateway Call) */
+app.post('/api/paymongo/refund', async (req, res) => {
+    const { amount, paymentId, reason, notes } = req.body;
+
+    const mode = (process.env.PAYMONGO_MODE || 'test').toLowerCase();
+    const finalKey = mode === 'live'
+        ? (process.env.PAYMONGO_SECRET_KEY_LIVE || process.env.PAYMONGO_SECRET_KEY)
+        : (process.env.PAYMONGO_SECRET_KEY_TEST || process.env.PAYMONGO_SECRET_KEY);
+
+    if (!finalKey) {
+        return res.status(200).json({ success: false, fallback: true, message: 'PayMongo secret key not configured. Recorded as manual refund.' });
+    }
+
+    if (!paymentId) {
+        return res.status(200).json({ success: false, fallback: true, message: 'No PayMongo paymentId provided. Recorded as manual refund.' });
+    }
+
+    const amountInCentavos = Math.round(Number(amount) * 100);
+
+    try {
+        const pmRes = await fetch('https://api.paymongo.com/v1/refunds', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Basic ' + Buffer.from(finalKey + ':').toString('base64'),
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                data: {
+                    attributes: {
+                        amount: amountInCentavos,
+                        payment_id: paymentId,
+                        reason: reason || 'requested_by_customer',
+                        notes: notes || 'Roland Steakhouse refund'
+                    }
+                }
+            })
+        });
+
+        const data = await pmRes.json();
+        if (!pmRes.ok) {
+            const errMsg = data?.errors?.[0]?.detail || JSON.stringify(data);
+            return res.status(200).json({ success: false, error: errMsg, fallback: true });
+        }
+
+        res.json({ success: true, refund: data?.data });
+    } catch (err) {
+        console.error('PayMongo refund error:', err);
+        res.status(200).json({ success: false, error: err.message, fallback: true });
+    }
+});
+
 // Run locally if testing on your laptop
 if (process.env.NODE_ENV !== 'production') {
     app.listen(3000, () => console.log("Server running locally on port 3000"));

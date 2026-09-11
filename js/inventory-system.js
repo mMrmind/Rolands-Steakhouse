@@ -1091,6 +1091,14 @@
         targetRes.cancelledBy = cancelledBy;
         targetRes.cancellationReason = reason;
 
+        // Check refund eligibility
+        const isPaid = targetRes.paymentStatus === 'paid' || targetRes.paymentStatus === 'pending_check' || (Number(targetRes.paymentAmount) > 0);
+        if (isPaid && targetRes.refundStatus !== 'refunded') {
+            targetRes.refundStatus = 'pending_refund';
+        } else if (!targetRes.refundStatus) {
+            targetRes.refundStatus = 'not_applicable';
+        }
+
         // 3. Release Booked Table
         const tableId = targetRes.bookedTable;
         let tableReleased = false;
@@ -1126,7 +1134,8 @@
                 reason: reason,
                 cancelledAt: targetRes.cancelledAt,
                 stockAction: stockAction,
-                tableReleased: tableReleased
+                tableReleased: tableReleased,
+                refundStatus: targetRes.refundStatus
             };
 
             window.dispatchEvent(new CustomEvent('reservationHistoryUpdated', { detail: hist }));
@@ -1148,7 +1157,81 @@
             };
         } catch (e) {
             console.error('Error saving cancelled reservation:', e);
-            return { success: false, error: e.message };
+            return { success: false, error: 'Failed to update reservation storage' };
+        }
+    }
+
+    // ── PROCESS RESERVATION REFUND ──
+    function processReservationRefund(params) {
+        const {
+            reservationNumber,
+            amount,
+            method = 'gcash',
+            refNumber = '',
+            reason = 'Customer requested refund',
+            operator = 'Admin'
+        } = params || {};
+
+        if (!reservationNumber) return { success: false, error: 'Missing reservationNumber' };
+
+        let hist = [];
+        try {
+            const raw = localStorage.getItem('reservationHistory');
+            if (raw) hist = JSON.parse(raw);
+        } catch (e) {
+            return { success: false, error: 'Failed to read reservation history' };
+        }
+
+        const resIdx = hist.findIndex(r => r.reservationNumber === reservationNumber);
+        if (resIdx === -1) {
+            return { success: false, error: 'Reservation not found' };
+        }
+
+        const targetRes = hist[resIdx];
+        const refundAmt = Math.max(0, Number(amount) || 0);
+
+        targetRes.paymentStatus = 'refunded';
+        targetRes.refundStatus = 'refunded';
+        targetRes.refundAmount = refundAmt;
+        targetRes.refundMethod = method;
+        targetRes.refundRef = refNumber;
+        targetRes.refundReason = reason;
+        targetRes.refundedAt = new Date().toISOString();
+        targetRes.refundedBy = operator;
+
+        try {
+            localStorage.setItem('reservationHistory', JSON.stringify(hist));
+
+            logStockMovement({
+                action: 'ORDER_REFUND',
+                ingredientId: 'FINANCIAL',
+                ingredientName: `Refund #${reservationNumber}`,
+                changeQty: 0,
+                newStock: 0,
+                unit: 'PHP',
+                operator: operator,
+                notes: `Issued ${method.toUpperCase()} refund of ₱${refundAmt.toLocaleString()} for #${reservationNumber} (${reason}). Ref: ${refNumber || 'N/A'}`,
+                financialValue: -refundAmt
+            });
+
+            const payload = {
+                reservationNumber: reservationNumber,
+                refundAmount: refundAmt,
+                refundMethod: method,
+                refundRef: refNumber,
+                refundedAt: targetRes.refundedAt,
+                operator: operator
+            };
+
+            window.dispatchEvent(new CustomEvent('reservationHistoryUpdated', { detail: hist }));
+            window.dispatchEvent(new CustomEvent('reservationRefunded', { detail: payload }));
+            broadcastSync('reservationRefunded', payload);
+            broadcastSync('reservationHistoryUpdated', hist);
+
+            return { success: true, reservation: targetRes };
+        } catch (err) {
+            console.error('Error processing refund:', err);
+            return { success: false, error: err.message };
         }
     }
 
@@ -1844,6 +1927,7 @@
         markTableAvailableAndDone: markTableAvailableAndDone,
         syncMasterRecipes: syncMasterRecipes,
         cancelReservationWithFood: cancelReservationWithFood,
+        processReservationRefund: processReservationRefund,
         resetToDefaultTestInventory: resetToDefaultTestInventory
     };
 

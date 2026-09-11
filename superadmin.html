@@ -1613,6 +1613,13 @@
                         try { dateStr = new Date(r.completedAt).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }); } catch (e) { }
                     }
 
+                    let refundBadge = '';
+                    if (r.refundStatus === 'refunded' || r.paymentStatus === 'refunded') {
+                        refundBadge = `<div style="font-size:10px; color:#60a5fa; font-weight:700;">💸 REFUNDED (-₱${Number(r.refundAmount || r.paymentAmount || 0).toLocaleString()})</div>`;
+                    } else if (r.refundStatus === 'pending_refund') {
+                        refundBadge = `<div style="font-size:10px; color:#fbbf24; font-weight:700;">⚠️ REFUND PENDING</div>`;
+                    }
+
                     tr.innerHTML = `
                         <td>${isNew ? '<span class="new-badge">NEW</span>' : ''}<strong style="font-size:12px;">${r.reservationNumber || 'N/A'}</strong></td>
                         <td style="font-size:12px; color:var(--sa-muted);">${dateStr}</td>
@@ -1620,7 +1627,7 @@
                         <td style="font-size:12px;">${r.bookedTable || '—'}</td>
                         <td>${typePill}</td>
                         <td class="foods-cell"></td>
-                        <td style="color:#4ade80; font-weight:800;">₱${Number(r.paymentAmount || 0).toLocaleString()}</td>
+                        <td style="color:${(r.refundStatus === 'refunded' || r.paymentStatus === 'refunded') ? '#94a3b8' : '#4ade80'}; font-weight:800;">₱${Number(r.paymentAmount || 0).toLocaleString()}${refundBadge}</td>
                         <td><button type="button" class="danger" style="padding:4px 8px; font-size:11px;" onclick="window.deleteRecord('${r.reservationNumber}')">🗑️</button></td>
                     `;
 

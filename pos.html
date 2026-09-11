@@ -1076,6 +1076,33 @@
 
 
 
+        function getReservationPaidAmount(r) {
+            if (!r) return 0;
+            const candidates = [r.paymentAmount, r.totalBill, r.amount, r.subtotalAmount, r.depositAmt];
+            for (const val of candidates) {
+                if (val !== undefined && val !== null && val !== '') {
+                    const clean = String(val).replace(/[^0-9.]/g, '');
+                    const parsed = parseFloat(clean);
+                    if (!isNaN(parsed) && parsed > 0) return parsed;
+                }
+            }
+            // Estimate from foods list if available
+            if (Array.isArray(r.foods) && r.foods.length > 0 && typeof menuItems !== 'undefined') {
+                let estimated = 0;
+                r.foods.forEach(fStr => {
+                    const match = String(fStr).match(/^(\d+)x\s+(.+)$/);
+                    const qty = match ? parseInt(match[1]) : 1;
+                    const title = match ? match[2].trim() : String(fStr).trim();
+                    const item = menuItems.find(m => m.title && (m.title.toLowerCase() === title.toLowerCase() || title.toLowerCase().includes(m.title.toLowerCase())));
+                    if (item && item.price) {
+                        estimated += Number(item.price) * qty;
+                    }
+                });
+                if (estimated > 0) return estimated;
+            }
+            return 0;
+        }
+
         function renderOrderStatus() {
             const list = document.getElementById('pos-order-status-list');
             const history = JSON.parse(localStorage.getItem('reservationHistory') || '[]');
@@ -1114,6 +1141,7 @@
                     }
                 }
 
+                const paidVal = getReservationPaidAmount(r);
                 html += `
                     <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:15px; position:relative;">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
@@ -1122,7 +1150,7 @@
                         </div>
                         <div style="font-size:13px; color:var(--text-muted); margin-bottom:5px;">👤 ${r.customerName || 'Walk-in'} &nbsp; | &nbsp; 🪑 ${r.bookedTable || 'None'}</div>
                         <div style="display:flex; justify-content:space-between; align-items:flex-end;">
-                            <div style="font-size:13px; color:var(--text-dark); font-weight:bold;">💰 ₱${Number(r.paymentAmount).toLocaleString()}</div>
+                            <div style="font-size:13px; color:var(--text-dark); font-weight:bold;">💰 ₱${paidVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                             <div>
                                 <button onclick="billOutOrder('${r.reservationNumber}')" style="background:#f1f5f9; color:#475569; border:none; padding:6px 12px; border-radius:6px; font-size:12px; font-weight:bold; cursor:pointer; margin-right:5px;">🧾 Bill Out</button>
                                 <button onclick="editOrder('${r.reservationNumber}')" style="background:var(--primary); color:white; border:none; padding:6px 12px; border-radius:6px; font-size:12px; font-weight:bold; cursor:pointer;">✏️ Edit</button>
@@ -1293,6 +1321,38 @@
             modal.style.display = 'flex';
 
             if (res) {
+                // Check if reservation is cancelled or rejected
+                const isCancelled = res.approvalStatus === 'cancelled' ||
+                                    res.approvalStatus === 'rejected' ||
+                                    res.kdsStatus === 'cancelled' ||
+                                    res.status === 'cancelled' ||
+                                    res.isCancelled === true ||
+                                    Boolean(res.cancelledAt);
+
+                if (isCancelled) {
+                    const isRefunded = res.refundStatus === 'refunded' || res.paymentStatus === 'refunded';
+                    const refundAmt = Number(res.refundAmount || res.paymentAmount || 0);
+                    icon.textContent = '🚫';
+                    title.textContent = isRefunded ? 'Cancelled & Refunded' : 'Cancelled - Invalid Receipt';
+                    body.innerHTML = `
+                        <div style="text-align:center; margin-bottom:15px; background:${isRefunded ? '#eff6ff' : '#fef2f2'}; padding:12px; border-radius:8px; border:1.5px solid ${isRefunded ? '#bfdbfe' : '#fca5a5'}; color:${isRefunded ? '#1e40af' : '#991b1b'}; font-weight:800; font-size:14px; letter-spacing:0.5px;">
+                            ${isRefunded ? `💸 CANCELLED & REFUNDED (₱${refundAmt.toLocaleString()})` : '🚫 RESERVATION CANCELLED (INVALID)'}
+                        </div>
+                        <div style="margin-bottom:8px;">👤 <b>Customer:</b> ${res.customerName || 'N/A'}</div>
+                        <div style="margin-bottom:8px;">🪑 <b>Table:</b> ${res.bookedTable || 'None'}</div>
+                        <div style="margin-bottom:8px;">🕒 <b>Date & Time:</b> ${res.arrivalDateTimeDisplay || res.arrivalDate || 'N/A'}</div>
+                        ${isRefunded ? `
+                            <div style="margin-bottom:8px; color:#1e40af;">💰 <b>Refunded:</b> ₱${refundAmt.toLocaleString()} via ${(res.refundMethod || 'GCash').toUpperCase()}</div>
+                            ${res.refundRef ? `<div style="margin-bottom:8px; color:#1e40af;">🔖 <b>Ref #:</b> ${res.refundRef}</div>` : ''}
+                        ` : ''}
+                        ${res.cancellationReason || res.cancelReason ? `<div style="margin-bottom:8px; color:#b91c1c;">⚠️ <b>Reason:</b> ${res.cancellationReason || res.cancelReason}</div>` : ''}
+                        <div style="font-size:12px; color:#991b1b; font-weight:800; margin-top:15px; text-align:center; background:#fff1f2; padding:8px; border-radius:6px;">
+                            ❌ VOID: THIS RESERVATION IS CANCELLED & CANNOT BE CLAIMED
+                        </div>
+                    `;
+                    return;
+                }
+
                 if (res.isVerified) {
                     icon.textContent = '⚠️';
                     title.textContent = 'Already Verified';
@@ -1306,8 +1366,12 @@
                         <div style="font-size:12px; color:#9a3412; font-weight:600; margin-top:15px; text-align:center;">FRAUD PROTECTION ACTIVE</div>
                     `;
                 } else {
+                    const paidAmt = getReservationPaidAmount(res);
                     history[resIndex].isVerified = true;
                     history[resIndex].verifiedAt = new Date().toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
+                    if (history[resIndex].paymentAmount == null) {
+                        history[resIndex].paymentAmount = paidAmt;
+                    }
                     localStorage.setItem('reservationHistory', JSON.stringify(history));
 
                     icon.textContent = '✅';
@@ -1316,7 +1380,7 @@
                         <div style="margin-bottom:10px;">👤 <b>Customer:</b> ${res.customerName}</div>
                         <div style="margin-bottom:10px;">🍽️ <b>Items:</b> ${res.foods?.join(', ') || 'None'}</div>
                         <div style="margin-bottom:10px;">🪑 <b>Table:</b> ${res.bookedTable}</div>
-                        <div style="margin-bottom:10px;">💰 <b>Paid:</b> ₱${Number(res.paymentAmount).toLocaleString()}</div>
+                        <div style="margin-bottom:10px;">💰 <b>Paid:</b> ₱${paidAmt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                         <div style="font-size:12px; color:var(--primary); font-weight:bold; margin-top:15px; text-align:center;">VERIFICATION COMPLETE</div>
                     `;
                 }

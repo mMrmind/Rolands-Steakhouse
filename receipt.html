@@ -126,12 +126,13 @@
         let arrivalDisplay = localStorage.getItem('arrivalDateTimeDisplay') || new Date().toLocaleString('en-GB', { hour12: false });
 
         if (urlRes) {
+            reservationNumber = urlRes;
             const hist = JSON.parse(localStorage.getItem('reservationHistory') || '[]');
             const myRes = hist.find(r => r.reservationNumber === urlRes);
             if (myRes) {
                 name = myRes.customerName || 'Valued Guest';
                 table = myRes.bookedTable || 'TBD';
-                total = myRes.paymentAmount || '0';
+                total = myRes.paymentAmount || myRes.totalBill || myRes.amount || myRes.subtotalAmount || '0';
                 orders = (myRes.foods && myRes.foods.length) ? myRes.foods.join(', ') : (myRes.orderSummary || 'Standard Reservation');
                 reservationNumber = myRes.reservationNumber;
                 arrivalDisplay = myRes.arrivalDateTimeDisplay || new Date().toLocaleString('en-GB', { hour12: false });
@@ -139,10 +140,11 @@
         }
 
         // Fill receipt
+        const cleanTotal = parseFloat(String(total || '0').replace(/[^0-9.]/g, '')) || 0;
         if (document.getElementById('order-num')) document.getElementById('order-num').textContent = reservationNumber;
         if (document.getElementById('customer-name')) document.getElementById('customer-name').textContent = name;
         if (document.getElementById('table-id')) document.getElementById('table-id').textContent = table;
-        if (document.getElementById('total-amount')) document.getElementById('total-amount').textContent = Number(total).toLocaleString();
+        if (document.getElementById('total-amount')) document.getElementById('total-amount').textContent = cleanTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         if (document.getElementById('date-now')) document.getElementById('date-now').textContent = arrivalDisplay;
 
         // Fill order items
@@ -164,20 +166,31 @@
         const qrContainer = document.getElementById("qrcode");
         if (qrContainer) {
             qrContainer.innerHTML = '';
-            new QRCode(qrContainer, {
-                text: reservationNumber,
-                width: 120,
-                height: 120,
-                colorDark: "#1e293b",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-            });
+            if (typeof QRCode !== 'undefined') {
+                new QRCode(qrContainer, {
+                    text: reservationNumber || 'TBD',
+                    width: 120,
+                    height: 120,
+                    colorDark: "#1e293b",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            } else {
+                // Fallback QR generator if CDN script failed or offline
+                const qrImg = document.createElement('img');
+                qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(reservationNumber || 'TBD')}`;
+                qrImg.alt = 'QR Code';
+                qrImg.style.width = '120px';
+                qrImg.style.height = '120px';
+                qrContainer.appendChild(qrImg);
+            }
+        }
         // Check if reservation is cancelled
         const hist = JSON.parse(localStorage.getItem('reservationHistory') || '[]');
         const currentRes = hist.find(r => r.reservationNumber === reservationNumber);
         const cancelBtn = document.getElementById('btn-cancel-reservation-receipt');
 
-        const isCancelled = currentRes && (currentRes.approvalStatus === 'rejected' || currentRes.approvalStatus === 'cancelled' || currentRes.kdsStatus === 'cancelled');
+        const isCancelled = currentRes && (currentRes.approvalStatus === 'rejected' || currentRes.approvalStatus === 'cancelled' || currentRes.kdsStatus === 'cancelled' || currentRes.status === 'cancelled' || currentRes.isCancelled === true || Boolean(currentRes.cancelledAt));
         const isCompleted = currentRes && (Boolean(currentRes.completedAt) || currentRes.approvalStatus === 'completed' || currentRes.kdsStatus === 'served');
 
         if (isCancelled || isCompleted) {
@@ -187,10 +200,31 @@
         if (isCancelled) {
             const paper = document.getElementById('receipt-capture-area');
             if (paper) {
+                const isRefunded = currentRes.refundStatus === 'refunded' || currentRes.paymentStatus === 'refunded';
+                const isRefundPending = currentRes.refundStatus === 'pending_refund';
+                const refundAmt = Number(currentRes.refundAmount || currentRes.paymentAmount || 0);
+
                 const stamp = document.createElement('div');
-                stamp.style.cssText = 'border:3px solid #dc2626; color:#dc2626; font-size:24px; font-weight:900; text-transform:uppercase; letter-spacing:3px; padding:8px 16px; border-radius:8px; text-align:center; margin:16px auto; width:fit-content; transform:rotate(-5deg);';
-                stamp.textContent = 'CANCELLED';
+                stamp.style.cssText = `border:3px solid ${isRefunded ? '#2563eb' : '#dc2626'}; color:${isRefunded ? '#2563eb' : '#dc2626'}; font-size:22px; font-weight:900; text-transform:uppercase; letter-spacing:2px; padding:8px 16px; border-radius:8px; text-align:center; margin:16px auto; width:fit-content; transform:rotate(-5deg);`;
+                stamp.textContent = isRefunded ? 'CANCELLED - REFUNDED' : (isRefundPending ? 'CANCELLED - REFUND PENDING' : 'CANCELLED - INVALID');
                 paper.insertBefore(stamp, paper.firstChild);
+
+                if (isRefunded) {
+                    const refCard = document.createElement('div');
+                    refCard.style.cssText = 'background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:10px 12px; margin:12px 0; font-size:12px; color:#1e40af; line-height:1.4;';
+                    refCard.innerHTML = `
+                        <strong>💸 Refund Processed:</strong> ₱${refundAmt.toLocaleString(undefined, { minimumFractionDigits: 2 })} via ${(currentRes.refundMethod || 'GCash').toUpperCase()}
+                        ${currentRes.refundRef ? `<br><span>Ref: ${currentRes.refundRef}</span>` : ''}
+                    `;
+                    paper.insertBefore(refCard, paper.children[1] || null);
+                } else if (isRefundPending) {
+                    const refCard = document.createElement('div');
+                    refCard.style.cssText = 'background:#fef3c7; border:1px solid #fde68a; border-radius:8px; padding:10px 12px; margin:12px 0; font-size:12px; color:#92400e; line-height:1.4;';
+                    refCard.innerHTML = `
+                        <strong>⚠️ Refund Status:</strong> Your cancellation was recorded. Our staff is processing your refund of ₱${refundAmt.toLocaleString(undefined, { minimumFractionDigits: 2 })}.
+                    `;
+                    paper.insertBefore(refCard, paper.children[1] || null);
+                }
             }
         }
 
